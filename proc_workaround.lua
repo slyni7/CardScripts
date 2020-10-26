@@ -1,41 +1,43 @@
 --Utilities to be added to the core
 
-local chaininfos={}
-function Duel.SetPossibleOperationInfo(chain,category,obj,count,playerid,param)
-	local maxchain=Duel.GetCurrentChain()
-	if maxchain==0 then return end
-	if chain==0 or chain>maxchain then
-		chain=maxchain
+if not Duel.SetPossibleOperationInfo then
+	local chaininfos={}
+	function Duel.SetPossibleOperationInfo(chain,category,obj,count,playerid,param)
+		local maxchain=Duel.GetCurrentChain()
+		if maxchain==0 then return end
+		if chain==0 or chain>maxchain then
+			chain=maxchain
+		end
+		local t=chaininfos[chain] or {}
+		t[category]={obj,count or 0,playerid or 0,param or 0}
+		chaininfos[chain]=t
 	end
-	local t=chaininfos[chain] or {}
-	t[category]={obj,count or 0,playerid or 0,param or 0}
-	chaininfos[chain]=t
-end
-function Duel.GetPossibleOperationInfo(chain,category,obj,count,playerid,param)
-	local maxchain=Duel.GetCurrentChain()
-	if maxchain==0 then return end
-	if chain==0 or chain>maxchain then
-		chain=maxchain
+	function Duel.GetPossibleOperationInfo(chain,category,obj,count,playerid,param)
+		local maxchain=Duel.GetCurrentChain()
+		if maxchain==0 then return end
+		if chain==0 or chain>maxchain then
+			chain=maxchain
+		end
+		if not chaininfos[chain] or not chaininfos[chain][category] then return false end
+		return true,table.unpack(chaininfos[chain][category])
 	end
-	if not chaininfos[chain] or not chaininfos[chain][category] then return false end
-	return true,table.unpack(chaininfos[chain][category])
-end
-local regcleareff=function()
-local opeff=Effect.GlobalEffect()
-opeff:SetCode(EVENT_CHAIN_END)
-opeff:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-opeff:SetOperation(function()chaininfos={} end)
-opeff:SetProperty(EFFECT_FLAG_CANNOT_NEGATE+EFFECT_CANNOT_DISABLE)
-Duel.RegisterEffect(opeff,0)
-end
-regcleareff()
-Debug.ReloadFieldBegin=(function()
-	local reloadfieldbegin=Debug.ReloadFieldBegin
-	return function(...)
-		reloadfieldbegin(...)
-		regcleareff()
+	local regcleareff=function()
+	local opeff=Effect.GlobalEffect()
+	opeff:SetCode(EVENT_CHAIN_END)
+	opeff:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	opeff:SetOperation(function()chaininfos={} end)
+	opeff:SetProperty(EFFECT_FLAG_CANNOT_NEGATE+EFFECT_CANNOT_DISABLE)
+	Duel.RegisterEffect(opeff,0)
 	end
-end)()
+	regcleareff()
+	Debug.ReloadFieldBegin=(function()
+		local reloadfieldbegin=Debug.ReloadFieldBegin
+		return function(...)
+			reloadfieldbegin(...)
+			regcleareff()
+		end
+	end)()
+end
 
 
 function Card.IsInMainMZone(c,tp)
