@@ -1,4 +1,5 @@
 --エクシーズ・リベンジ
+--Xyz Revenge
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
@@ -34,7 +35,7 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then
-		local g1=Duel.GetOverlayGroup(tp,0,1)
+		local g1=Duel.GetOverlayGroup(tp,0,1):Filter(Card.IsCanBeOverlay,nil,tp)
 		if #g1==0 then return end
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,0))
