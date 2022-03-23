@@ -1682,6 +1682,8 @@ function Auxiliary.SelectEffect(tp,...)
     return sel[Duel.SelectOption(tp,table.unpack(eff))+1]
 end
 
+Card.IsCanBeOverlay=Card.IsCanOverlay
+
 Duel.LoadScript("cards_specific_functions.lua")
 Duel.LoadScript("proc_fusion.lua")
 Duel.LoadScript("proc_fusion_spell.lua")
