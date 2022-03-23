@@ -67,8 +67,9 @@ function s.spop1(e,tp,eg,ep,ev,re,r,rp)
 		sc:CompleteProcedure()
 	end
 end
-function s.spfilter3(c,e)
-	return (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and c:IsSetCard(0x20dc) and c:IsType(TYPE_XYZ) and c:IsCanBeEffectTarget(e)
+function s.spfilter3(c,e,tp)
+	return (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and c:IsSetCard(0x20dc)
+		and c:IsType(TYPE_XYZ) and c:IsCanBeOverlay(tp) and c:IsCanBeEffectTarget(e)
 end
 function s.spfilter4(c,e,tp,rp)
 	return c:IsCode(84025439) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCountFromEx(tp,rp,nil,c)>0
@@ -92,6 +93,8 @@ function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local sc=sg:GetFirst()
 	if sc and Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local g=Duel.GetTargetCards(e):Match(aux.NOT(Card.IsImmuneToEffect),nil,e)
-		Duel.Overlay(sc,g)
+		if #g:Match(Card.IsCanBeOverlay,nil,tp)>0 then
+			Duel.Overlay(sc,g)
+		end
 	end
 end
