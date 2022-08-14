@@ -1,6 +1,5 @@
 --楽姫の独演
 --Music Maiden's Solo Performance
-
 local s,id=GetID()
 function s.initial_effect(c)
 	--Negate opponent monster's attack
@@ -12,19 +11,13 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function s.filter(c)
-	return c:IsType(TYPE_MONSTER)
-end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetMatchingGroupCountRush(s.filter,e:GetHandler():GetControler(),LOCATION_MZONE,0,nil)==1
-	and Duel.GetTurnPlayer()==1-tp and Duel.GetAttacker():IsLevelBelow(8)
+	local at=Duel.GetAttacker()
+	return Duel.GetMatchingGroupCountRush(Card.IsType,tp,LOCATION_MZONE,0,nil,TYPE_MONSTER)==1
+		and at:IsControler(1-tp) and at:IsLevelBelow(8)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetChainLimit(s.chlimit)
-end
-function s.chlimit(e,ep,tp)
-	return not e:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	--Effect

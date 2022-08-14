@@ -1009,11 +1009,7 @@ function Card.GetToBeLinkedZone(tc,c,tp,clink,emz)
 	return zone
 end
 function Group.GetToBeLinkedZone(g,c,tp,clink,emz)
-	local zone=0
-	for tc in aux.Next(g) do
-		zone=zone|tc:GetToBeLinkedZone(c,tp,clink,emz)
-	end
-	return zone
+	return g:GetBitwiseOr(Card.GetToBeLinkedZone,c,tp,clink,emz)
 end
 function Auxiliary.ResetEffects(g,eff)
 	for c in aux.Next(g) do
@@ -1541,7 +1537,7 @@ Function to simplify registering EFFECT_FLAG_CLIENT_HINT to players
 -str: the string called;
 -reset: additional resets, other than RESET_PHASE+PHASE_END
 ]]
-function Auxiliary.RegisterClientHint(card,property,tp,player1,player2,str,reset)
+function Auxiliary.RegisterClientHint(card,property,tp,player1,player2,str,reset,ct)
 	if card then
 	if not property then property=0 end
 	if not reset then reset=0 end
@@ -1553,7 +1549,8 @@ function Auxiliary.RegisterClientHint(card,property,tp,player1,player2,str,reset
 		else
 			eff:SetDescription(aux.Stringid(card:GetOriginalCode(),1))
 		end
-		eff:SetReset(RESET_PHASE+PHASE_END|reset)
+		if ct==nil then ct=1 end
+		eff:SetReset(RESET_PHASE+PHASE_END|reset,ct)
 		Duel.RegisterEffect(eff,tp)
 	end
 end
