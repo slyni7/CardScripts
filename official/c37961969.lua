@@ -1,5 +1,5 @@
 -- ティアラメンツ・ハゥフニス
--- Tearalaments Haufenis
+-- Tearalaments Havnis
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	-- Fusion Summon
-	local fusparams={nil,Card.IsAbleToDeck,s.extramat,s.extraop,Fusion.ForcedHandler}
+	local fusparams = {matfilter=Card.IsAbleToDeck,extrafil=s.extramat,extraop=s.extraop,gc=Fusion.ForcedHandler,extratg=s.extratarget}
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
@@ -24,12 +24,10 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(function(e) return e:GetHandler():IsReason(REASON_EFFECT) end)
-	e2:SetTarget(Fusion.SummonEffTG(table.unpack(fusparams)))
-	e2:SetOperation(Fusion.SummonEffOP(table.unpack(fusparams)))
+	e2:SetCondition(function(e) return Duel.GetCurrentPhase()~=PHASE_DAMAGE and e:GetHandler():IsReason(REASON_EFFECT) end)
+	e2:SetTarget(Fusion.SummonEffTG(fusparams))
+	e2:SetOperation(Fusion.SummonEffOP(fusparams))
 	c:RegisterEffect(e2)
-	if not GhostBelleTable then GhostBelleTable={} end
-	table.insert(GhostBelleTable,e2)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and re:IsActiveType(TYPE_MONSTER) and re:GetActivateLocation()==LOCATION_MZONE
@@ -51,9 +49,15 @@ end
 function s.extramat(e,tp,mg)
 	return Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_GRAVE,0,nil)
 end
+function s.extratarget(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,tp,LOCATION_HAND+LOCATION_MZONE+LOCATION_GRAVE)
+end
 function s.extraop(e,tc,tp,sg)
 	local gg=sg:Filter(Card.IsLocation,nil,LOCATION_HAND+LOCATION_GRAVE)
 	if #gg>0 then Duel.HintSelection(gg,true) end
+	local rg=sg:Filter(Card.IsFacedown,nil)
+	if #rg>0 then Duel.ConfirmCards(1-tp,rg) end
 	Duel.SendtoDeck(sg,nil,SEQ_DECKBOTTOM,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
 	local dg=Duel.GetOperatedGroup():Filter(Card.IsLocation,nil,LOCATION_DECK)
 	local ct=dg:FilterCount(Card.IsControler,nil,tp)

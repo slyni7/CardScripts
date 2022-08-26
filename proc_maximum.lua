@@ -12,6 +12,19 @@ end
 if not Maximum then
 	Maximum = aux.MaximumProcedure
 end
+function Debug.AddMaximumCard(player,center,left,right)
+	local c=Debug.AddCard(center,player,player,LOCATION_MZONE,2,POS_FACEUP_ATTACK,true)
+	c:RegisterFlagEffect(FLAG_MAXIMUM_CENTER,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
+	c:RegisterFlagEffect(FLAG_MAXIMUM_CENTER_PREONFIELD,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD-RESET_TOGRAVE-RESET_LEAVE,0,1)
+
+	local l=Debug.AddCard(left,player,player,LOCATION_MZONE,1,POS_FACEUP_ATTACK,true)
+	local r=Debug.AddCard(right,player,player,LOCATION_MZONE,3,POS_FACEUP_ATTACK,true)
+	--side
+	for _,tc in ipairs({l,r}) do
+		tc:RegisterFlagEffect(FLAG_MAXIMUM_SIDE,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
+		tc:RegisterFlagEffect(FLAG_MAXIMUM_SIDE_PREONFIELD,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD-RESET_TOGRAVE-RESET_LEAVE,0,1)
+	end
+end
 --Maximum Summon
 function Maximum.AddProcedure(c,desc,...)
 	local mats={...}
@@ -63,6 +76,12 @@ function Maximum.AddProcedure(c,desc,...)
 	e4:SetCondition(Maximum.battlecon)
 	e4:SetOperation(Maximum.battleop)
 	c:RegisterEffect(e4)
+	--makes so it virtually cannot have any DEF
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_UPDATE_DEFENSE)
+	e5:SetValue(-1000000)
+	c:RegisterEffect(e5)
 end
 --that function check if you can maximum summon the monster and its other part(s)
 function Maximum.Condition(mats)
@@ -207,6 +226,11 @@ function Card.AddSideMaximumHandler(c,eff)
 	e1:SetCode(EFFECT_SET_BASE_ATTACK)
 	e1:SetValue(Maximum.maxCenterVal(Card.GetMaximumAttack))
 	c:RegisterEffect(e1)
+
+	local e0=baseeff:Clone()
+	e0:SetCode(EFFECT_SET_ATTACK_FINAL)
+	e0:SetValue(Maximum.maxCenterVal(Card.GetAttack))
+	c:RegisterEffect(e0)
 	
 	--change level
 	local e2=baseeff:Clone()
@@ -296,7 +320,7 @@ end
 
 --functions to handle counting monsters but without the side Maximum monsters (the L/R max monsters are subtracted from the count)
 function Duel.GetMatchingGroupCountRush(f,tp,LOCP1,LOCP2,exclude,...)
-	local maxi=Duel.GetMatchingGroupCount(aux.FilterMaximumSideFunction(f),tp,LOCP1,LOCP2,exclude,...)
+	local maxi=Duel.GetMatchingGroupCount(aux.FilterMaximumSideFunction(f,...),tp,LOCP1,LOCP2,exclude)
 	return Duel.GetMatchingGroupCount(f,tp,LOCP1,LOCP2,exclude,...)-maxi
 end
 --function that return only the side monsters
@@ -315,13 +339,17 @@ function Auxiliary.FilterMaximumSideFunctionEx(f,...)
 				and f(target,table.unpack(params))
 			end
 end
+--function used only in Duel.GetFieldGroupCountRush because the old implementation did not want to work
+function Maximum.GroupCountFunction(c)
+	return ((not c:IsMaximumMode()) or (not (c:IsMaximumMode() and not c:IsMaximumModeCenter()))) 
+end
 -- function that return the count of a location P1 et P2 minus the Maximum Side
 function Duel.GetFieldGroupCountRush(player, p1, p2)
 	return Duel.GetMatchingGroupCount(Maximum.GroupCountFunction,player,p1,p2,nil)
 end
---function used only in Duel.GetFieldGroupCountRush because the old implementation did not wanted to work
-function Maximum.GroupCountFunction(c)
-	return ((not c:IsMaximumMode()) or (not (c:IsMaximumMode() and not c:IsMaximumModeCenter()))) 
+--Function that returns the same as GetMatchingGroup, but removes L/R Maximum mode monsters from the group
+function Duel.GetMatchingGroupRush(f,player,loc1,loc2,exc,...)
+	return Duel.GetMatchingGroup(Auxiliary.FilterMaximumSideFunctionEx(f,...),player,loc1,loc2,exc)
 end
 --function that add every parts of the Maximum Mode monster to the group
 function Group.AddMaximumCheck(group)
@@ -583,8 +611,18 @@ end
 
 --Double tribute handler
 FLAG_NO_TRIBUTE=160001029
-function Card.AddDoubleTribute(c,id,otfilter,eftg)
-	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+FLAG_DOUBLE_TRIB=160009052 --Executie up
+FLAG_DOUBLE_TRIB_DRAGON=160402002 --righteous dragon
+FLAG_DOUBLE_TRIB_FIRE=160007025 --dododo second
+FLAG_DOUBLE_TRIB_WINGEDBEAST=160005033 --blasting bird
+FLAG_DOUBLE_TRIB_LIGHT=160414001 --ultimate flag beast surge bicorn
+FLAG_DOUBLE_TRIB_MACHINE=160414002
+FLAG_DOUBLE_TRIB_DARK=160317015 --Voidvelgr Globule
+FLAG_DOUBLE_TRIB_GALAXY=160317115
+function Card.AddDoubleTribute(c,id,otfilter,eftg,reset,...)
+	for i,flag in ipairs{...} do
+		c:RegisterFlagEffect(flag,reset,0,1)
+	end
 	local e1=aux.summonproc(c,true,true,1,1,SUMMON_TYPE_TRIBUTE,aux.Stringid(id,0),otfilter)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
@@ -592,11 +630,32 @@ function Card.AddDoubleTribute(c,id,otfilter,eftg)
 	e2:SetTargetRange(LOCATION_HAND,0)
 	e2:SetTarget(eftg)
 	e2:SetLabelObject(e1)
-	e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	if reset~=0 then e2:SetReset(reset) end
 	c:RegisterEffect(e2)
 end
 function aux.DoubleTributeCon(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsPlayerAffectedByEffect(tp,FLAG_NO_TRIBUTE)
+end
+--function to check if the monster have the flag for double tribute (used in otfilter)
+function Card.CanBeDoubleTribute(c,...)
+	if c:GetFlagEffect(FLAG_DOUBLE_TRIB)~=0 then return false end
+	local totalFlags=0
+	for i,flag in ipairs{...} do
+		totalFlags=totalFlags+flag
+		if c:GetFlagEffect(flag)~=0 then return false end
+	end
+	if c:GetFlagEffect(totalFlags)~=0 then return false end
+	return true
+end
+--function to check if the monster can get the corresponding double tribute flags
+--explanation: you can use Executie up on a monster like Rightous dragon that used its own effect to become a double tribute for dragon, it then become usable as 2 tribute for any monsters not just dragon
+--but the opposite scenario don't work, if you used executie up on a Righteous dragon making it a double tribute for any monster, you can't activate righteous dragon effect
+function Card.IsDoubleTribute(c,...)
+	--check for each individual flag
+	for i,flag in ipairs{...} do
+		if c:GetFlagEffect(flag)==0 then return false end
+	end
+	return true
 end
 function Card.AddNoTributeCheck(c,id,stringid,rangeP1,rangeP2)
 	local e1=Effect.CreateEffect(c)

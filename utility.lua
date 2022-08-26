@@ -435,54 +435,58 @@ function Auxiliary.IsMaterialListCode(c,...)
 	end
 	return false
 end
+local function MatchSetcode(set_code,to_match)
+	return (set_code&0xfff)==(to_match&0xfff) and (set_code&to_match)==set_code;
+end
 function Auxiliary.IsMaterialListSetCard(c,...)
 	if not c.material_setcode then return false end
 	local setcodes={...}
 	for _,setcode in ipairs(setcodes) do
 		if type(c.material_setcode)=='table' then
 			for _,v in ipairs(c.material_setcode) do
-				if v==setcode then return true end
+				if MatchSetcode(setcode,v) then return true end
 			end
 		else
-			if c.material_setcode==setcode then return true end
+			if MatchSetcode(setcode,c.material_setcode) then return true end
 		end
 	end
 	return false
 end
 --Returns true if the Card "c" specifically lists any of the card IDs in "..."
 function Auxiliary.IsCodeListed(c,...)
-	if not c.listed_names then return false end
-	local codes={...}
-	for _,code in ipairs(codes) do
-		for _,ccode in ipairs(c.listed_names) do
-			if code==ccode then return true end
+	if c.listed_names then
+		local codes={...}
+		for _,wanted in ipairs(codes) do
+			for _,cardcode in ipairs(c.listed_names) do
+				if wanted==cardcode then return true end
+			end
+		end
+	elseif c.fit_monster then
+		local codes={...}
+		for _,wanted in ipairs(codes) do
+			for _,listed in ipairs(c.fit_monster) do
+				if wanted==listed then return true end
+			end
 		end
 	end
 	return false
 end
 --Returns true if the Card "c" specifically lists the name of a card that is part of an archetype in "..."
-Auxiliary.IsArchetypeCodeListed=(function()
-	local sc=Debug.AddCard(946,0,0,0,0,0)
-	Debug.ReloadFieldBegin=(function()
-		local old=Debug.ReloadFieldBegin
-		return function(...)
-				old(...)
-				sc=Debug.AddCard(946,0,0,0,0,0)
-			end
-		end
-	)()
-	return function(c,...)
-		if not c.listed_names then return false end
-		local setcodes={...}
-		for _,ccode in ipairs(c.listed_names) do
-			sc:Recreate(ccode)
+function Auxiliary.IsArchetypeCodeListed(c,...)
+	if not c.listed_names then return false end
+	local setcodes={...}
+	for _,cardcode in ipairs(c.listed_names) do
+		local match_setcodes={Duel.GetCardSetcodeFromCode(cardcode)}
+		if #match_setcodes>0 then
 			for _,setcode in ipairs(setcodes) do
-				if sc:IsSetCard(setcode) then return true end
+				for _,to_match in ipairs(match_setcodes) do
+					if MatchSetcode(setcode,to_match) then return true end
+				end
 			end
 		end
-		return false
 	end
-end)()
+	return false
+end
 --Returns true if the Card "c" specifically lists any of the card types in "..."
 function Auxiliary.IsCardTypeListed(c,...)
 	if not c.listed_card_types then return false end
@@ -631,9 +635,9 @@ function Auxiliary.cannotmatfilter(val1,...)
 	return function(e,c,sumtype,tp)
 		local sum=tot&sumtype
 		for _,val in pairs(allowed) do
-			if sum==val then return 1 end
+			if sum==val then return true end
 		end
-		return 0
+		return false
 	end
 end
 --effects inflicting damage to tp
@@ -1256,24 +1260,21 @@ function Duel.GetZoneWithLinkedCount(count,tp)
 end
 --Checks whether a card (c) has an effect that mentions a certain type of counter
 --This includes adding, removing, gaining ATK/DEF per counter, etc.
-function aux.HasCounterListed(c,counter_type)
-	if c.counter_list or c.counter_place_list then
-		if c.counter_place_list then
-			--if it generates, it always manipulates
-			for _,ccounter in ipairs(c.counter_place_list) do
-				if counter_type==ccounter then return true end
-			end
-		else
-			for _,ccounter in ipairs(c.counter_list) do
-				if counter_type==ccounter then return true end
-			end
+function Auxiliary.HasCounterListed(c,counter_type)
+	if c.counter_list then
+		for _,ccounter in ipairs(c.counter_list) do
+			if counter_type==ccounter then return true end
 		end
-	else
-		return false
+	elseif c.counter_place_list then
+		--if it places counters, it always lists them
+		for _,ccounter in ipairs(c.counter_place_list) do
+			if counter_type==ccounter then return true end
+		end
 	end
+	return false
 end
 --Checks whether a card (c) has an effect that places a certain type of counter
-function aux.CanPlaceCounter(c,counter_type)
+function Auxiliary.CanPlaceCounter(c,counter_type)
 	if not c.counter_place_list then return false end
 	for _,ccounter in ipairs(c.counter_place_list) do
 		if counter_type==ccounter then return true end
@@ -1677,15 +1678,142 @@ end
 --and makes the player choose among the strings whose conditions are met
 --it returns the index of the choosen element starting from 1, nil if none was selected
 function Auxiliary.SelectEffect(tp,...)
-    local eff,sel={},{}
-    for i,val in ipairs({...}) do
-        if val[1] then
-            table.insert(eff,val[2])
-            table.insert(sel,i)
-        end
-    end
-    if #eff==0 then return nil end
-    return sel[Duel.SelectOption(tp,table.unpack(eff))+1]
+	local eff,sel={},{}
+	for i,val in ipairs({...}) do
+		if val[1] then
+			table.insert(eff,val[2])
+			table.insert(sel,i)
+		end
+	end
+	if #eff==0 then return nil end
+	return sel[Duel.SelectOption(tp,table.unpack(eff))+1]
+end
+
+function Auxiliary.CheckPendulumZones(player)
+	return Duel.CheckLocation(player,LOCATION_PZONE,0) or Duel.CheckLocation(player,LOCATION_PZONE,1)
+end
+
+--[[
+Returns the zone values (bitfield mask) of the Main Monster Zones on the field of "target_player"
+that are pointed to by any Link Cards, which match the "by_filter" function/filter, in the locations "player_location"
+and "oppo_location", from the perspective of "player".
+
+- The first parameter, "player", is mandatory, all other parameters are optional, to use the default value of a parameter just pass it as nil.
+- The filter by default checks that the card is face-up and is a Link Card, any additional check (e.g. archetype) is added onto that.
+- Both locations default to LOCATION_MZONE if not provided since most cards care about zones that any Link Monster points to, if you want to
+include Link Spells then use LOCATION_ONFIELD, or LOCATION_SZONE to exclude Link Monsters and check for Link Spells only.
+- The second location defaults to the first one if not provided, if you want to not count a side of the field then you need to specifically pass 0 for that location.
+- "target_player" defaults to "player" if not provided.
+- Any additional parameters that "by_filter" might need can be passed to this function as "..." after "target_player".
+--]]
+local function link_card_filter(c,f,...)
+	return c:IsFaceup() and c:IsType(TYPE_LINK) and (not f or f(c,...))
+end
+function Auxiliary.GetMMZonesPointedTo(player,by_filter,player_location,oppo_location,target_player,...)
+	local loc1=player_location==nil and LOCATION_MZONE or player_location
+	local loc2=oppo_location==nil and loc1 or oppo_location
+	target_player=target_player==nil and player or target_player
+	return Duel.GetMatchingGroup(link_card_filter,player,loc1,loc2,nil,by_filter,...):GetLinkedZone(target_player)&0x1f
+end
+
+--[[
+	Performs an operation to a card(s) each time a given phase is entered.
+	Returns the effect that would perform the operation, or nil if no card/group or an empty group is passed.
+
+		Card|Group card_or_group: the cards that will be affected
+		int phase: the phase when `oper` will be applied to the banished cards
+		int flag: a unique integer to be registered as a flag on the affected cards
+		Effect e: the effect performing the banishment
+		int tp: the player performing the banishment, and will later perform `oper`
+		function oper: a function with the signature (ag,e,tp,eg,ep,ev,re,r,rp)
+			where `ag` is the group of affected cards
+		function|nil cond: an additional condition function with the signature (ag,e,tp,eg,ep,ev,re,r,rp).
+			`ag` is already checked if it's not empty.
+		int|nil reset: the reset value. If not passed, the reset will be `RESET_PHASE+phase`.
+		int|nil reset_count: how many times the reset value must happen.
+			If not passed, the count will be 1.
+		int|nil hint: a string to show on the affected cards
+--]]
+function Auxiliary.DelayedOperation(card_or_group,phase,flag,e,tp,oper,cond,reset,reset_count,hint)
+	local g=(type(card_or_group)=="Group" and card_or_group or Group.FromCards(card_or_group))
+	if #g==0 then return end
+	reset=reset or (RESET_PHASE+phase)
+	reset_count=reset_count or 1
+	local fid=e:GetFieldID()
+	local flagprop=hint and EFFECT_FLAG_CLIENT_HINT or 0
+	for tc in g:Iter() do
+		tc:RegisterFlagEffect(flag,RESET_EVENT+RESETS_STANDARD+reset,flagprop,reset_count,fid,hint)
+	end
+	g:KeepAlive()
+	local function get_affected_group()
+		return g:Filter(function(c) return c:GetFlagEffectLabel(flag)==fid end,nil)
+	end
+	--Apply operation
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PHASE|phase)
+	e1:SetReset(reset,resetcount)
+	e1:SetCountLimit(1)
+	e1:SetLabelObject(g) --in case something needs access to it after registry (e.g. when overwriting oper and cond) 
+	e1:SetCondition(function(...)
+		local ag=get_affected_group()
+		return #ag>0 and (not cond or cond(ag,...))
+	end)
+	e1:SetOperation(function(...)
+		if oper then oper(get_affected_group(),...) end
+	end)
+	Duel.RegisterEffect(e1,tp)
+	return e1
+end
+
+--[[
+	Banishes card(s) and performs an operation to them in a given phase (usually return them to their current location).
+	Returns the effect that would perform the operation if a card is successfully banished, otherwise returns nil.
+
+		Card|Group card_or_group: the cards to banish
+		int|nil pos: the cards' position when banished. `nil` will use their current position
+		int reason: the reason for banishing
+		int phase: the phase when `oper` will be applied to the banished cards
+		int flag: a unique integer to be registered as a flag on the affected cards
+		Effect e: the effect performing the banishment
+		int tp: the player performing the banishment, and will later perform `oper`
+		function oper: a function with the signature (rg,e,tp,eg,ep,ev,re,r,rp)
+			where `rg` is the group of cards that can be returned
+		function|nil cond: an additional condition function with the signature (rg,e,tp,eg,ep,ev,re,r,rp).
+			`rg` is already checked if it's not empty
+		int|nil reset: the reset value. If not passed, the reset will be `RESET_PHASE+phase`.
+		int|nil reset_count: how many times the reset value must happen.
+			If not passed, the count will be 1.
+		int|nil hint: a string to show on the affected cards
+--]]
+function Auxiliary.RemoveUntil(card_or_group,pos,reason,phase,flag,e,tp,oper,cond,reset,reset_count,hint)
+	local g=(type(card_or_group)=="Group" and card_or_group or Group.FromCards(card_or_group))
+	if #g>0 and Duel.Remove(g,pos,reason|REASON_TEMPORARY)>0 and #g:Match(Card.IsLocation,nil,LOCATION_REMOVED)>0 then
+		return aux.DelayedOperation(g,phase,flag,e,tp,oper,cond,reset,reset_count,hint)
+	end
+end
+
+--[[
+	An operation function to be used with `aux.RemoveUntil`.
+	Will return the banished cards to the monster zone.
+	Makes the player select cards to return if there are less available zones than returnable cards.
+--]]
+function Auxiliary.DefaultFieldReturnOp(rg,e,tp)
+	if #rg==0 then return end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE,0)
+	local tg=nil
+	if ft>0 and #rg>ft then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+		tg=rg:Select(tp,ft,ft,nil)
+	else
+		tg=rg:Clone()
+	end
+	for tc in tg:Iter() do
+		Duel.ReturnToField(tc)
+	end
+	for tc in rg:Sub(tg):Iter() do
+		Duel.ReturnToField(tc)
+	end
 end
 
 Duel.LoadScript("cards_specific_functions.lua")

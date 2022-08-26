@@ -69,8 +69,8 @@ if not AnimeArchetype then
 	Card.IsAssassin=MakeCheck({0x504},AnimeArchetype.OCGAssassin)
 
 	-- Astral アストラル
-	-- Astral Barrier/Astral Barrier
-	Card.IsAstral=MakeCheck({0x505},{37053871,45950291})
+	-- Astral Barrier/RUM Astral Force/Astral Kuriboh/Astraltopia
+	Card.IsAstral=MakeCheck({0x505},{37053871,45950291,64591429,69852487})
 
 	-- Atlandis アトランタル
 	-- Number C6: Chronomaly Chaos Atlandis/Number 6: Chronomaly Atlandis
@@ -329,7 +329,7 @@ if not AnimeArchetype then
 	-- Gorgonic Gargoyle/Gorgonic Guardian/Gorgonic Ghoul
 	-- Gorgonic Cerberus/Gorgonic Golem
 	AnimeArchetype.OCGGorgonic={
-		64379261,84401683,98637386,37168514,90764875
+		64379261,84401683,37984162,37168514,90764875
 	}
 	Card.IsGorgonic=MakeCheck({0x522},AnimeArchetype.OCGGorgonic)
 	-- Goyo ゴヨウ
@@ -624,8 +624,8 @@ if not AnimeArchetype then
 	Card.IsMelodiousSongtress=MakeCheck({0x209b},{14763299,62895219})
 
 	-- Motor モーター
-	-- Fiendish Engine Ω/Motor Shell
-	Card.IsMotor=MakeCheck({0x537},{82556058,78394032})
+	-- Fiendish Engine Ω/Motor Shell/Motor Frenzy
+	Card.IsMotor=MakeCheck({0x537},{82556058,78394032,77672444})
 
 	-- Neko 猫
 	-- Dark Cat with White Tail/Kinka-byo/Black Cat-astrophe

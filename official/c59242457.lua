@@ -67,11 +67,13 @@ end
 function s.tecon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp
 end
-function s.tefilter(c)
-	return c:IsType(TYPE_XYZ) and c:IsAbleToExtra()
+function s.tefilter(c,tp)
+	return c:GetOwner()==tp and c:IsType(TYPE_XYZ) and c:IsAbleToExtra()
 end
 function s.tetg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetOverlayGroup():IsExists(s.tefilter,1,nil) end
+	local c=e:GetHandler()
+	if chk==0 then return c:GetFlagEffect(id)==0 and c:GetOverlayGroup():IsExists(s.tefilter,1,nil,tp) end
+	c:RegisterFlagEffect(id,RESET_CHAIN,0,1)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_OVERLAY)
 end
@@ -79,7 +81,7 @@ function s.teop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local tc=c:GetOverlayGroup():FilterSelect(tp,s.tefilter,1,1,nil):GetFirst()
+	local tc=c:GetOverlayGroup():FilterSelect(tp,s.tefilter,1,1,nil,tp):GetFirst()
 	if not tc or Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)<1 or not tc:IsLocation(LOCATION_EXTRA) then return end
 	if c:IsFacedown() or c:IsControler(1-tp) or c:IsImmuneToEffect(e) then return end
 	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)

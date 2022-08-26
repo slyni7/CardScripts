@@ -1,6 +1,5 @@
 --簡易融合
 --Instant Fusion
-
 local s,id=GetID()
 function s.initial_effect(c)
 	--Special summon 1 level 5 or lower fusion monster from extra deck
@@ -41,30 +40,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CLIENT_HINT)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1,true)
-		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1)
 		tc:CompleteProcedure()
 		--Destroy it during end phase
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e2:SetCode(EVENT_PHASE+PHASE_END)
-		e2:SetCountLimit(1)
-		e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-		e2:SetLabelObject(tc)
-		e2:SetCondition(s.descon)
-		e2:SetOperation(s.desop)
-		Duel.RegisterEffect(e2,tp)
+		aux.DelayedOperation(tc,PHASE_END,id,e,tp,function(ag) Duel.Destroy(ag,REASON_EFFECT) end,nil,0)
 	end
-end
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	if tc:GetFlagEffect(id)~=0 then
-		return true
-	else
-		e:Reset()
-		return false
-	end
-end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	Duel.Destroy(tc,REASON_EFFECT)
 end
