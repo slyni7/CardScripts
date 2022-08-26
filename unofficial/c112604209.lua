@@ -124,7 +124,7 @@ end
 function s.tgtg(c)
 	return (c:IsRace(RACE_FAIRY) or c:IsLocation(LOCATION_SZONE)) and c:IsFaceup()
 end
-function s.thfilter1(c)
+function s.thfilter(c)
 	return c:IsSetCard(0xe79) and c:IsAbleToHand() and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED))
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

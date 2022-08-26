@@ -26,7 +26,7 @@ function s.nfil111(c)
 	return c:IsFaceup() and c:IsCode(112601198)
 end
 function s.nfil112(c)
-	return c:IsFaceup() and c:IsSetCard(0xe90)
+	return c:IsFaceup() and c:IsSetCard(0xe90) and c:IsType(TYPE_MONSTER)
 end
 function s.tfil11(c)
 	return c:IsAbleToHand() and c:IsSetCard(0xe90) and c:IsType(TYPE_SPELL) and not c:IsCode(id)
@@ -35,7 +35,7 @@ function s.nfil121(c)
 	return c:IsFaceup() and c:IsSetCard(0xe70)
 end
 function s.nfil122(c)
-	return c:IsFaceup() and c:IsSetCard(0xe72)
+	return c:IsFaceup() and c:IsSetCard(0xe72) and c:IsType(TYPE_MONSTER)
 end
 function s.tfil11(c)
 	return c:IsAbleToGrave() and c:IsSetCard(0xe70)

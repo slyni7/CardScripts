@@ -32,6 +32,9 @@ end
 function s.thfilter(c)
 	return c:IsSetCard(0xe78) and c:IsAbleToHand()
 end
+function s.thfilter2(c)
+	return c:IsSetCard(0xe78) and not c:IsCode(id) and c:IsAbleToHand()
+end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_ONFIELD+LOCATION_GRAVE)
@@ -43,7 +46,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 		local dc=g:GetFirst()
-		if dc:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		if dc:IsCanBeSpecialSummoned(e,0,tp,false,false) and not dc:IsCode(id)
 			and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.BreakEffect()
 			Duel.SpecialSummon(dc,0,tp,tp,false,false,POS_FACEUP)

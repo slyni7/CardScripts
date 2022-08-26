@@ -123,7 +123,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 		local sg=aux.SelectUnselectGroup(g,e,tp,1,#g,s.ofun14,1,tp,HINTMSG_TODECK)
 		if #sg>0 then
 			Duel.SendtoDeck(sg,nil,0,REASON_EFFECT)
-			Duel.ShuffleDeck()
+			Duel.ShuffleDeck(tp)
 			Duel.BreakEffect()
 			Duel.Draw(tp,#sg+1,REASON_EFFECT)
 		end
