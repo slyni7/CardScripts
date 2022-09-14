@@ -40,7 +40,7 @@ s.listed_names={40140448}
 s.listed_series={0x137}
 --no attack
 function s.atcon(e)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x137),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x137),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
 end
 --search
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -50,7 +50,7 @@ function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function s.thfilter(c)
-	return not c:IsCode(id) and c:IsSetCard(0x137) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return not c:IsCode(id) and c:IsSetCard(0x137) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

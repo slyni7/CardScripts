@@ -23,7 +23,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0xf7}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_WINGEDBEAST),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsRace,RACE_WINGEDBEAST),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.spfilter(c,e,tp)
 	return c:IsRace(RACE_WINGEDBEAST) and c:GetLevel()==1 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -76,7 +76,7 @@ function s.xyzcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ)
 end
 function s.xyzfilter(c)
-	return c:IsSetCard(0xf7) and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0xf7) and c:IsMonster()
 end
 function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.xyzfilter(chkc) end

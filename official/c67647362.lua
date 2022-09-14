@@ -33,7 +33,7 @@ function s.filter(c,e,tp,att)
 		and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
 end
 function s.cfilter(c)
-	return c:IsType(TYPE_MONSTER) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE))
+	return c:IsMonster() and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE))
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local att=0
@@ -41,10 +41,10 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		att=att|gc:GetAttribute()
 	end
 	if chk==0 then return att>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 
-		and Duel.IsExistingTarget(aux.FilterFaceupFunction(Card.IsType,TYPE_EFFECT),tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingTarget(aux.FaceupFilter(Card.IsType,TYPE_EFFECT),tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,att)
 		and Duel.IsPlayerCanDraw(tp,1) end
-	local g=Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsType,TYPE_EFFECT),tp,LOCATION_MZONE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,aux.FaceupFilter(Card.IsType,TYPE_EFFECT),tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end

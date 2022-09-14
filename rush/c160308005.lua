@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.cfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToDeckOrExtraAsCost()
+	return c:IsMonster() and c:IsAbleToDeckOrExtraAsCost()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,2,nil) end
@@ -34,7 +34,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 and Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
 		local tc=Duel.SelectMatchingCard(tp,s.filter2,tp,0,LOCATION_MZONE,1,1,nil):GetFirst()
-		local atk=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsRace,RACE_CYBERSE),tp,LOCATION_MZONE,0,nil)
+		local atk=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsRace,RACE_CYBERSE),tp,LOCATION_MZONE,0,nil)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)

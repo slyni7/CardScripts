@@ -37,8 +37,8 @@ end
 s.listed_names={CARD_DARK_FUSION}
 s.listed_series={0x8,0x46}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_FIEND),tp,LOCATION_MZONE,0,1,nil)
-		and Duel.GetMatchingGroupCount(Card.IsType,tp,0,LOCATION_GRAVE,nil,TYPE_MONSTER)>=e:GetLabel()
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsRace,RACE_FIEND),tp,LOCATION_MZONE,0,1,nil)
+		and Duel.GetMatchingGroupCount(Card.IsMonster,tp,0,LOCATION_GRAVE,nil)>=e:GetLabel()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -55,7 +55,7 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
 function s.thfilter1(c)
-	return ((c:IsSetCard(0x8) and c:IsType(TYPE_MONSTER)) or c:IsCode(CARD_DARK_FUSION)) and c:IsAbleToHand()
+	return ((c:IsSetCard(0x8) and c:IsMonster()) or c:IsCode(CARD_DARK_FUSION)) and c:IsAbleToHand()
 end
 function s.thtg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter1,tp,LOCATION_DECK,0,1,nil) end
@@ -70,7 +70,7 @@ function s.thop1(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.thfilter2(c)
-	return c:IsSetCard(0x46) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+	return c:IsSetCard(0x46) and c:IsSpell() and c:IsAbleToHand()
 end
 function s.thtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter2,tp,LOCATION_DECK,0,1,nil) end

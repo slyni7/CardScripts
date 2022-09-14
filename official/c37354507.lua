@@ -30,7 +30,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x61,0x2b}
 function s.setfilter(c)
-	return c:IsSetCard(0x61) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable()
+	return c:IsSetCard(0x61) and c:IsSpellTrap() and c:IsSSetable()
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -43,6 +43,6 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.tgcon(e)
-	return #(e:GetHandler():GetLinkedGroup():Filter(Card.IsType,nil,TYPE_MONSTER))>0
+	return #(e:GetHandler():GetLinkedGroup():Filter(Card.IsMonster,nil))>0
 end
 

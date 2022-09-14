@@ -47,13 +47,13 @@ s.listed_names={id}
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tg=Duel.GetAttacker()
 	if chk==0 then return tg:IsOnField()
-		and Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsType,TYPE_PENDULUM),tp,LOCATION_EXTRA,0,nil)>0 end
+		and Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsType,TYPE_PENDULUM),tp,LOCATION_EXTRA,0,nil)>0 end
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local at=Duel.GetAttacker()
-	local pc=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsType,TYPE_PENDULUM),tp,LOCATION_EXTRA,0,nil)
+	local pc=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsType,TYPE_PENDULUM),tp,LOCATION_EXTRA,0,nil)
 	if pc>0 and at and at:IsRelateToBattle() and at:IsFaceup() then
 		-- Decrease ATK
 		local e1=Effect.CreateEffect(c)
@@ -88,19 +88,16 @@ function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-function s.penzone(tp)
-	return Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)
-end
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsFaceup()
 end
 function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return s.penzone(tp) end
+	if chk==0 then return Duel.CheckPendulumZones(tp) end
 end
 function s.penop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and s.penzone(tp) then
+	if c:IsRelateToEffect(e) and Duel.CheckPendulumZones(tp) then
 		Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	end
 end

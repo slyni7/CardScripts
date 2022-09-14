@@ -22,7 +22,7 @@ end
 s.listed_series={0x174}
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
-	return #g>0 and g:FilterCount(aux.FilterFaceupFunction(Card.IsSetCard,0x174),nil)==#g
+	return #g>0 and g:FilterCount(aux.FaceupFilter(Card.IsSetCard,0x174),nil)==#g
 end
 function s.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,800) end
@@ -47,7 +47,7 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b2=#rg>0 and Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)>0
 	if not (b1 or b2) then return end
 	if not Duel.SelectYesNo(tp,aux.Stringid(id,1)) then return end
-	local op=aux.SelectEffect(tp,
+	local op=Duel.SelectEffect(tp,
 		{b1,aux.Stringid(id,2)},
 		{b2,aux.Stringid(id,3)})
 	if op==1 then

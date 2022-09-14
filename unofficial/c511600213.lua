@@ -61,10 +61,10 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 end
 function s.cfilter1(c)
-	return c:IsType(TYPE_EQUIP) and c:IsType(TYPE_SPELL) and c:IsAbleToRemove()
+	return c:IsType(TYPE_EQUIP) and c:IsSpell() and c:IsAbleToRemove()
 end
 function s.cfilter2(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
+	return c:IsMonster() and c:IsAbleToRemove()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -87,7 +87,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_UPDATE_ATTACK)
-			e1:SetValue(-Duel.GetOperatedGroup():Filter(Card.IsType,nil,TYPE_MONSTER):GetFirst():GetTextAttack())
+			e1:SetValue(-Duel.GetOperatedGroup():Filter(Card.IsMonster,nil):GetFirst():GetTextAttack())
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 			tc:RegisterEffect(e1)
 		end

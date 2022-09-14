@@ -44,18 +44,18 @@ function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
-	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil,TYPE_MONSTER)
+	local g=Duel.GetMatchingGroup(Card.IsMonster,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil)
 	return g:GetClassCount(Card.GetAttribute)>=6
 end
 function s.atkval(e,c)
-	local g=Duel.GetMatchingGroup(Card.IsType,e:GetHandlerPlayer(),LOCATION_GRAVE,LOCATION_GRAVE,nil,TYPE_MONSTER)
+	local g=Duel.GetMatchingGroup(Card.IsMonster,e:GetHandlerPlayer(),LOCATION_GRAVE,LOCATION_GRAVE,nil)
 	return g:GetClassCount(Card.GetAttribute)*500
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=ep and Duel.GetCurrentChain()==0
 end
 function s.discfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
+	return c:IsMonster() and c:IsAbleToRemoveAsCost()
 end
 function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.discfilter,tp,LOCATION_GRAVE,0,3,nil) end

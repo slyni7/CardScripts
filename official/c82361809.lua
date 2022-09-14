@@ -28,7 +28,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={0x17c}
-s.sclawfilter=aux.FilterFaceupFunction(Card.IsSetCard,0x17c)
+s.sclawfilter=aux.FaceupFilter(Card.IsSetCard,0x17c)
 function s.hspval(e,c)
 	local zone=0
 	local left_right=0
@@ -41,7 +41,7 @@ function s.hspval(e,c)
 	return 0,zone&0x1f
 end
 function s.thfilter(c)
-	return c:IsSetCard(0x17c) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+	return c:IsSetCard(0x17c) and c:IsSpellTrap() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

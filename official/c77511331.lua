@@ -3,12 +3,11 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--pendulum summon
 	Pendulum.AddProcedure(c)
-	--spirit return
-	aux.EnableSpiritReturn(c,EVENT_SUMMON_SUCCESS,EVENT_FLIP)
-	--to hand
+	Spirit.AddProcedure(c,EVENT_SUMMON_SUCCESS,EVENT_FLIP)
+	--Return this card from the Pendulum Zone to the hand
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -17,8 +16,9 @@ function s.initial_effect(c)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-	--gy
+	--Send Spell/Trap cards to the GY
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
@@ -39,7 +39,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoHand(c,nil,REASON_EFFECT)
 end
 function s.tgfilter(c,tp)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:GetColumnGroup():IsExists(s.gyfilter,1,nil,tp)
+	return c:IsSpellTrap() and c:GetColumnGroup():IsExists(s.gyfilter,1,nil,tp)
 end
 function s.gyfilter(c,tp)
 	return c:IsControler(tp) and c:IsLocation(LOCATION_PZONE)
@@ -50,5 +50,7 @@ function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.tgfilter,tp,0,LOCATION_ONFIELD,nil,tp)
-	Duel.SendtoGrave(g,REASON_EFFECT)
+	if #g>0 then
+		Duel.SendtoGrave(g,REASON_EFFECT)
+	end
 end

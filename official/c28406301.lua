@@ -55,14 +55,14 @@ end
 s.listed_names={id}
 s.listed_series={0xae,0xaf}
 function s.atkfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0xae) and c:IsType(TYPE_SPELL+TYPE_TRAP)
+	return c:IsFaceup() and c:IsSetCard(0xae) and c:IsSpellTrap()
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() and chkc:IsRace(RACE_FIEND) end
 	if chk==0 then return Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
-		and Duel.IsExistingTarget(aux.FilterFaceupFunction(Card.IsRace,RACE_FIEND),tp,LOCATION_MZONE,0,1,nil) end
+		and Duel.IsExistingTarget(aux.FaceupFilter(Card.IsRace,RACE_FIEND),tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
-	Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsRace,RACE_FIEND),tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,aux.FaceupFilter(Card.IsRace,RACE_FIEND),tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
@@ -85,7 +85,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0xaf),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0xaf),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

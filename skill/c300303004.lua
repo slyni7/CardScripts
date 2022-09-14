@@ -18,7 +18,7 @@ end
 function s.flipcon(e,tp,eg,ep,ev,re,r,rp)
 	--condition
 	return aux.CanActivateSkill(tp)
-		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_JINZO),tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_JINZO),tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(s.setfilter,tp,0,LOCATION_SZONE,1,nil)
 end
 function s.flipop(e,tp,eg,ep,ev,re,r,rp)
@@ -28,7 +28,7 @@ function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:Select(tp,1,1,nil):GetFirst()
 	if not tc then return end
 	Duel.ConfirmCards(tp,tc)
-	if tc:IsType(TYPE_TRAP) then
+	if tc:IsTrap() then
 		Duel.Draw(tp,1,REASON_EFFECT)
 	end
 end

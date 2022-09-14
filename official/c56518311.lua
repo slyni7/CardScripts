@@ -76,7 +76,7 @@ end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsCanBeEffectTarget,e),tp,LOCATION_ONFIELD,0,nil,e)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsCanBeEffectTarget,e),tp,LOCATION_ONFIELD,0,nil,e)
 	local filter=s.rescon
 	if ft==0 or (ft==1 and Duel.GetMatchingGroupCount(s.mzfilter,tp,LOCATION_MZONE,0,nil)>4) then
 		filter=s.rescon2
@@ -100,7 +100,7 @@ function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return re and re:GetHandler():IsSetCard(0xe1)
 end
 function s.rmfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove() and aux.SpElimFilter(c,false,true)
+	return c:IsMonster() and c:IsAbleToRemove() and aux.SpElimFilter(c,false,true)
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) and chkc:IsControler(1-tp) and s.rmfilter(chkc) end

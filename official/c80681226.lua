@@ -30,7 +30,7 @@ end
 s.listed_names={CARD_JINZO}
 s.listed_series={0xbc}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_MACHINE),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsRace,RACE_MACHINE),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.costfilter(c)
 	return c:IsCode(CARD_JINZO) and c:IsAbleToGraveAsCost()
@@ -52,10 +52,10 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 function s.thfilter(c)
-	return c:IsRace(RACE_MACHINE) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsRace(RACE_MACHINE) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.tgyfilter(c)
-	return c:IsSetCard(0xbc) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
+	return c:IsSetCard(0xbc) and c:IsMonster() and c:IsAbleToGrave()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.thfilter(chkc) end

@@ -22,7 +22,7 @@ function s.cfilter(c)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local reveal=Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil)
-	local control=Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x2034),tp,LOCATION_MZONE,0,1,nil)
+	local control=Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x2034),tp,LOCATION_MZONE,0,1,nil)
 	if chk==0 then return reveal or control end
 	if reveal and (not control or Duel.SelectYesNo(tp,aux.Stringid(id,0))) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
@@ -44,7 +44,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b1=Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)
 	local b2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND_DECK_GRAVE_SZONE,0,1,nil,e,tp) 
 	if chk==0 then return b1 or b2 end
-	local op=aux.SelectEffect(tp,
+	local op=Duel.SelectEffect(tp,
 		{b1,aux.Stringid(id,1)},
 		{b2,aux.Stringid(id,2)},
 		{b1 and b2 and e:GetLabel()==0,aux.Stringid(id,3)})

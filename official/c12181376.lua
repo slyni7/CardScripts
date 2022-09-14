@@ -13,11 +13,11 @@ function s.initial_effect(c)
 end
 s.listed_names={CARD_HARPIE_LADY_SISTERS}
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_HARPIE_LADY_SISTERS),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_HARPIE_LADY_SISTERS),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsCode,CARD_HARPIE_LADY_SISTERS),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsCode,CARD_HARPIE_LADY_SISTERS),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local tc=g:GetFirst()
 	for tc in aux.Next(g) do
 		local e1=Effect.CreateEffect(c)
@@ -57,5 +57,5 @@ function s.aclimit(e,re,tp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP)
 end
 function s.distg(e,c)
-	return c:IsType(TYPE_TRAP)
+	return c:IsTrap()
 end

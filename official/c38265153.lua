@@ -21,7 +21,7 @@ end
 s.listed_names={CARD_JINZO}
 	--If the player controls "Jinzo"
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_JINZO),tp,LOCATION_ONFIELD,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_JINZO),tp,LOCATION_ONFIELD,0,1,nil)
 end
 	--Activation legality
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -36,12 +36,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)>0 then
-		local dg=Duel.GetMatchingGroup(aux.disfilter3,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
-		if tc:IsType(TYPE_TRAP) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		local dg=Duel.GetMatchingGroup(Card.IsNegatable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+		if tc:IsTrap() and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 			Duel.BreakEffect()
 			local op=0
 			local b1=(#dg>0)
-			local b2=Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_JINZO),tp,LOCATION_MZONE,0,1,nil)
+			local b2=Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_JINZO),tp,LOCATION_MZONE,0,1,nil)
 			Duel.Hint(HINT_SELECTMSG,tp,0)
 			if b1 and b2 then op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
 			elseif b1 then op=Duel.SelectOption(tp,aux.Stringid(id,1))
@@ -71,7 +71,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 					sc:RegisterEffect(e3)
 				end
 			else --All "Jinzo" you control gains 800 ATK
-				local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsCode,CARD_JINZO),tp,LOCATION_MZONE,0,nil)
+				local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsCode,CARD_JINZO),tp,LOCATION_MZONE,0,nil)
 				for tc in aux.Next(g) do
 					local e1=Effect.CreateEffect(e:GetHandler())
 					e1:SetType(EFFECT_TYPE_SINGLE)

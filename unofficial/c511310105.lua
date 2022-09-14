@@ -27,8 +27,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_names={511310100,511310104}
-s.darkfilter=aux.FilterFaceupFunction(Card.IsCode,511310100)
-s.zerofilter=aux.FilterFaceupFunction(Card.IsCode,511310104)
+s.darkfilter=aux.FaceupFilter(Card.IsCode,511310100)
+s.zerofilter=aux.FaceupFilter(Card.IsCode,511310104)
 function s.actcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.darkfilter,tp,LOCATION_ONFIELD,0,1,nil)
 		and not Duel.IsExistingMatchingCard(s.zerofilter,tp,LOCATION_ONFIELD,0,1,nil)
@@ -84,7 +84,7 @@ function s.faop(e,tp,eg,ep,ev,re,r,rp)
 	local te=tc:GetActivateEffect()
 	local tep=tc:GetControler()
 	if te and te:GetCode()==EVENT_FREE_CHAIN and te:IsActivatable(tep)
-		and (not tc:IsType(TYPE_SPELL) or tc:IsType(TYPE_QUICKPLAY)) then
+		and (not tc:IsSpell() or tc:IsType(TYPE_QUICKPLAY)) then
 		Duel.Activate(te)
 	end
 	e:Reset()

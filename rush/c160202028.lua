@@ -1,6 +1,5 @@
 --猫の目
 --Cat's Eyes
-
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
@@ -11,8 +10,8 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsRace,RACE_BEAST),e:GetHandlerPlayer(),LOCATION_MZONE,0,nil)==3 end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsRace,RACE_BEAST),e:GetHandlerPlayer(),LOCATION_MZONE,0,nil)==3 end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
@@ -20,7 +19,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.DiscardDeck(1-tp,1,REASON_EFFECT)>0 then
 		local tc=Duel.GetOperatedGroup():GetFirst()
 		if tc and tc:IsLocation(LOCATION_GRAVE) then
-			if ((op==0 and tc:IsType(TYPE_MONSTER)) or (op==1 and tc:IsType(TYPE_SPELL)) or (op==2 and tc:IsType(TYPE_TRAP))) then return end
+			if ((op==0 and tc:IsMonster()) or (op==1 and tc:IsSpell()) or (op==2 and tc:IsTrap())) then return end
 			local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
 			for tc in g:Iter() do
 				local e1=Effect.CreateEffect(e:GetHandler())

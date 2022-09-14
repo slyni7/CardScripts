@@ -35,7 +35,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function s.cfilter(c)
-	return c:IsRace(RACE_INSECT) and c:IsType(TYPE_MONSTER) and aux.SpElimFilter(c,true)
+	return c:IsRace(RACE_INSECT) and c:IsMonster() and aux.SpElimFilter(c,true)
 end
 function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
@@ -47,7 +47,7 @@ function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
-	local ct=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsRace,RACE_INSECT),tp,LOCATION_REMOVED,0,nil)
+	local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsRace,RACE_INSECT),tp,LOCATION_REMOVED,0,nil)
 	if #g>0 then
 		g:ForEach(s.op,e:GetHandler(),-500*ct)
 	end

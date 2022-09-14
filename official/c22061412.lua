@@ -34,13 +34,13 @@ end
 s.listed_series={0x3008}
 s.material_setcode={0x8,0x3008}
 function s.atkup(e,c)
-	return Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsSetCard,0x3008),c:GetControler(),LOCATION_REMOVED,0,nil)*300
+	return Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsSetCard,0x3008),c:GetControler(),LOCATION_REMOVED,0,nil)*300
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return (e:GetHandler():GetPreviousLocation()&LOCATION_ONFIELD)>0
 end
 function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3008) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsSetCard(0x3008) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:GetControler()==tp and chkc:IsLocation(LOCATION_REMOVED) and s.filter(chkc) end

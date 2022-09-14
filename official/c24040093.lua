@@ -16,14 +16,14 @@ function s.initial_effect(c)
 end
 s.listed_series={0x35}
 function s.con(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x35),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x35),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function s.filter(c)
-	return c:IsSetCard(0x35) and c:IsType(TYPE_MONSTER) and c:GetCode()~=id and c:IsAbleToHand()
+	return c:IsSetCard(0x35) and c:IsMonster() and c:GetCode()~=id and c:IsAbleToHand()
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end

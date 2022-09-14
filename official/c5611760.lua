@@ -30,7 +30,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x1034}
 function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsLevelAbove,10),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsLevelAbove,10),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	return #g>1 and g:GetClassCount(Card.GetRace)>1 and Duel.GetFlagEffect(tp,id)==0
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -62,7 +62,7 @@ function s.cbfilter(c,tp)
 		and Duel.IsExistingMatchingCard(s.fsfilter,tp,LOCATION_DECK,0,1,c)
 end
 function s.fsfilter(c)
-	return c:IsType(TYPE_FIELD) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+	return c:IsType(TYPE_FIELD) and c:IsSpell() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cbfilter,tp,LOCATION_DECK,0,1,nil,tp) end

@@ -1,86 +1,3 @@
-function Auxiliary.IsGeminiState(effect)
-	local c=effect:GetHandler()
-	return not c:IsDisabled() and c:IsGeminiState()
-end
-function Auxiliary.IsNotGeminiState(effect)
-	local c=effect:GetHandler()
-	return c:IsDisabled() or not c:IsGeminiState()
-end
-function Auxiliary.GeminiNormalCondition(effect)
-	local c=effect:GetHandler()
-	return c:IsFaceup() and not c:IsGeminiState()
-end
-function Auxiliary.EnableGeminiAttribute(c)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_GEMINI_SUMMONABLE)
-	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_ADD_TYPE)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e2:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
-	e2:SetCondition(aux.GeminiNormalCondition)
-	e2:SetValue(TYPE_NORMAL)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EFFECT_REMOVE_TYPE)
-	e3:SetValue(TYPE_EFFECT)
-	c:RegisterEffect(e3)
-end
---register effect of return to hand for Spirit monsters
-function Auxiliary.EnableSpiritReturn(c,event1,...)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(event1)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetOperation(Auxiliary.SpiritReturnReg)
-	c:RegisterEffect(e1)
-	for i,event in ipairs{...} do
-		local e2=e1:Clone()
-		e2:SetCode(event)
-		c:RegisterEffect(e2)
-	end
-end
-function Auxiliary.SpiritReturnReg(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetDescription(1104)
-	e1:SetCategory(CATEGORY_TOHAND)
-	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
-	if e:GetCode() == EVENT_FLIP_SUMMON_SUCCESS or e:GetCode() == EVENT_FLIP then
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-	else
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TEMP_REMOVE-RESET_LEAVE+RESET_PHASE+PHASE_END)
-	end
-	e1:SetCondition(Auxiliary.SpiritReturnCondition)
-	e1:SetTarget(Auxiliary.SpiritReturnTarget)
-	e1:SetOperation(Auxiliary.SpiritReturnOperation)
-	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	c:RegisterEffect(e2)
-end
-function Auxiliary.SpiritReturnCondition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsHasEffect(EFFECT_SPIRIT_DONOT_RETURN) then return false end
-	if e:IsHasType(EFFECT_TYPE_TRIGGER_F) then
-		return not c:IsHasEffect(EFFECT_SPIRIT_MAYNOT_RETURN)
-	else return c:IsHasEffect(EFFECT_SPIRIT_MAYNOT_RETURN) end
-end
-function Auxiliary.SpiritReturnTarget(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
-end
-function Auxiliary.SpiritReturnOperation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
-		Duel.SendtoHand(c,nil,REASON_EFFECT)
-	end
-end
 --filter for the immune effect of qli monsters
 function Auxiliary.qlifilter(e,te)
 	if te:IsActiveType(TYPE_MONSTER) and te:IsActivated() then
@@ -123,7 +40,7 @@ end
 function Auxiliary.SpElimFilter(c,mustbefaceup,includemzone)
 	--includemzone - contains MZONE in original requirement
 	--NOTE: Should only check LOCATION_MZONE+LOCATION_GRAVE
-	if c:IsType(TYPE_MONSTER) then
+	if c:IsMonster() then
 		if mustbefaceup and c:IsLocation(LOCATION_MZONE) and c:IsFacedown() then return false end
 		if includemzone then return c:IsLocation(LOCATION_MZONE) or not Duel.IsPlayerAffectedByEffect(c:GetControler(),69832741) end
 		if Duel.IsPlayerAffectedByEffect(c:GetControler(),69832741) then
@@ -357,7 +274,7 @@ end
 --Discard cost for Witchcrafter monsters, supports the replacements from the Continuous Spells
 local Witchcrafter={}
 function Witchcrafter.DiscardSpell(c)
-	return c:IsDiscardable() and c:IsType(TYPE_SPELL)
+	return c:IsDiscardable() and c:IsSpell()
 end
 function Witchcrafter.DiscardCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Witchcrafter.DiscardSpell,tp,LOCATION_HAND,0,1,nil) end
@@ -376,7 +293,7 @@ function Witchcrafter.repcon(e)
 end
 function Witchcrafter.repval(base,e,tp,eg,ep,ev,re,r,rp,chk,extracon)
 	local c=e:GetHandler()
-	return c:IsControler(tp) and c:IsType(TYPE_MONSTER) and c:IsSetCard(0x128)
+	return c:IsControler(tp) and c:IsMonster() and c:IsSetCard(0x128)
 end
 function Witchcrafter.repop(id)
 	return function(base,e,tp,eg,ep,ev,re,r,rp)
@@ -730,7 +647,7 @@ function Auxiliary.AttractionEquipCon(self)
 	end
 end
 function AA.eqsfilter(c,tp)
-	return c:IsSetCard(0x15f) and c:IsType(TYPE_TRAP) and c:GetEquipTarget() and
+	return c:IsSetCard(0x15f) and c:IsTrap() and c:GetEquipTarget() and
 		   Duel.IsExistingMatchingCard(AA.eqmfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,c:GetEquipTarget(),tp)
 end
 function AA.eqmfilter(c,tp)
@@ -924,7 +841,7 @@ end
 
 Drytron={}
 function Drytron.TributeCostFilter(c,tp)
-	return ((c:IsSetCard(0x151) and c:IsType(TYPE_MONSTER)) or c:IsRitualMonster()) and (c:IsControler(tp) or c:IsFaceup())
+	return ((c:IsSetCard(0x151) and c:IsMonster()) or c:IsRitualMonster()) and (c:IsControler(tp) or c:IsFaceup())
 		and (c:IsInMainMZone(tp) or Duel.GetLocationCount(tp,LOCATION_MZONE)>0)
 end
 function Drytron.TributeBaseCost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -1034,7 +951,7 @@ Effect.CreateMysteruneQPEffect = (function()
 			local b1=rmtg(e,tp,eg,ep,ev,re,r,rp,0,uniquetg,rmcount)
 			local b2=sptg(e,tp,eg,ep,ev,re,r,rp,0)
 			if chk==0 then return b1 or b2 end
-			local sel=aux.SelectEffect(tp,
+			local sel=Duel.SelectEffect(tp,
 				{b1,aux.Stringid(id,0)},
 				{b2,aux.Stringid(id,1)})
 			if sel==1 then

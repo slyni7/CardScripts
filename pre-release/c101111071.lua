@@ -25,9 +25,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_names={CARD_GALAXYEYES_P_DRAGON}
-s.listed_series={0x7b,0x55}
+s.listed_series={SET_PHOTON,SET_GALAXY}
 function s.filter(c,ft,tp) 
-	return (c:IsSetCard(0x7b) or c:IsSetCard(0x55)) and c:IsSpellTrap() and c:IsType(TYPE_CONTINUOUS)
+	return (c:IsSetCard(SET_PHOTON) or c:IsSetCard(SET_GALAXY)) and c:IsSpellTrap() and c:IsType(TYPE_CONTINUOUS)
 		and (c:IsAbleToHand() or (ft>0 and not c:IsForbidden() and c:CheckUniqueOnField(tp)))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -60,7 +60,7 @@ function s.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:GetOverlayGroup():IsExists(Card.IsCode,1,nil,CARD_GALAXYEYES_P_DRAGON)
 end
 function s.skiptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_GALAXYEYES_P_DRAGON),tp,LOCATION_ONFIELD,0,1,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_GALAXYEYES_P_DRAGON),tp,LOCATION_ONFIELD,0,1,nil)
 		or Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil) end
 end
 function s.skipop(e,tp,eg,ep,ev,re,r,rp)

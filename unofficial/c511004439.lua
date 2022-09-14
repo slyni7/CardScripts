@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_SET_BASE_ATTACK)
-	e2:SetValue(function (e) return 1000*e:GetHandler():GetOverlayGroup():FilterCount(Card.IsType,nil,TYPE_MONSTER) end)
+	e2:SetValue(function (e) return 1000*e:GetHandler():GetOverlayGroup():FilterCount(Card.IsMonster,nil) end)
 	c:RegisterEffect(e2)
 	--attack 3 times
 	local e3=Effect.CreateEffect(c)
@@ -72,7 +72,7 @@ function s.operation(e,tp,eg,ev,ep,re,r,rp)
 	end
 end
 function s.spfilter(c,e,tp)
-	return c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SPECIAL,tp,true,false) and c:IsType(TYPE_MONSTER) and c:IsCubicSeed()
+	return c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SPECIAL,tp,true,false) and c:IsMonster() and c:IsCubicSeed()
 end
 function s.target0(e,tp,eg,ev,ep,re,r,rp,chk)
 	local c=e:GetHandler()

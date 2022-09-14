@@ -50,7 +50,7 @@ function s.otfilter(c,tp)
 	return c:IsRace(RACE_DINOSAUR) and (c:IsControler(tp) or c:IsFaceup())
 end
 function s.tscon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsMainPhase() and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_DINOSAUR),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) 
+	return Duel.IsMainPhase() and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsRace,RACE_DINOSAUR),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) 
 end
 function s.tstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -77,7 +77,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 		local atk=0
 		if tc:IsFaceup() then atk=tc:GetAttack()/2 end
 		local c=e:GetHandler()
-		if Duel.Destroy(tc,REASON_EFFECT)>0 and c:IsSummonType(SUMMON_TYPE_TRIBUTE) and e:GetLabel()==1 and atk>0 then
+		if Duel.Destroy(tc,REASON_EFFECT)>0 and c:IsRelateToEffect(e) and c:IsSummonType(SUMMON_TYPE_TRIBUTE) and e:GetLabel()==1 and atk>0 then
 			Duel.BreakEffect()
 			--Increase ATK
 			local e1=Effect.CreateEffect(c)

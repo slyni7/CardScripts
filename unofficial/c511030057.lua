@@ -29,7 +29,7 @@ function s.cfilter(c,tp)
 	return c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsSetCard(0x14a)
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	if not (rp==1-tp and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) and re:GetHandler():IsType(TYPE_MONSTER)) then return false end
+	if not (rp==1-tp and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) and re:GetHandler():IsMonster()) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	return g and g:IsExists(s.cfilter,1,nil,tp) and Duel.IsChainDisablable(ev)
 end
@@ -51,7 +51,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.filter,1,nil,tp)
 end
 function s.spfilter(c,e,tp,eg)
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsType,TYPE_LINK),tp,LOCATION_ONFIELD,0,nil)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsType,TYPE_LINK),tp,LOCATION_ONFIELD,0,nil)
 	if #g<=0 then return false end
 	local zone=g:GetToBeLinkedZone(c,tp,true)
 	return eg:IsContains(c) and c:IsLinkMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
@@ -76,7 +76,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local spc=tg:GetFirst()
 	local rmc=tg:GetNext()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 or not spc:IsRelateToEffect(e) then return end
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsType,TYPE_LINK),tp,LOCATION_ONFIELD,0,nil)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsType,TYPE_LINK),tp,LOCATION_ONFIELD,0,nil)
 	if #g>0 then
 		local zone=g:GetToBeLinkedZone(spc,tp,true)
 		if zone>0 and Duel.SpecialSummon(spc,0,tp,tp,true,false,POS_FACEUP,zone)>0 and rmc and rmc:IsRelateToEffect(e)

@@ -42,12 +42,12 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsSummonType(SUMMON_TYPE_TRIBUTE) then
 		local mg=tc:GetMaterial()
 		if mg then
-			s[ep]=s[ep]+mg:FilterCount(Card.IsType,nil,TYPE_MONSTER)
+			s[ep]=s[ep]+mg:FilterCount(Card.IsMonster,nil)
 		end
 	end
 end
 function s.filter2(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsMonster() and c:IsAbleToHand()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b1=s[tp]>0 and Duel.IsExistingMatchingCard(Card.IsFacedown,tp,0,LOCATION_ONFIELD,1,nil)

@@ -24,7 +24,7 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_SET_BASE_ATTACK)
-	e3:SetValue(function (e) return 800*e:GetHandler():GetOverlayGroup():FilterCount(Card.IsType,nil,TYPE_MONSTER) end)
+	e3:SetValue(function (e) return 800*e:GetHandler():GetOverlayGroup():FilterCount(Card.IsMonster,nil) end)
 	c:RegisterEffect(e3)
 	--Add to hand when destroying a monster by battle
 	local e4=Effect.CreateEffect(c)
@@ -36,7 +36,7 @@ function s.initial_effect(c)
 end
 s.listed_names={77387463}
 function s.filter(c,sc)
-	return c:IsType(TYPE_MONSTER) and c:IsCubicSeed() and c:IsFaceup()
+	return c:IsMonster() and c:IsCubicSeed() and c:IsFaceup()
 end
 function s.target(e,tp,eg,ev,ep,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil,e:GetHandler()) and e:GetHandler():IsCanBeSpecialSummoned(e,SUMMON_TYPE_SPECIAL,tp,true,false) end
@@ -77,7 +77,7 @@ function s.target1(e,tp,eg,ev,ep,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,LOCATION_DECK)
 end
 function s.spfilter(c,e,tp)
-	return c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SPECIAL,tp,true,false) and c:IsType(TYPE_MONSTER) and c:IsCubicSeed()
+	return c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SPECIAL,tp,true,false) and c:IsMonster() and c:IsCubicSeed()
 end
 function s.operation1(e,tp,eg,ev,ep,re,r,rp)
 	local c=e:GetHandler()

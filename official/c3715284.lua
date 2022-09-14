@@ -28,7 +28,7 @@ end
 s.listed_names={id}
 s.listed_series={0x13,0x6013}
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x6013) and c:IsType(TYPE_MONSTER) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
+	return c:IsSetCard(0x6013) and c:IsMonster() and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -78,10 +78,10 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.dmtg(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x13),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x13),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.dmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
-	local value=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsSetCard,0x13),tp,LOCATION_MZONE,0,1,nil)
+	local value=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsSetCard,0x13),tp,LOCATION_MZONE,0,1,nil)
 	Duel.Damage(1-tp,value*100,REASON_EFFECT)
 end

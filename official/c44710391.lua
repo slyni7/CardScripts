@@ -46,7 +46,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x21}
 function s.indcon(e)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsLevel,10),0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsLevel,10),0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function s.dttg(e,c)
 	return c:IsType(TYPE_SYNCHRO) and (c:IsControler(e:GetHandlerPlayer() or c:IsFaceup()))
@@ -58,7 +58,7 @@ function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(Card.IsType,1,nil,TYPE_SYNCHRO)
 end
 function s.thfilter(c)
-	return c:IsSetCard(0x21) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+	return c:IsSetCard(0x21) and c:IsSpellTrap() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

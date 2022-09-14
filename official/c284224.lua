@@ -58,7 +58,7 @@ function s.indct(e,re,r,rp)
 end
 	--Check for spells/traps
 function s.filter(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+	return c:IsSpellTrap() and c:IsAbleToHand()
 end
 	--Activation legality
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -74,7 +74,7 @@ end
 	--If a monster effect is activated on opponent's field, while you control 2+ fusion monsters
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return re:GetHandler():IsOnField() and re:IsActiveType(TYPE_MONSTER) and ep==1-tp
-		and Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsType,TYPE_FUSION),tp,LOCATION_MZONE,0,nil)>=2
+		and Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsType,TYPE_FUSION),tp,LOCATION_MZONE,0,nil)>=2
 end
 	--Activation legality
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)

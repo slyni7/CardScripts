@@ -15,10 +15,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end 
 function s.condition(e,tp)
-	return not Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_ONFIELD,0,1,e:GetHandler(),TYPE_MONSTER)
+	return not Duel.IsExistingMatchingCard(Card.IsMonster,tp,LOCATION_ONFIELD,0,1,e:GetHandler())
 end
 function s.tdfilter(c,tp)
-	return c:IsType(TYPE_MONSTER) and c:IsAttack(0)	and c:IsAbleToDeckOrExtraAsCost()
+	return c:IsMonster() and c:IsAttack(0)	and c:IsAbleToDeckOrExtraAsCost()
 end
 function s.spfilter(c,e,tp)
 	return c:IsAttack(0) and c:IsLevelAbove(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -27,7 +27,7 @@ end
 s.listed_series={0x51}
 
 function s.eqfilter(c)
-	return c:IsRace(RACE_MACHINE) and c:IsSetCard(0x51) and c:IsFaceup() and c:IsType(TYPE_MONSTER)
+	return c:IsRace(RACE_MACHINE) and c:IsSetCard(0x51) and c:IsFaceup() and c:IsMonster()
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.GetMatchingGroup(s.eqfilter,tp,LOCATION_GRAVE+LOCATION_MZONE,0,nil)
@@ -46,7 +46,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
-		local g=Duel.GetTargetCards(e):Match(Card.IsType,nil,TYPE_MONSTER):Match(Card.IsSetCard,nil,0x51)
+		local g=Duel.GetTargetCards(e):Match(Card.IsMonster,nil):Match(Card.IsSetCard,nil,0x51)
 		if ft<#g then return end
 		Duel.BreakEffect()
 		for tc in aux.Next(g) do

@@ -42,13 +42,13 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.filter2(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+	return c:IsSpellTrap() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and s.filter2(chkc) end
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0xdf),tp,LOCATION_ONFIELD,0,1,e:GetHandler())
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0xdf),tp,LOCATION_ONFIELD,0,1,e:GetHandler())
 		and Duel.IsExistingTarget(s.filter2,tp,0,LOCATION_ONFIELD,1,nil) end
-	local ct=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsSetCard,0xdf),tp,LOCATION_ONFIELD,0,e:GetHandler())
+	local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsSetCard,0xdf),tp,LOCATION_ONFIELD,0,e:GetHandler())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,s.filter2,tp,0,LOCATION_ONFIELD,1,ct,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,#g,0,0)

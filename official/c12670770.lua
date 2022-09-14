@@ -41,7 +41,7 @@ function s.filter2(c)
 	return c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToRemove()
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_CYBER_DRAGON),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_CYBER_DRAGON),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end
 function s.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -58,7 +58,7 @@ function s.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,3)
 	c:RegisterEffect(e1)
 	c:SetTurnCounter(0)
-	if Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_CYBER_DRAGON),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+	if Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_CYBER_DRAGON),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 		and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK,0,1,nil)
 		and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK)
@@ -113,9 +113,6 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_REMOVED)
 end
-function s.desfilter(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP)
-end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local tg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_REMOVED,0,nil,e,tp)
@@ -135,6 +132,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 	end
 	Duel.SpecialSummonComplete()
-	local dg=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_ONFIELD,0,nil)
+	local dg=Duel.GetMatchingGroup(Card.IsSpellTrap,tp,LOCATION_ONFIELD,0,nil)
 	Duel.Destroy(dg,REASON_EFFECT)
 end

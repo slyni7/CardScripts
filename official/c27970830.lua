@@ -54,7 +54,7 @@ end
 s.listed_series={0x3d,0x20}
 s.counter_place_list={0x3}
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(aux.FilterFaceupFunction(Card.IsSetCard,0x3d),1,nil) then
+	if eg:IsExists(aux.FaceupFilter(Card.IsSetCard,0x3d),1,nil) then
 		e:GetHandler():AddCounter(0x3,2)
 	end
 end
@@ -91,7 +91,7 @@ function s.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RemoveCounter(tp,1,0,0x3,4,REASON_COST)
 end
 function s.filter2(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x3d) and c:IsAbleToHand()
+	return c:IsMonster() and c:IsSetCard(0x3d) and c:IsAbleToHand()
 end
 function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end

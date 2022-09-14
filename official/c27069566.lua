@@ -37,10 +37,10 @@ function s.rmvcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.rmvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if chk==0 then return Duel.IsExistingTarget(aux.FilterFaceupFunction(Card.IsAbleToRemove),tp,0,LOCATION_ONFIELD,1,nil)
+	if chk==0 then return Duel.IsExistingTarget(aux.FaceupFilter(Card.IsAbleToRemove),tp,0,LOCATION_ONFIELD,1,nil)
 		and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g1=Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsAbleToRemove),tp,0,LOCATION_ONFIELD,1,1,nil)
+	local g1=Duel.SelectTarget(tp,aux.FaceupFilter(Card.IsAbleToRemove),tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g2=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
 	g1:Merge(g2)
@@ -59,7 +59,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 		and c:IsSummonType(SUMMON_TYPE_XYZ) and rp==1-tp
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x150) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
+	return c:IsSetCard(0x150) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
 end
 function s.rescon(sg,e,tp,mg)
 	return sg:GetClassCount(Card.GetRace)==1 and sg:GetClassCount(Card.GetAttribute)==1

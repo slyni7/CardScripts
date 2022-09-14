@@ -42,7 +42,7 @@ end
 s.listed_names={CARD_UMI}
 s.listed_series={0x179,0x17a}
 function s.umicon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_UMI),0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_UMI),0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 		or Duel.IsEnvironment(CARD_UMI)
 end
 function s.nonwaterfilter(c)
@@ -116,7 +116,7 @@ function s.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 end
 function s.thfilter(c)
 	return c:IsAbleToHand() and (c:IsCode(CARD_UMI)
-		or ((c:IsSetCard(0x179) or c:IsSetCard(0x17a)) and c:IsType(TYPE_SPELL+TYPE_TRAP)))
+		or ((c:IsSetCard(0x179) or c:IsSetCard(0x17a)) and c:IsSpellTrap()))
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

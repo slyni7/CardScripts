@@ -41,7 +41,7 @@ function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_DRAW
 end
 function s.tdfilter(c)
-	return c:IsType(TYPE_TRAP) and c:IsControler(Duel.GetTurnPlayer())
+	return c:IsTrap() and c:IsControler(Duel.GetTurnPlayer())
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(s.tdfilter,1,nil) end
@@ -55,7 +55,7 @@ end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=eg:Filter(s.cfilter,nil,e)
-	local sg=g:Filter(Card.IsType,nil,TYPE_TRAP)
+	local sg=g:Filter(Card.IsTrap,nil)
 	if #g>0 then
 		Duel.ConfirmCards(1-Duel.GetTurnPlayer(),g)
 		Duel.SendtoDeck(sg,nil,2,REASON_EFFECT)

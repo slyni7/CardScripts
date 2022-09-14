@@ -53,7 +53,7 @@ function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
 end
 function s.equipop(c,e,tp,tc)
-	if not aux.EquipByEffectAndLimitRegister(c,e,tp,tc,nil,true) then return end
+	if not c:EquipByEffectAndLimitRegister(e,tp,tc,nil,true) then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_EQUIP)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OWNER_RELATE)
@@ -109,7 +109,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	for tc in g:Iter() do
 		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
-			tc:EnableGeminiState()
+			tc:EnableGeminiStatus()
 			tc:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,64)
 		end
 	end

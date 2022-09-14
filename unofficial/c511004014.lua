@@ -92,11 +92,11 @@ function s.op(oc)
 	e7a:SetType(EFFECT_TYPE_FIELD)
 	e7a:SetCode(EFFECT_BECOME_QUICK)
 	e7a:SetTargetRange(LOCATION_ONFIELD,LOCATION_ONFIELD)
-	e7a:SetTarget(function(e,c) return c:IsType(TYPE_SPELL) and not c:IsType(TYPE_QUICKPLAY) and c:IsFacedown() and Duel.GetTurnPlayer()~=c:GetControler() end)
+	e7a:SetTarget(function(e,c) return c:IsSpell() and not c:IsType(TYPE_QUICKPLAY) and c:IsFacedown() and Duel.GetTurnPlayer()~=c:GetControler() end)
 	Duel.RegisterEffect(e7a,0)
 	local e7b=e7a:Clone()
 	e7b:SetCode(EFFECT_QP_ACT_IN_SET_TURN)
-	e7b:SetTarget(function(e,c) return c:IsType(TYPE_SPELL) and not c:IsType(TYPE_QUICKPLAY) and c:IsHasEffect(EFFECT_BECOME_QUICK) and (Duel.IsBattlePhase() or Duel.GetTurnPlayer()~=c:GetControler()) end)
+	e7b:SetTarget(function(e,c) return c:IsSpell() and not c:IsType(TYPE_QUICKPLAY) and c:IsHasEffect(EFFECT_BECOME_QUICK) and (Duel.IsBattlePhase() or Duel.GetTurnPlayer()~=c:GetControler()) end)
 	Duel.RegisterEffect(e7b,0)
 	--Negate
 	local e8=Effect.GlobalEffect()
@@ -330,8 +330,8 @@ function s.aclimit(e,re,tp)
 	return false
 end
 function s.setlimit(e,c,tp)
-	return (c:IsLocation(LOCATION_HAND) and ((c:IsType(TYPE_SPELL) and Duel.GetFlagEffect(tp,TYPE_SPELL)>0)
-		or (c:IsType(TYPE_TRAP) and Duel.GetFlagEffect(tp,TYPE_TRAP)>(Duel.IsPlayerAffectedByEffect(tp,511004017) and 1 or 0))))
+	return (c:IsLocation(LOCATION_HAND) and ((c:IsSpell() and Duel.GetFlagEffect(tp,TYPE_SPELL)>0)
+		or (c:IsTrap() and Duel.GetFlagEffect(tp,TYPE_TRAP)>(Duel.IsPlayerAffectedByEffect(tp,511004017) and 1 or 0))))
 		or (c:IsType(TYPE_FIELD) and not Duel.GetFieldCard(tp,LOCATION_SZONE,5) and Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)>4)
 end
 function s.aclimit1(e,tp,eg,ep,ev,re,r,rp)
@@ -347,10 +347,10 @@ end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local hg=eg:Filter(Card.IsPreviousLocation,nil,LOCATION_HAND)
 	if #hg>0 then
-		if hg:IsExists(Card.IsType,1,nil,TYPE_SPELL) then
+		if hg:IsExists(Card.IsSpell,1,nil) then
 			Duel.RegisterFlagEffect(rp,TYPE_SPELL,RESET_PHASE+PHASE_END,0,1)
 		end
-		if hg:IsExists(Card.IsType,1,nil,TYPE_TRAP) then
+		if hg:IsExists(Card.IsTrap,1,nil) then
 			Duel.RegisterFlagEffect(rp,TYPE_TRAP,RESET_PHASE+PHASE_END,0,1)
 		end
 	end

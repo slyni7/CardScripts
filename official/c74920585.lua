@@ -38,11 +38,11 @@ end
 s.listed_names={CARD_VISAS_STARFROST}
 s.listed_series={0x182}
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_VISAS_STARFROST),tp,LOCATION_ONFIELD,0,1,nil)
-		or Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x182),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_VISAS_STARFROST),tp,LOCATION_ONFIELD,0,1,nil)
+		or Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x182),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.tgfilter(c)
-	return c:IsType(TYPE_EFFECT) and aux.disfilter1(c)
+	return c:IsType(TYPE_EFFECT) and c:IsNegatableMonster()
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and s.tgfilter(chkc) end

@@ -26,7 +26,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x73,0x139,0x7e,0x16c}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsType,TYPE_XYZ),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsType,TYPE_XYZ),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -47,7 +47,7 @@ function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function s.thfilter(c)
-	if not (c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()) then return false end
+	if not (c:IsSpellTrap() and c:IsAbleToHand()) then return false end
 	return c:IsSetCard(0x73) or c:IsSetCard(0x139) or c:IsSetCard(0x7e) or c:IsSetCard(0x16c)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)

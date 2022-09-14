@@ -1,4 +1,5 @@
 --ストーム・シューター
+--Storm Shooter
 local s,id=GetID()
 function s.initial_effect(c)
 	--move
@@ -9,7 +10,8 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCondition(aux.seqmovcon)
 	e1:SetCost(s.cost)
-	e1:SetOperation(aux.seqmovop)
+	e1:SetTarget(aux.seqmovtg)
+	e1:SetOperation(aux.seqmovtgop)
 	c:RegisterEffect(e1)
 	--
 	local e2=Effect.CreateEffect(c)

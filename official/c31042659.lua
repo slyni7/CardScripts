@@ -61,7 +61,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 	--Check for "Great Grand Sea – Gold Golgonda" on the field
 function s.atkcon(e)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,60884672),0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,60884672),0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 		or Duel.IsEnvironment(60884672)
 end
 	--Check for "Great Grand Sea – Gold Golgonda" being destroyed
@@ -71,7 +71,7 @@ function s.repfilter(c,tp,rp)
 end
 	--Activation legality
 function s.rmfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
+	return c:IsMonster() and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
 end
 function s.repval(e,c)
 	return s.repfilter(c,e:GetHandlerPlayer(),c:GetReasonPlayer())

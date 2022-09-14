@@ -29,7 +29,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function s.filter(c)
-	return c:IsSetCard(0xbc) and not c:IsCode(id) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0xbc) and not c:IsCode(id) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
@@ -53,7 +53,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(tp,cg)
 		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 		if ft<=0 then return end
-		local ct=cg:FilterCount(Card.IsType,nil,TYPE_TRAP)
+		local ct=cg:FilterCount(Card.IsTrap,nil)
 		if ct>ft then ct=ft end
 		local sg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_HAND,0,nil,e,tp)
 		if ct>0 and #sg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then

@@ -91,7 +91,7 @@ function s.atcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==1-tp
 end
 function s.attg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.NOT(aux.FilterFaceupFunction(Card.IsStatus,STATUS_BATTLE_DESTROYED)),tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.NOT(aux.FaceupFilter(Card.IsStatus,STATUS_BATTLE_DESTROYED)),tp,0,LOCATION_MZONE,1,nil) end
 end
 function s.atop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
@@ -112,7 +112,7 @@ function s.damcon(e,tp,eg,ep,ev,re,r,rp,chk)
 	return Duel.GetTurnPlayer()==tp and s[0]
 end
 function s.filter(c)
-	return c:IsSetCard(0x12f) and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x12f) and c:IsMonster()
 end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil) end

@@ -34,7 +34,7 @@ function s.rmfilter(c)
 	return c:IsCode(89264428,58793369) and c:IsAbleToRemove()
 end
 function s.excheck(tp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,27693363,97148796),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,27693363,97148796),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end
 function s.spfilter(c,e,tp,sg)
 	return c:IsCode(33250142) and Duel.GetLocationCountFromEx(tp,tp,sg,c)>0 
@@ -51,8 +51,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	local g=Duel.GetMatchingGroup(s.rmfilter,tp,loc,0,nil)
 	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,2,2,s.spcheck,0) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,2,tp,LOCATION_HAND+LOCATION_ONFIELD)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local loc=LOCATION_HAND | LOCATION_ONFIELD 
@@ -74,7 +75,7 @@ function s.repcon(e)
 end
 function s.repval(base,e,tp,eg,ep,ev,re,r,rp,chk,extracon)
 	local c=e:GetHandler()
-	return c:IsType(TYPE_MONSTER) and (c:IsSetCard(0x165) or c:IsSetCard(0x151)) and (not extracon or extracon(base,c,e,tp,eg,ep,ev,re,r,rp,chk))
+	return c:IsMonster() and (c:IsSetCard(0x165) or c:IsSetCard(0x151)) and (not extracon or extracon(base,c,e,tp,eg,ep,ev,re,r,rp,chk))
 end
 function s.repop(base,e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)

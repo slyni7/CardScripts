@@ -1,5 +1,5 @@
 --白銀の城のラビュリンス
---Labrynth of the Silver Castle
+--Lovely Labrynth of the Silver Castle
 --Scripted by The Razgriz
 local s,id=GetID()
 function s.initial_effect(c)
@@ -36,7 +36,7 @@ function s.initial_effect(c)
 end
 function s.chainop(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
-	if rp==tp and rc:GetType()==TYPE_TRAP then
+	if rp==tp and rc:GetType()==TYPE_TRAP and re:IsHasType(EFFECT_TYPE_ACTIVATE) then
 		Duel.SetChainLimit(s.chainlm)
 	end
 end
@@ -68,7 +68,7 @@ function s.fgop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.triggercon(e)
 	local tp=e:GetHandlerPlayer()
-	return not Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_FIEND),tp,LOCATION_MZONE,0,1,nil)
+	return not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsRace,RACE_FIEND),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.cfilter(c)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsReason(REASON_EFFECT)
@@ -88,7 +88,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local b1=#g1>0
 	local b2=#g2>0
 	if not (b1 or b2) then return end
-	local op=aux.SelectEffect(tp,
+	local op=Duel.SelectEffect(tp,
 		{b1,aux.Stringid(id,2)},
 		{b2,aux.Stringid(id,3)})
 	local sg=Group.CreateGroup()

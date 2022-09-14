@@ -38,7 +38,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x152}
 function s.spcfilter(c,tp)
-	return c:IsRace(RACE_SPELLCASTER) and c:IsType(TYPE_MONSTER) and (c:IsLocation(LOCATION_HAND)
+	return c:IsRace(RACE_SPELLCASTER) and c:IsMonster() and (c:IsLocation(LOCATION_HAND)
 		or c:IsFaceup()) and c:IsAbleToGraveAsCost() and Duel.GetMZoneCount(tp,c)>0
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -75,16 +75,16 @@ function s.attop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.eqfilter(c)
-	return c:IsSetCard(0x152) and not c:IsLevel(4) and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x152) and not c:IsLevel(4) and c:IsMonster()
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() and chkc:IsSetCard(0x152) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingTarget(aux.FilterFaceupFunction(Card.IsSetCard,0x152),tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingTarget(aux.FaceupFilter(Card.IsSetCard,0x152),tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_GRAVE,0,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsSetCard,0x152),tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,aux.FaceupFilter(Card.IsSetCard,0x152),tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_GRAVE)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)

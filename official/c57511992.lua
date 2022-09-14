@@ -51,7 +51,7 @@ function s.lvnmfilter(c,tc)
 end
 function s.spfilter(c,e,tp)
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and aux.nvfilter(c)
-		and (Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_UMI),0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) or Duel.IsEnvironment(CARD_UMI))
+		and (Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_UMI),0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) or Duel.IsEnvironment(CARD_UMI))
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
 end
 function s.lvnmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -78,7 +78,7 @@ function s.lvnmop(e,tp,eg,ep,ev,re,r,rp)
 	if not (tc and tc:IsRelateToEffect(e)) then return end
 	local b1=s.lvnmfilter(tc,c) and c:IsRelateToEffect(e) and c:IsFaceup()
 	local b2=s.spfilter(tc,e,tp)
-	local op=aux.SelectEffect(tp,
+	local op=Duel.SelectEffect(tp,
 		{b1,aux.Stringid(id,2)},
 		{b2,aux.Stringid(id,3)})
 	if op==1 then

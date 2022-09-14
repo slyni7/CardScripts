@@ -32,10 +32,10 @@ end
 s.listed_series={0x13f}
 
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x13f),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x13f),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ct=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsType,TYPE_EQUIP),tp,LOCATION_ONFIELD,0,nil)
+	local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsType,TYPE_EQUIP),tp,LOCATION_ONFIELD,0,nil)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,ct+1) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,ct+1)
@@ -43,7 +43,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	local ct=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsType,TYPE_EQUIP),p,LOCATION_ONFIELD,0,nil)
+	local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsType,TYPE_EQUIP),p,LOCATION_ONFIELD,0,nil)
 	if Duel.Draw(p,ct+1,REASON_EFFECT)>0 and ct>0 then
 		Duel.ShuffleHand(tp)
 		Duel.BreakEffect()
@@ -70,7 +70,7 @@ function s.eqpop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.equipop(c,e,tp,tc)
-	if not aux.EquipByEffectAndLimitRegister(c,e,tp,tc,nil,true) then return end
+	if not c:EquipByEffectAndLimitRegister(e,tp,tc,nil,true) then return end
 	--Gains 500 ATK
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_EQUIP)

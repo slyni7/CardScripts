@@ -3,7 +3,6 @@
 --scripted by YoshiDuels
 local s,id=GetID()
 function s.initial_effect(c)
-	Card.Alias(c,15960641)
 	--Opponent cannot activate Trap Cards during the Battle Phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -16,5 +15,5 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.aclimit(e,re,tp)
-	return re:GetHandler():IsType(TYPE_TRAP) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return re:GetHandler():IsTrap() and re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end

@@ -43,11 +43,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function s.thfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsMonster() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	local ct=#(c:GetMutualLinkedGroup():Filter(Card.IsType,nil,TYPE_MONSTER))
+	local ct=#(c:GetMutualLinkedGroup():Filter(Card.IsMonster,nil))
 	if chkc then return chkc:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) and s.thfilter(chkc) end
 	if chk==0 then return ct>0 and Duel.IsExistingTarget(s.thfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)

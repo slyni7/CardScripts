@@ -59,7 +59,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0xc4}
 function s.mtfilter(c)
-	return c:IsSetCard(0xc4) and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0xc4) and c:IsMonster()
 end
 function s.valcheck(e,c)
 	if c:GetMaterial():IsExists(s.mtfilter,1,nil) then
@@ -67,7 +67,7 @@ function s.valcheck(e,c)
 	end
 end
 function s.filter(c)
-	return c:IsSetCard(0xc4) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0xc4) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
@@ -119,12 +119,12 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_DECK,0,1,nil,TYPE_MONSTER) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsMonster,tp,LOCATION_DECK,0,1,nil) end
 end
 function s.stop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,4))
-	local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_DECK,0,1,1,nil,TYPE_MONSTER)
+	local g=Duel.SelectMatchingCard(tp,Card.IsMonster,tp,LOCATION_DECK,0,1,1,nil)
 	local tc=g:GetFirst()
 	if tc then
 		Duel.ShuffleDeck(tp)

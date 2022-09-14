@@ -49,12 +49,12 @@ function s.pcfilter(c)
 	return c:IsType(TYPE_PENDULUM) and not c:IsForbidden()
 end
 function s.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
+	if chk==0 then return Duel.CheckPendulumZones(tp)
 		and Duel.IsExistingMatchingCard(s.pcfilter,tp,LOCATION_DECK,0,1,nil) end
 end
 function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return end
+	if not Duel.CheckPendulumZones(tp) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local g=Duel.SelectMatchingCard(tp,s.pcfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then
@@ -66,13 +66,13 @@ function s.descon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsLevelBelow,7),tp,0,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsLevelBelow,7),tp,0,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,#g*1000)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsLevelBelow,7),tp,0,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsLevelBelow,7),tp,0,LOCATION_MZONE,nil)
 	local ct=Duel.Destroy(g,REASON_EFFECT)
 	if Duel.Damage(1-tp,ct*1000,REASON_EFFECT)~=0 then
 		local e1=Effect.CreateEffect(c)

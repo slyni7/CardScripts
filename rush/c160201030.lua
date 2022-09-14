@@ -21,13 +21,13 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 	--Check for psychic monsters in GY
 function s.cfilter(c)
-	return c:IsRace(RACE_PSYCHIC) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeckOrExtraAsCost()
+	return c:IsRace(RACE_PSYCHIC) and c:IsMonster() and c:IsAbleToDeckOrExtraAsCost()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
 end
 	--Activation legality
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsAbleToEnterBP() and not e:GetHandler():IsHasEffect(EFFECT_DIRECT_ATTACK) end
 end
 	--Shuffle 1 psychic into the deck; this turn, this card can attack directly

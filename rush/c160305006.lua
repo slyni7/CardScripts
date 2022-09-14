@@ -16,7 +16,7 @@ function s.initial_effect(c)
 end
 s.listed_names={160006042,160006060,160305030}
 function s.costfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_WARRIOR) and c:IsAbleToGraveAsCost()
+	return c:IsMonster() and c:IsRace(RACE_WARRIOR) and c:IsAbleToGraveAsCost()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_HAND,0,1,nil) end
@@ -26,7 +26,6 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsSummonType(SUMMON_TYPE_NORMAL) and c:IsStatus(STATUS_SUMMON_TURN)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.sfilter(chkc) end
 	if chk==0 then return Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_GRAVE,0,1,nil) end
 end
 function s.sfilter(c)

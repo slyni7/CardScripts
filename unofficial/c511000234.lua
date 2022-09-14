@@ -50,7 +50,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e6)
 end
 function s.spfilter(c,tp)
-	return c:IsType(TYPE_TRAP) and c:IsAbleToGraveAsCost()
+	return c:IsTrap() and c:IsAbleToGraveAsCost()
 end
 function s.spcon(e,c)
 	if c==nil then return true end
@@ -79,7 +79,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	g:DeleteGroup()
 end
 function s.atkdefval(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsType,c:GetControler(),LOCATION_GRAVE,0,nil,TYPE_TRAP)*1000
+	return Duel.GetMatchingGroupCount(Card.IsTrap,c:GetControler(),LOCATION_GRAVE,0,nil)*1000
 end
 function s.trapdesfilter(c)
 	return c:IsFacedown() and c:IsDestructable()
@@ -124,7 +124,7 @@ function s.spr(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1)
 end
 function s.trapfilter(c)
-	return c:IsType(TYPE_TRAP) and c:IsDiscardable()
+	return c:IsTrap() and c:IsDiscardable()
 end
 function s.risecon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

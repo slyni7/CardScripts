@@ -33,7 +33,7 @@ end
 s.listed_series={0x107b,0x48}
 s.listed_names={CARD_GALAXYEYES_P_DRAGON}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x107b),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x107b),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -74,7 +74,7 @@ function s.atop(e,tp,eg,ep,ev,re,r,rp)
 	local spchk=ft>0 and tc:IsCanBeSpecialSummoned(e,0,tp,false,false)
 	local attchk=Duel.IsExistingMatchingCard(s.attfilter,tp,LOCATION_MZONE,0,1,nil,e)
 	if not (spchk or attchk) then return end
-	local op=aux.SelectEffect(tp,
+	local op=Duel.SelectEffect(tp,
 		{spchk,aux.Stringid(id,3)},
 		{attchk,aux.Stringid(id,4)})
 	local success_chk=nil

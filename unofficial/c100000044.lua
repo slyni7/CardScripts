@@ -67,7 +67,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	g:DeleteGroup()
 end
 function s.sdcon(e)
-	return not Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x3013),0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+	return not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x3013),0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function s.cbcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:GetFirst():IsControler(tp)
@@ -80,7 +80,7 @@ function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local bc=tc:GetBattleTarget()
 	return tc:IsRelateToBattle() and tc:IsControler(tp)
 		and bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE)
-		and bc:IsType(TYPE_MONSTER) and bc:IsPreviousControler(1-tp)
+		and bc:IsMonster() and bc:IsPreviousControler(1-tp)
 end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

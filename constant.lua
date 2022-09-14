@@ -821,6 +821,7 @@ HINTMSG_TOZONE          = 571
 HINTMSG_COUNTER         = 572
 HINTMSG_NEGATE          = 575
 HINTMSG_ATKDEF          = 576
+HINTMSG_APPLYTO         = 577
 --Selects
 SELECT_HEADS = 60
 SELECT_TAILS = 61
@@ -941,6 +942,7 @@ FUSPROC_NOTFUSION  = 0x100
 FUSPROC_CONTACTFUS = 0x200
 FUSPROC_LISTEDMATS = 0x400
 FUSPROC_NOLIMIT    = 0x800
+FUSPROC_CANCELABLE = 0X1000
 --Flags for the type of ritual sumon
 RITPROC_EQUAL      = 0x1
 RITPROC_GREATER    = 0x2
@@ -978,3 +980,4 @@ WIN_REASON_DECK_MASTER         = 0x56
 WIN_REASON_DRAW_OF_FATE        = 0x57
 WIN_REASON_SEKITORI            = 0x58
 Duel.LoadScript("card_counter_constants.lua")
+Duel.LoadScript("archetype_setcode_constants.lua")

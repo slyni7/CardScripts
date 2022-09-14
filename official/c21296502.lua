@@ -51,8 +51,8 @@ function s.atklimit(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.dircon(e)
 	local tp=e:GetHandlerPlayer()
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,15259703),tp,LOCATION_ONFIELD,0,1,nil)
-		and not Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsType,TYPE_TOON),tp,0,LOCATION_MZONE,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,15259703),tp,LOCATION_ONFIELD,0,1,nil)
+		and not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsType,TYPE_TOON),tp,0,LOCATION_MZONE,1,nil)
 end
 function s.costfilter(c)
 	return c:IsSetCard(0x62) and c:IsDiscardable()
@@ -63,7 +63,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,s.costfilter,1,1,REASON_COST+REASON_DISCARD)
 end
 function s.thfilter(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSetCard(0x62) and c:IsAbleToHand()
+	return c:IsSpellTrap() and c:IsSetCard(0x62) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

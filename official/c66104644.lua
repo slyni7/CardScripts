@@ -86,7 +86,7 @@ function s.sptg1(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.GetLocationCountFromEx(tp)>0
 		and Duel.GetUsableMZoneCount(tp)>1 
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(s.spfilter,e,tp),tp,LOCATION_EXTRA,0,1,nil,e,tp)
+		and Duel.IsExistingMatchingCard(aux.FaceupFilter(s.spfilter,e,tp),tp,LOCATION_EXTRA,0,1,nil,e,tp)
 		and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,0)
 end
@@ -99,7 +99,7 @@ function s.spop1(e,tp,eg,ep,ev,re,r,rp)
 		or Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then
 		return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,aux.FilterFaceupFunction(s.spfilter,e,tp),tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,aux.FaceupFilter(s.spfilter,e,tp),tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 	if #g>0 then
 		g:AddCard(c)
 		if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)==2 then
@@ -145,11 +145,11 @@ function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=e:GetLabelObject():GetLabel()
-	if chk==0 then return (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
+	if chk==0 then return Duel.CheckPendulumZones(tp)
 		and (ct==0 or e:GetHandler():IsCanAddCounter(COUNTER_SPELL,ct,false,LOCATION_PZONE)) end
 end
 function s.penop(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return false end
+	if not Duel.CheckPendulumZones(tp) then return false end
 	local c=e:GetHandler()
 	local ct=e:GetLabelObject():GetLabel()
 	if c:IsRelateToEffect(e) and Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true) and ct>0 then

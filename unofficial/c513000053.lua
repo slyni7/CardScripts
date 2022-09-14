@@ -25,7 +25,7 @@ function s.initial_effect(c)
 	e4:SetCode(EFFECT_DISABLE)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_SZONE,LOCATION_SZONE)
-	e4:SetTarget(aux.TargetBoolFunction(Card.IsType,TYPE_TRAP))
+	e4:SetTarget(aux.TargetBoolFunction(Card.IsTrap))
 	c:RegisterEffect(e4)
 	--disable effect
 	local e5=Effect.CreateEffect(c)
@@ -41,7 +41,7 @@ function s.initial_effect(c)
 	e6:SetCode(EFFECT_DISABLE_TRAPMONSTER)
 	e6:SetRange(LOCATION_MZONE)
 	e6:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e6:SetTarget(aux.TargetBoolFunction(Card.IsType,TYPE_TRAP))
+	e6:SetTarget(aux.TargetBoolFunction(Card.IsTrap))
 	c:RegisterEffect(e6)
 	--self destroy
 --[[
@@ -57,11 +57,11 @@ function s.initial_effect(c)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,TYPE_TRAP)
+	local g=Duel.GetMatchingGroup(Card.IsTrap,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0,nil)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,TYPE_TRAP)
+	local g=Duel.GetMatchingGroup(Card.IsTrap,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	local sg=Duel.GetMatchingGroup(Card.IsFacedown,tp,LOCATION_SZONE,LOCATION_SZONE,nil)
 	if #sg>0 then
 		Duel.ConfirmCards(1-tp,sg)

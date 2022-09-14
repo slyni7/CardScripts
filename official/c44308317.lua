@@ -42,13 +42,13 @@ s.listed_names={44308318}
 s.listed_series={0x2f}
 
 function s.changecon(e)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x2f),e:GetHandler():GetControler(),LOCATION_MZONE,0,1,e:GetHandler())
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x2f),e:GetHandler():GetControler(),LOCATION_MZONE,0,1,e:GetHandler())
 end
 function s.changetg(e,c)
 	return c:IsDefensePos()
 end
 function s.spcfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsSetCard(0x2f)
+	return c:IsFaceup() and c:IsMonster() and c:IsSetCard(0x2f)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.spcfilter,tp,LOCATION_MZONE,0,1,nil)
@@ -64,7 +64,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 end
 function s.tokenfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsSetCard(0x2f)
+	return c:IsFaceup() and c:IsMonster() and c:IsSetCard(0x2f)
 end
 function s.tokencon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.tokenfilter,tp,LOCATION_MZONE,0,1,nil)

@@ -17,11 +17,11 @@ function s.initial_effect(c)
 end
 	--Check for a monster that can be returned to deck
 function s.filter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
+	return c:IsMonster() and c:IsAbleToDeck()
 end
 	--Check for card in hand to send to GY
 function s.tdfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_PSYCHIC) and c:IsAbleToDeckOrExtraAsCost()
+	return c:IsMonster() and c:IsRace(RACE_PSYCHIC) and c:IsAbleToDeckOrExtraAsCost()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tdfilter,tp,LOCATION_GRAVE,0,1,nil) end
@@ -44,7 +44,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.HintSelection(g)
 		if #g>0 then
 			Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
-			if Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsType,TYPE_NORMAL),tp,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+			if Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsType,TYPE_NORMAL),tp,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 				Duel.Recover(tp,500,REASON_EFFECT)
 			end
 		end

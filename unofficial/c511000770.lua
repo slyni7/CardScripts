@@ -31,7 +31,7 @@ function s.accost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,500)
 end
 function s.accon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsDefensePos() and not Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_GRAVE,0,1,nil,TYPE_SPELL)
+	return e:GetHandler():IsDefensePos() and not Duel.IsExistingMatchingCard(Card.IsSpell,tp,LOCATION_GRAVE,0,1,nil)
 end
 function s.acfilter(c,e,tp)
 	local te=c:GetActivateEffect()
@@ -44,7 +44,7 @@ function s.acfilter(c,e,tp)
 		end
 	end
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
-	return c:IsType(TYPE_SPELL) and c:CheckActivateEffect(false,false,false)~=nil and (ft>0 or c:IsType(TYPE_FIELD))
+	return c:IsSpell() and c:CheckActivateEffect(false,false,false)~=nil and (ft>0 or c:IsType(TYPE_FIELD))
 end
 function s.actg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_GRAVE) and s.acfilter(chkc,e,tp) end

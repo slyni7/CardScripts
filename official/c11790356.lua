@@ -41,7 +41,7 @@ end
 s.listed_names={78193831}
 s.listed_series={0xd7,0xd6}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0xd7),tp,LOCATION_MZONE,0,1,nil)
+	return not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0xd7),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.filter(c,e,tp)
 	return c:IsCode(78193831) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -64,10 +64,10 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 end
 function s.cfilter(c)
-	return c:IsSetCard(0xd7) and c:IsType(TYPE_MONSTER) and c:IsFaceup()
+	return c:IsSetCard(0xd7) and c:IsMonster() and c:IsFaceup()
 end
 function s.filter2(c)
-	return c:IsSetCard(0xd6) and c:IsType(TYPE_MONSTER) and not c:IsForbidden()
+	return c:IsSetCard(0xd6) and c:IsMonster() and not c:IsForbidden()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.cfilter(chkc) end

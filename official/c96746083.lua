@@ -4,6 +4,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Destroy 2 monsters and Special Summon itself from the hand
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON+CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
@@ -13,6 +14,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	--Add 1 non-FIRE Wyrm from the GY to the hand
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
@@ -24,7 +26,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.desfilter(c)
-	return c:IsType(TYPE_MONSTER) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
+	return c:IsMonster() and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
 end
 function s.desfilter2(c)
 	return c:IsFaceup() and c:GetSequence()<5
@@ -55,7 +57,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_MZONE+LOCATION_GRAVE)
 end
 function s.rmfilter(c,tp)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove(tp)
+	return c:IsMonster() and c:IsAbleToRemove(tp)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -91,7 +93,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			return
 		end
 		local rg=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_MZONE+LOCATION_GRAVE,nil,tp)
-		if rm and #rg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		if rm and #rg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 			local tg=rg:Select(tp,1,1,nil)
 			Duel.HintSelection(tg)

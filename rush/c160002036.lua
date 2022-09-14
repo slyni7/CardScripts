@@ -21,20 +21,20 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.costfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost() and c:IsAttribute(ATTRIBUTE_EARTH)
+	return c:IsMonster() and c:IsAbleToGraveAsCost() and c:IsAttribute(ATTRIBUTE_EARTH)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_HAND,0,1,nil) end
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
-		and Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_GRAVE,0,1,nil,TYPE_MONSTER) end
+		and Duel.IsExistingMatchingCard(Card.IsMonster,tp,LOCATION_GRAVE,0,1,nil) end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	--Requirement
 	if Duel.DiscardHand(tp,s.costfilter,1,1,REASON_COST)>0 then
 		--Effect
-		local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
+		local g=Duel.GetMatchingGroup(Card.IsMonster,tp,LOCATION_GRAVE,0,nil)
 		if #g==0 then return end
 		local sg=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_MZONE,1,1,nil)
 		Duel.HintSelection(sg)

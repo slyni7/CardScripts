@@ -1,7 +1,6 @@
 --軍貫処『海せん』
 --Gunkan Sushipyard Seaside Supper Spot
 --Scripted by The Razgriz
-
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
@@ -40,7 +39,7 @@ s.listed_series={0x168}
 s.listed_names={CARD_SUSHIP_SHARI}
 
 function s.cfilter(c,tp)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x168) and c:IsSummonPlayer(tp)
+	return c:IsMonster() and c:IsSetCard(0x168) and c:IsSummonPlayer(tp)
 end
 function s.dtcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
@@ -96,12 +95,11 @@ function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
 			local sc=xyzg:GetFirst()
 			if sc then
 				Duel.BreakEffect()
+				sc:SetMaterial(hc)
 				Duel.Overlay(sc,hc)
-				if Duel.SpecialSummonStep(sc,SUMMON_TYPE_XYZ,tp,tp,true,false,POS_FACEUP) then
-					sc:SetMaterial(hc)
+				if Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,true,false,POS_FACEUP)>0 then
+					sc:CompleteProcedure()
 				end
-				Duel.SpecialSummonComplete()
-				sc:CompleteProcedure()
 			end
 		end
 	end

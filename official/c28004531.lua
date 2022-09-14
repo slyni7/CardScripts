@@ -35,7 +35,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x114}
 function s.thfilter(c)
-	return c:IsSetCard(0x114) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+	return c:IsSetCard(0x114) and c:IsSpellTrap() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -50,7 +50,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.gthcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsMainPhase() and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x114),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsMainPhase() and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x114),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.gthfilter(c,ft,e,tp)
 	return c:IsSetCard(0x114)

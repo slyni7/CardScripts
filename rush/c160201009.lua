@@ -1,8 +1,7 @@
 --右手に盾を左手に剣を
---Shield & Sword
+--Shield & Sword (Rush)
 local s,id=GetID()
 function s.initial_effect(c)
-	Card.Alias(c,52097679)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
@@ -14,8 +13,8 @@ function s.initial_effect(c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:IsHasType(EFFECT_TYPE_ACTIVATE)
-		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.HasDefense),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.HasDefense),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.HasDefense),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.HasDefense),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	Duel.SetTargetCard(g)
 end
 function s.filter(c,e)

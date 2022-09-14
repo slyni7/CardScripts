@@ -27,14 +27,14 @@ end
 s.listed_names={CARD_JINZO}
 
 function s.condition1(e,tp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_JINZO),tp,LOCATION_ONFIELD,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_JINZO),tp,LOCATION_ONFIELD,0,1,nil)
 end
 function s.target1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_MACHINE),tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsRace,RACE_MACHINE),tp,LOCATION_MZONE,0,1,nil) end
 end
 function s.operation1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsRace,RACE_MACHINE),tp,LOCATION_MZONE,0,nil)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsRace,RACE_MACHINE),tp,LOCATION_MZONE,0,nil)
 	for tc in aux.Next(g) do
 		--Cannot be destroyed by opponent's card effects
 		local e1=Effect.CreateEffect(c)
@@ -51,7 +51,7 @@ function s.efilter(e,re,rp)
 	return e:GetHandlerPlayer()==1-rp
 end
 function s.tgfilter(c,tp)
-	return c:IsControler(tp) and c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsType(TYPE_MONSTER)
+	return c:IsControler(tp) and c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsMonster()
 end
 function s.condition2(e,tp,eg,ep,ev,re,r,rp)
 	if not s.condition1(e,tp) or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end

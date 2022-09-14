@@ -13,10 +13,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_GRAVE,0,5,nil,TYPE_MONSTER)
+	return Duel.IsExistingMatchingCard(Card.IsMonster,tp,LOCATION_GRAVE,0,5,nil)
 end
 function s.filter(c)
-	return c:IsAttackBelow(1500) and c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_EFFECT) and c:IsAbleToHand()
+	return c:IsAttackBelow(1500) and c:IsMonster() and not c:IsType(TYPE_EFFECT) and c:IsAbleToHand()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.filter(chkc) end

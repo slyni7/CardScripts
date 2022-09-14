@@ -41,7 +41,7 @@ s.listed_series={0x131}
 s.listed_names={CARD_DREAM_MIRROR_JOY,CARD_DREAM_MIRROR_TERROR}
 
 function s.filter(c)
-	return c:IsSetCard(0x131) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0x131) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
@@ -55,6 +55,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.condition(cid)
 	return function(e,c)
-				return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,cid),0,LOCATION_FZONE,LOCATION_FZONE,1,nil)
+				return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,cid),0,LOCATION_FZONE,LOCATION_FZONE,1,nil)
 			end
 end

@@ -34,7 +34,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function s.spfilter(c)
-	return c:IsType(TYPE_MONSTER) and (c:IsFaceup() or not c:IsOnField()) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true,true)
+	return c:IsMonster() and (c:IsFaceup() or not c:IsOnField()) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true,true)
 end
 function s.rescon(sg,e,tp)
 	return aux.ChkfMMZ(1)(sg,e,tp,nil) and sg:GetClassCount(Card.GetAttribute)==#sg,sg:GetClassCount(Card.GetAttribute)~=#sg
@@ -79,7 +79,7 @@ end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local arc=e:GetLabel()
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsAttribute,arc),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsAttribute,arc),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if #g>0 then
 		Duel.Destroy(g,REASON_EFFECT)
 	end

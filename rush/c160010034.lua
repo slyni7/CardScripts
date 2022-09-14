@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.costfilter(c,e,tp)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost() and c:IsRace(RACE_AQUA)
+	return c:IsMonster() and c:IsAbleToGraveAsCost() and c:IsRace(RACE_AQUA)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
@@ -39,7 +39,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(1500)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
-		local dg=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_SPELL+TYPE_TRAP)
+		local dg=Duel.GetMatchingGroup(Card.IsSpellTrap,tp,0,LOCATION_ONFIELD,nil)
 		if #dg>0 and g:GetFirst():IsAttackBelow(100) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			local sg=dg:Select(tp,1,1,nil)
 			Duel.HintSelection(sg)
