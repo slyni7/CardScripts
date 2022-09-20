@@ -1,4 +1,4 @@
-Duel.LoadScript("expansions/convert-from-core.lua")
+Duel.LoadScript("convert-from-core.lua")
 if IREDO_COMES_TRUE then
 	function Auxiliary.Stringid(code,id)
 		return code*16+id
@@ -37,7 +37,7 @@ else
 	EFFECT_COUNT_CODE_DUEL   = 0x20000000
 	EFFECT_COUNT_CODE_SINGLE = 0x40000000
 	SUMMON_TYPE_ADVANCE=SUMMON_TYPE_TRIBUTE
-	Duel.LoadScript("expansions/script/exinit.lua")
+	Duel.LoadScript("exinit.lua")
 end
 
 local ct=Duel.GetFieldGroupCount(1,LOCATION_DECK,0)
