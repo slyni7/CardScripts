@@ -2,7 +2,7 @@
 
 YuL={}
 
-pcall(Duel.LoadScript,"expansions/script/proc_module.lua")
+Duel.LoadScript("proc_module.lua")
 
 --SEARCHING CARD CATEGORY
 CATEGORY_SEARCH_CARD=CATEGORY_SEARCH+CATEGORY_TOHAND
