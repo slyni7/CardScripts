@@ -1,4 +1,4 @@
-Duel.LoadScript("expansions/script/proc_version_check.lua")
+Duel.LoadScript("proc_version_check.lua")
 
 function Auxiliary.FilterBoolFunctionEx(f,...)
 	local params={...}
@@ -138,7 +138,7 @@ function GetID()
 	return self_table,self_code
 end
 
-Duel.LoadScript("expansions/script/AuxCard_CustomType.lua")
+Duel.LoadScript("AuxCard_CustomType.lua")
 if YGOPRO_VERSION~="Percy/EDO" then
 	pcall(Duel.LoadScript,"expansions/script/proc_fusion_koishi.lua")
 	pcall(Duel.LoadScript,"expansions/script/proc_synchro_koishi.lua")
@@ -148,12 +148,12 @@ pcall(Duel.LoadScript,"expansions/script/proc_equation.lua")
 --pcall(Duel.LoadScript,"expansions/script/proc_access.lua")
 pcall(Duel.LoadScript,"expansions/script/proc_order.lua")
 pcall(Duel.LoadScript,"expansions/script/proc_diffusion.lua")
-Duel.LoadScript("expansions/script/proc_beyond.lua")
-Duel.LoadScript("expansions/script/proc_square.lua")
-Duel.LoadScript("expansions/script/proc_delight.lua")
-Duel.LoadScript("expansions/script/proc_scripted.lua")
+Duel.LoadScript("proc_beyond.lua")
+Duel.LoadScript("proc_square.lua")
+Duel.LoadScript("proc_delight.lua")
+Duel.LoadScript("proc_scripted.lua")
 pcall(Duel.LoadScript,"expansions/script/inf.lua")
-Duel.LoadScript("expansions/script/ireina.lua")
+Duel.LoadScript("ireina.lua")
 pcall(Duel.LoadScript,"expansions/script/BELCH.lua")
 pcall(Duel.LoadScript,"expansions/script/mirror.lua")
 pcall(Duel.LoadScript,"expansions/script/Spinel.lua")
@@ -165,7 +165,7 @@ pcall(Duel.LoadScript,"expansions/script/cirukiru9.lua")
 pcall(Duel.LoadScript,"expansions/script/additional_setcards.lua")
 pcall(Duel.LoadScript,"expansions/script/remove_xyz_which_have_rank.lua")
 pcall(Duel.LoadScript,"expansions/script/kaos.lua")
-Duel.LoadScript("expansions/script/SSSS.lua")
+Duel.LoadScript("SSSS.lua")
 local cregeff=Card.RegisterEffect
 Auxiliary.MetatableEffectCount=true
 function Card.RegisterEffect(c,e,forced,...)
@@ -192,4 +192,4 @@ function Card.RegisterEffect(c,e,forced,...)
 	end
 	cregeff(c,e,forced,...)
 end
---Duel.LoadScript("expansions/script/RDD.lua")
+--Duel.LoadScript("RDD.lua")

@@ -1804,7 +1804,7 @@ function Card.RegisterEffect(c,e,forced,...)
 	end
 end
 
---Duel.LoadScript("expansions/script/proc_delay.lua")
+--Duel.LoadScript("proc_delay.lua")
 
 EFFECT_ALICE_SCARLET=18453385
 local cregeff=Card.RegisterEffect
@@ -2281,8 +2281,8 @@ function Card.RegisterEffect(c,e,...)
 	end
 end
 
---Duel.LoadScript("expansions/script/proto.lua")
+--Duel.LoadScript("proto.lua")
 
---Duel.LoadScript("expansions/script/RDD.lua")
+--Duel.LoadScript("RDD.lua")
 
---Duel.LoadScript("expansions/script/fairduel.lua")
+--Duel.LoadScript("fairduel.lua")
