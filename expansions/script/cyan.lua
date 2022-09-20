@@ -122,4 +122,4 @@ function cyan.htgcost(ct)
 	end
 end
 
-pcall(Duel.LoadScript,"expansions/script/proc_access.lua")
+Duel.LoadScript("proc_access.lua")

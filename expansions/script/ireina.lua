@@ -1786,7 +1786,7 @@ if not CATEGORY_LVCHANGE then
 	CATEGORY_LVCHANGE=0x0
 end
 
-pcall(Duel.LoadScript,"expansions/script/yukitokisaki.lua")
+Duel.LoadScript("yukitokisaki.lua")
 
 local cregeff=Card.RegisterEffect
 function Card.RegisterEffect(c,e,forced,...)

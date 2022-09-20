@@ -10,7 +10,7 @@ Auxiliary.AdditionalSetcardsList={
 --Æ¼¾Æ¶ó
 [0x2c4]={37164373},
 }
-pcall(Duel.LoadScript,"expansions/expand.lua")
+Duel.LoadScript("expand.lua")
 local cisc=Card.IsSetCard
 function Card.IsSetCard(c,set,...)
 	if Auxiliary.AdditionalSetcardsList[set]
