@@ -1786,7 +1786,7 @@ if not CATEGORY_LVCHANGE then
 	CATEGORY_LVCHANGE=0x0
 end
 
-pcall(dofile,"expansions/script/yukitokisaki.lua")
+pcall(Duel.LoadScript,"expansions/script/yukitokisaki.lua")
 
 local cregeff=Card.RegisterEffect
 function Card.RegisterEffect(c,e,forced,...)
@@ -1804,7 +1804,7 @@ function Card.RegisterEffect(c,e,forced,...)
 	end
 end
 
---dofile("expansions/script/proc_delay.lua")
+--Duel.LoadScript("expansions/script/proc_delay.lua")
 
 EFFECT_ALICE_SCARLET=18453385
 local cregeff=Card.RegisterEffect
@@ -2281,8 +2281,8 @@ function Card.RegisterEffect(c,e,...)
 	end
 end
 
---dofile("expansions/script/proto.lua")
+--Duel.LoadScript("expansions/script/proto.lua")
 
---dofile("expansions/script/RDD.lua")
+--Duel.LoadScript("expansions/script/RDD.lua")
 
---dofile("expansions/script/fairduel.lua")
+--Duel.LoadScript("expansions/script/fairduel.lua")
