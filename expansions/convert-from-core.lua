@@ -12,5 +12,6 @@ if IREDO_COMES_TRUE==nil then
 end
 Duel.LoadScript("convert-from-core-proc_ritual.lua")
 Duel.LoadScript("convert-from-core-proc_synchro.lua")
+Duel.LoadScript("convert-from-core-proc_union.lua")
 Duel.LoadScript("convert-from-core-proc_xyz.lua")
 Duel.LoadScript("convert-from-core-utility.lua")
