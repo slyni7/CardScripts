@@ -1786,7 +1786,7 @@ if not CATEGORY_LVCHANGE then
 	CATEGORY_LVCHANGE=0x0
 end
 
-Duel.LoadScript("yukitokisaki.lua")
+pcall(dofile,"expansions/script/yukitokisaki.lua")
 
 local cregeff=Card.RegisterEffect
 function Card.RegisterEffect(c,e,forced,...)
@@ -1804,7 +1804,7 @@ function Card.RegisterEffect(c,e,forced,...)
 	end
 end
 
---Duel.LoadScript("proc_delay.lua")
+--dofile("expansions/script/proc_delay.lua")
 
 EFFECT_ALICE_SCARLET=18453385
 local cregeff=Card.RegisterEffect
@@ -2281,8 +2281,90 @@ function Card.RegisterEffect(c,e,...)
 	end
 end
 
---Duel.LoadScript("proto.lua")
+local gid=GetID
+EDOCard={}
+function GetID(...)
+	local s,id=gid(...)
+	EDOCard[id]=true
+	return gid(...)
+end
 
---Duel.LoadScript("RDD.lua")
+Auxiliary.TriggeringEffect=nil
 
---Duel.LoadScript("fairduel.lua")
+local est=Effect.SetTarget
+function Effect.SetTarget(e,tg)
+	if e:IsHasType(EFFECT_TYPE_ACTIONS) then
+		local tgf=function(...)
+			local t={...}
+			Auxiliary.TriggeringEffect=t[1]
+			local res=tg(...)
+			Auxiliary.TriggeringEffect=nil
+			return res
+		end
+		est(e,tgf)
+	else
+		est(e,tg)
+	end
+end
+
+local cixs=Card.IsXyzSummonable
+function Card.IsXyzSummonable(...)
+	local ce=dgci(0,CHAININFO_TRIGGERING_EFFECT)
+	if not ce then
+		ce=Auxiliary.TriggeringEffect
+	end
+	if not ce then
+		return cixs(...)
+	end
+	local id=ce:GetHandler():GetOriginalCode()
+	if EDOCard[id] then
+		return cixs(...)
+	else
+		local t={...}
+		local c=t[1]
+		local a=t[2]
+		local b=t[3]
+		local d=t[4]
+		if d then
+			return cixs(c,nil,a,b,d)
+		elseif a and not b then
+			return cixs(c,nil,a)
+		else
+			return cixs(...)
+		end
+	end
+end
+
+local dxs=Duel.XyzSummon
+function Duel.XyzSummon(...)
+	local ce=dgci(0,CHAININFO_TRIGGERING_EFFECT)
+	if not ce then
+		ce=Auxiliary.TriggeringEffect
+	end
+	if not ce then
+		return dxs(...)
+	end
+	local id=ce:GetHandler():GetOriginalCode()
+	if EDOCard[id] then
+		return cixs(...)
+	else
+		local t={...}
+		local p=t[1]
+		local c=t[2]
+		local a=t[3]
+		local b=t[4]
+		if not a and b then
+			return dxs(p,c,nil,b,1,99)
+		elseif a and not b then
+			return dxs(p,c,nil,a)
+		else
+			return dxs(...)
+		end
+	end
+end
+
+--dofile("expansions/script/proto.lua")
+
+--dofile("expansions/script/RDD.lua")
+
+--dofile("expansions/script/fairduel.lua")
