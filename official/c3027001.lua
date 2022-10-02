@@ -15,6 +15,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_HAND+LOCATION_DECK)
 	e2:SetTargetRange(LOCATION_HAND,LOCATION_HAND)
 	c:RegisterEffect(e2)
+	Card.IsPublic=aux.FALSE
 end
 function s.cfilter(c,tp)
 	return c:IsTrap() and c:IsControler(tp)
