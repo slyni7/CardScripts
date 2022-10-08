@@ -169,28 +169,39 @@ function Card.CheckAdjacent(c)
 		or (seq<4 and Duel.CheckLocation(p,LOCATION_MZONE,seq+1))
 end
 
-function Card.SelectAdjacent(c)
-	local tp=c:GetControler()
-	local seq=c:GetSequence()
-	local flag=0
-	if seq>0 and Duel.CheckLocation(tp,LOCATION_MZONE,seq-1) then flag=flag|(0x1<<seq-1) end
-	if seq<4 and Duel.CheckLocation(tp,LOCATION_MZONE,seq+1) then flag=flag|(0x1<<seq+1) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOZONE)
-	local sel=Duel.SelectDisableField(tp,1,LOCATION_MZONE,0,~flag)
-	Duel.Hint(HINT_ZONE,tp,sel)
-	return math.log(sel,2)
-end
-
-function Card.MoveAdjacent(c)
-	local tp=c:GetControler()
+function Card.SelectAdjacent(c,sel_player)
 	local seq=c:GetSequence()
 	if seq>4 then return end
 	local flag=0
-	if seq>0 and Duel.CheckLocation(tp,LOCATION_MZONE,seq-1) then flag=flag|(0x1<<seq-1) end
-	if seq<4 and Duel.CheckLocation(tp,LOCATION_MZONE,seq+1) then flag=flag|(0x1<<seq+1) end
+	local targ_player=c:GetControler()
+	if seq>0 and Duel.CheckLocation(targ_player,LOCATION_MZONE,seq-1) then flag=flag|(0x1<<seq-1) end
+	if seq<4 and Duel.CheckLocation(targ_player,LOCATION_MZONE,seq+1) then flag=flag|(0x1<<seq+1) end
 	if flag==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOZONE)
-	Duel.MoveSequence(c,math.log(Duel.SelectDisableField(tp,1,LOCATION_MZONE,0,~flag),2))
+	local sel_player=sel_player==nil and targ_player or sel_player
+	local loc1=targ_player==sel_player and LOCATION_MZONE or 0
+	local loc2=loc1==0 and LOCATION_MZONE or 0
+	local shift=loc2*4
+	Duel.Hint(HINT_SELECTMSG,sel_player,HINTMSG_TOZONE)
+	local zone=(Duel.SelectDisableField(sel_player,1,loc1,loc2,~(flag<<shift)))>>shift
+	Duel.Hint(HINT_ZONE,targ_player,zone)
+	return math.log(zone,2)
+end
+
+function Card.MoveAdjacent(c,sel_player)
+	local seq=c:GetSequence()
+	if seq>4 then return end
+	local flag=0
+	local targ_player=c:GetControler()
+	if seq>0 and Duel.CheckLocation(targ_player,LOCATION_MZONE,seq-1) then flag=flag|(0x1<<seq-1) end
+	if seq<4 and Duel.CheckLocation(targ_player,LOCATION_MZONE,seq+1) then flag=flag|(0x1<<seq+1) end
+	if flag==0 then return end
+	local sel_player=sel_player==nil and targ_player or sel_player
+	local loc1=targ_player==sel_player and LOCATION_MZONE or 0
+	local loc2=loc1==0 and LOCATION_MZONE or 0
+	local shift=loc2*4
+	Duel.Hint(HINT_SELECTMSG,sel_player,HINTMSG_TOZONE)
+	local zone=Duel.SelectDisableField(sel_player,1,loc1,loc2,~(flag<<shift))
+	Duel.MoveSequence(c,math.log(zone>>shift,2))
 end
 
 function Card.IsColumn(c,seq,tp,loc)
@@ -486,8 +497,7 @@ end
 function Card.IsOriginalCode(c,...)
 	local args={...}
 	if #args==0 then
-		Debug.Message("Card.IsOriginalCode requires at least 2 params")
-		return false
+		error("Card.IsOriginalCode requires at least 2 params",2)
 	end
 	for _,cd in ipairs(args) do
 		if c:GetOriginalCode()==cd then return true end
@@ -498,8 +508,7 @@ end
 function Card.IsOriginalCodeRule(c,...)
 	local args={...}
 	if #args==0 then
-		Debug.Message("Card.IsOriginalCodeRule requires at least 2 params")
-		return false
+		error("Card.IsOriginalCodeRule requires at least 2 params",2)
 	end
 	local c1,c2=c:GetOriginalCodeRule()
 	for _,cd in ipairs(args) do
@@ -2109,32 +2118,38 @@ end
 function Auxiliary.DelayedOperation(card_or_group,phase,flag,e,tp,oper,cond,reset,reset_count,hint)
 	local g=(type(card_or_group)=="Group" and card_or_group or Group.FromCards(card_or_group))
 	if #g==0 then return end
-	reset=reset or (RESET_PHASE+phase)
+	reset=reset or (RESET_PHASE|phase)
 	reset_count=reset_count or 1
 	local fid=e:GetFieldID()
-	local flagprop=hint and EFFECT_FLAG_CLIENT_HINT or 0
-	for tc in g:Iter() do
-		tc:RegisterFlagEffect(flag,RESET_EVENT+RESETS_STANDARD+reset,flagprop,reset_count,fid,hint)
-	end
-	g:KeepAlive()
-	local function get_affected_group()
-		return g:Filter(function(c) return c:GetFlagEffectLabel(flag)==fid end,nil)
-	end
+	local function agfilter(c,lbl) return c:GetFlagEffectLabel(flag)==lbl end
+	local function get_affected_group(e) return e:GetLabelObject():Filter(agfilter,nil,e:GetLabel()) end
+
 	--Apply operation
-	local e1=Effect.CreateEffect(e:GetHandler())
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE|phase)
-	e1:SetReset(reset,resetcount)
+	e1:SetReset(reset,reset_count)
 	e1:SetCountLimit(1)
-	e1:SetLabelObject(g) --in case something needs access to it after registry (e.g. when overwriting oper and cond) 
-	e1:SetCondition(function(...)
-		local ag=get_affected_group()
-		return #ag>0 and (not cond or cond(ag,...))
+	e1:SetLabel(fid)
+	e1:SetLabelObject(g)
+	e1:SetCondition(function(e,...)
+		local ag=get_affected_group(e)
+		return #ag>0 and (not cond or cond(ag,e,...))
 	end)
-	e1:SetOperation(function(...)
-		if oper then oper(get_affected_group(),...) end
+	e1:SetOperation(function(e,...)
+		if oper then oper(get_affected_group(e),e,...) end
 	end)
 	Duel.RegisterEffect(e1,tp)
+
+	--Flag cards
+	local flagprop=hint and EFFECT_FLAG_CLIENT_HINT or 0
+	local function flagcond() return not e1:IsDeleted() end
+	for tc in g:Iter() do
+		tc:RegisterFlagEffect(flag,RESET_EVENT+RESETS_STANDARD,flagprop,1,fid,hint):SetCondition(flagcond)
+	end
+	g:KeepAlive()
+
 	return e1
 end
 
@@ -2165,27 +2180,33 @@ function Auxiliary.RemoveUntil(card_or_group,pos,reason,phase,flag,e,tp,oper,con
 	end
 end
 
+local function select_field_return_cards(p,g)
+	if #g==0 then return end
+	local ft=Duel.GetLocationCount(p,LOCATION_MZONE)
+	if ft>0 and #g>ft then
+		Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TOFIELD)
+		local tg=g:Select(p,ft,ft,nil)
+		for tc in tg:Iter() do
+			Duel.ReturnToField(tc)
+		end
+		g:Sub(tg)
+	end
+	for tc in g:Iter() do
+		Duel.ReturnToField(tc)
+	end
+end
+
 --[[
 	An operation function to be used with `aux.RemoveUntil`.
-	Will return the banished cards to the monster zone.
-	Makes the player select cards to return if there are less available zones than returnable cards.
+	Will return the banished cards to the monster zone, starting with the turn player.
+	Makes each player select cards to return if they have fewer available zones than returnable cards.
 --]]
-function Auxiliary.DefaultFieldReturnOp(rg,e,tp)
+function Auxiliary.DefaultFieldReturnOp(rg)
 	if #rg==0 then return end
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE,0)
-	local tg=nil
-	if ft>0 and #rg>ft then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-		tg=rg:Select(tp,ft,ft,nil)
-	else
-		tg=rg:Clone()
-	end
-	for tc in tg:Iter() do
-		Duel.ReturnToField(tc)
-	end
-	for tc in rg:Sub(tg):Iter() do
-		Duel.ReturnToField(tc)
-	end
+	local turn_p=Duel.GetTurnPlayer()
+	local g0,g1=rg:Split(Card.IsPreviousControler,nil,turn_p)
+	select_field_return_cards(turn_p,g0)
+	select_field_return_cards(1-turn_p,g1)
 end
 
 Duel.LoadScript("cards_specific_functions.lua")
