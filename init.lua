@@ -1,5 +1,4 @@
 Duel.LoadScript("convert-from-core.lua")
-dofile("abc.lua")
 if IREDO_COMES_TRUE then
 	function Auxiliary.Stringid(code,id)
 		return code*16+id
