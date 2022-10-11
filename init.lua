@@ -1,3 +1,5 @@
+Debug.Message("loadfile")
+Debug.Message("assert")
 Duel.LoadScript("convert-from-core.lua")
 if IREDO_COMES_TRUE then
 	function Auxiliary.Stringid(code,id)
