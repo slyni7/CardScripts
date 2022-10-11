@@ -38,7 +38,6 @@ function c76859401.initial_effect(c)
 		Duel.RegisterEffect(ge2,0)
 	end
 end
-Debug.Message(76859401)
 function c76859401.gop1(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	while tc do
