@@ -1,5 +1,5 @@
 --戦華史略-東南之風
---Ancient Warriors Saga - Southeast Wind
+--Ancient Warriors Saga - East-by-South Winds
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetTarget(s.target)
 	c:RegisterEffect(e1)
-	--Toss
+	--Toss a coin and send this card to the GY
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_COIN+CATEGORY_TOGRAVE)
@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.tgtg)
 	e2:SetOperation(s.tgop)
 	c:RegisterEffect(e2)
-	--register effect
+	--Register effect when sent to the GY
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -29,25 +29,22 @@ function s.initial_effect(c)
 	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 end
-s.listed_series={0x137}
+s.listed_series={SET_ANCIENT_WARRIORS}
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local c=e:GetHandler()
-	--send self to gy
+	--Send itself to the GY during the second Standby Phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
-	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_SZONE)
-	e1:SetCondition(s.scon)
+	e1:SetCountLimit(1)
+	e1:SetCondition(function(_,tp) return Duel.IsTurnPlayer(tp) end)
 	e1:SetOperation(s.sop)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 	c:SetTurnCounter(0)
 	c:RegisterEffect(e1)
-end
-function s.scon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp
 end
 function s.sop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -63,21 +60,16 @@ function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local coin=Duel.TossCoin(tp,1)
-	if coin==1 then
+	if Duel.TossCoin(tp,1)==COIN_HEADS then
 		Duel.SendtoGrave(e:GetHandler(),REASON_EFFECT)
 	end
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_SZONE)
 end
-function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x137)
-end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	--Cannot respond
+	--Your opponent cannot activate cards and effects in response to "Ancient Warriors" cards
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_CHAINING)
@@ -85,21 +77,22 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 	aux.RegisterClientHint(c,nil,tp,1,1,aux.Stringid(id,1),nil)
-	for tc in aux.Next(Duel.GetMatchingGroup(s.filter,tp,LOCATION_MZONE,0,nil)) do
-		--Destroy
-		local e2=Effect.CreateEffect(c)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsSetCard,SET_ANCIENT_WARRIORS),tp,LOCATION_MZONE,0,nil)
+	for tc in g:Iter() do
+		--Destroy 1 card the opponent controls
+		local e2=Effect.CreateEffect(tc)
 		e2:SetDescription(aux.Stringid(id,2))
 		e2:SetCategory(CATEGORY_DESTROY)
 		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 		e2:SetCode(EVENT_ATTACK_ANNOUNCE)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		e2:SetTarget(s.destg)
 		e2:SetOperation(s.desop)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e2)
 	end
 end
 function s.chainop(e,tp,eg,ep,ev,re,r,rp)
-	if re:GetHandler():IsSetCard(0x137) and ep==tp then
+	if re:GetHandler():IsSetCard(SET_ANCIENT_WARRIORS) and ep==tp then
 		Duel.SetChainLimit(s.chainlm)
 	end
 end
@@ -107,15 +100,14 @@ function s.chainlm(e,ep,tp)
 	return tp==ep
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil) end
-	local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_ONFIELD,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(nil,tp,0,LOCATION_ONFIELD,1,nil) end
+	local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local tc=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,1,nil):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,nil,tp,0,LOCATION_ONFIELD,1,1,nil):GetFirst()
 	if tc then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
-

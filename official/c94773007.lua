@@ -1,7 +1,8 @@
 --地雷蜘蛛
+--Jirai Gumo
 local s,id=GetID()
 function s.initial_effect(c)
-	--coin
+	--Toss a coin and halve the player's LP
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_COIN)
@@ -17,9 +18,7 @@ function s.attg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
 end
 function s.atop(e,tp,eg,ep,ev,re,r,rp)
-	local opt=Duel.SelectOption(tp,60,61)
-	local coin=Duel.TossCoin(tp,1)
-	if opt==coin then
+	if not Duel.CallCoin(tp) then
 		Duel.SetLP(tp,math.ceil(Duel.GetLP(tp)/2))
 	end
 end

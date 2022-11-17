@@ -27,9 +27,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.toss_coin=true
-s.listed_names={73206827}
-s.listed_series={0x5}
-
+s.listed_names={CARD_LIGHT_BARRIER}
+s.listed_series={SET_ARCANA_FORCE}
 function s.thfilter(c)
 	return c.toss_coin and c:IsAbleToHand() and not c:IsCode(id)
 end
@@ -41,30 +40,37 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local sel
-	if Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,73206827),tp,LOCATION_FZONE,0,1,nil) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_COIN)
-		sel=1-Duel.SelectOption(tp,true,SELECT_HEADS,SELECT_TAILS)
+	if Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_LIGHT_BARRIER),tp,LOCATION_FZONE,0,1,nil) then
+		local self=Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)
+		local oppo=Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,0,LOCATION_DECK,1,nil)
+		local op=Duel.SelectEffect(tp,{self,aux.GetCoinEffectHintString(COIN_HEADS)},{oppo,aux.GetCoinEffectHintString(COIN_TAILS)})
+		if op==1 then
+			sel=COIN_HEADS
+		elseif op==2 then
+			sel=COIN_TAILS
+		else
+			return
+		end
 	else
 		sel=Duel.TossCoin(tp,1)
 	end
-	if sel==1 then
+	if sel==COIN_HEADS then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
 		if #g>0 then
 			Duel.SendtoHand(g,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,g)
 		end
-	else
+	elseif sel==COIN_TAILS then
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
 		local g=Duel.SelectMatchingCard(1-tp,Card.IsAbleToHand,tp,0,LOCATION_DECK,1,1,nil)
 		if #g>0 then
 			Duel.SendtoHand(g,nil,REASON_EFFECT)
-			--Duel.ConfirmCards(tp,g)
 		end
 	end
 end
 function s.nsfilter(c)
-	return c:IsSetCard(0x5) and c:IsSummonable(true,nil)
+	return c:IsSetCard(SET_ARCANA_FORCE) and c:IsSummonable(true,nil)
 end
 function s.nstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.nsfilter,tp,LOCATION_HAND,0,1,nil) end

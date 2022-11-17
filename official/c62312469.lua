@@ -2,32 +2,32 @@
 --Dark Doriado
 local s,id=GetID()
 function s.initial_effect(c)
-	--pendulum summon
+	--Pendulum Summon
 	Pendulum.AddProcedure(c)
-	--atk
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_UPDATE_ATTACK)
-	e2:SetRange(LOCATION_PZONE)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(s.atktg)
-	e2:SetValue(s.value)
+	--Increase ATK of monsters you control
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetRange(LOCATION_PZONE)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(s.atktg)
+	e1:SetValue(s.value)
+	c:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EFFECT_UPDATE_DEFENSE)
+	--Place 4 monsters on the top of the Deck
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_SUMMON_SUCCESS)
+	e3:SetTarget(s.sttg)
+	e3:SetOperation(s.stop)
 	c:RegisterEffect(e3)
-	--deck sort
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_DELAY)
-	e4:SetCode(EVENT_SUMMON_SUCCESS)
-	e4:SetTarget(s.sttg)
-	e4:SetOperation(s.stop)
+	local e4=e3:Clone()
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
-	local e5=e4:Clone()
-	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e5)
 end
 local ATTRIBUTES=ATTRIBUTE_EARTH|ATTRIBUTE_WATER|ATTRIBUTE_FIRE|ATTRIBUTE_WIND
 function s.atktg(e,c)
@@ -35,18 +35,7 @@ function s.atktg(e,c)
 end
 function s.value(e,c)
 	local tp=e:GetHandlerPlayer()
-	local att=0
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
-	local tc=g:GetFirst()
-	for tc in aux.Next(g) do
-		att=(att|tc:GetAttribute())
-	end
-	local ct=0
-	while att~=0 do
-		if (att&0x1)~=0 then ct=ct+1 end
-		att=(att>>1)
-	end
-	return ct*200
+	return Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil):GetBinClassCount(Card.GetAttribute)*200
 end
 function s.spfilter(c)
 	return c:IsMonster() and c:IsAttribute(ATTRIBUTES)

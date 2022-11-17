@@ -1,19 +1,20 @@
 --アルカナフォース０－THE FOOL
+--Arcana Force 0 - The Fool
 local s,id=GetID()
 function s.initial_effect(c)
-	--battle indestructable
+	--Cannot be destroyed by battle
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
-	--
+	--Cannot be changed to Defense Position
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
 	e2:SetCondition(s.poscon)
 	c:RegisterEffect(e2)
-	--coin
+	--Toss coin and apply effects
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_COIN)
@@ -40,14 +41,10 @@ end
 function s.coinop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-	local res=0
-	if c:IsHasEffect(73206827) then
-		res=1-Duel.SelectOption(tp,60,61)
-	else res=Duel.TossCoin(tp,1) end
-	s.arcanareg(c,res)
+	s.arcanareg(c,Arcana.TossCoin(c,tp))
 end
 function s.arcanareg(c,coin)
-	--disable
+	--Negate card effecs that target this card
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_DISABLE)
@@ -56,7 +53,6 @@ function s.arcanareg(c,coin)
 	e1:SetTarget(s.distg)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e1)
-	--disable effect
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_CHAIN_SOLVING)
@@ -73,7 +69,7 @@ function s.arcanareg(c,coin)
 	e3:SetTarget(s.distg)
 	e3:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e3)
-	c:RegisterFlagEffect(36690018,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,coin,63-coin)
+	Arcana.RegisterCoinResult(c,coin)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
@@ -85,16 +81,24 @@ end
 function s.distg(e,c)
 	local ec=e:GetHandler()
 	if c==ec or c:GetCardTargetCount()==0 then return false end
-	local val=ec:GetFlagEffectLabel(36690018)
-	if val==1 then
+	local val=Arcana.GetCoinResult(ec)
+	if val==COIN_HEADS then
 		return c:GetControler()==ec:GetControler() and c:GetCardTarget():IsContains(ec)
-	else return c:GetControler()~=ec:GetControler() and c:GetCardTarget():IsContains(ec) end
+	elseif val==COIN_TAILS then
+		return c:GetControler()~=ec:GetControler() and c:GetCardTarget():IsContains(ec)
+	else
+		return false
+	end
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler()
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
-	local val=ec:GetFlagEffectLabel(36690018)
-	if (val==1 and rp~=ec:GetControler()) or (val==0 and rp==ec:GetControler()) then return end
+	local val=Arcana.GetCoinResult(ec)
+	if val==COIN_HEADS then
+		if rp~=ec:GetControler() then return end
+	elseif val==COIN_TAILS then
+		if rp==ec:GetControler() then return end
+	else return end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or not g:IsContains(ec) then return end
 	if Duel.NegateEffect(ev) and re:GetHandler():IsRelateToEffect(re) then

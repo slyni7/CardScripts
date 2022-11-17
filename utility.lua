@@ -5,10 +5,117 @@ function GetID()
 	return self_table,self_code
 end
 
+function Auxiliary.NULL()
+end
+
+function Auxiliary.TRUE()
+	return true
+end
+
+function Auxiliary.FALSE()
+	return false
+end
+
+function Auxiliary.AND(...)
+	local funs={...}
+	return	function(...)
+				for _,f in ipairs(funs) do
+					if not f(...) then return false end
+				end
+				return true
+			end
+end
+
+function Auxiliary.OR(...)
+	local funs={...}
+	return	function(...)
+				for _,f in ipairs(funs) do
+					if f(...) then return true end
+				end
+				return false
+			end
+end
+
+function Auxiliary.tableAND(...)
+	local funs={...}
+	return	function(...)
+				local ret={}
+				for _,f in ipairs(funs) do
+					local res={f(...)}
+					for _,val in pairs(res) do
+						ret[_]=val and (ret[_]==nil or ret[_])
+					end
+				end
+				return ret
+			end
+end
+
+function Auxiliary.tableOR(...)
+	local funs={...}
+	return	function(...)
+				local ret={}
+				for _,f in ipairs(funs) do
+					local res={f(...)}
+					for _,val in pairs(res) do
+						ret[_]=val or not (ret[_]==nil or not ret[_])
+					end
+				end
+				return ret
+			end
+end
+
+function Auxiliary.NOT(f)
+	return	function(...)
+				return not f(...)
+			end
+end
+
+function Auxiliary.TargetEqualFunction(f,value,...)
+	local params={...}
+	return	function(effect,target)
+				return f(target,table.unpack(params))==value
+			end
+end
+
+function Auxiliary.TargetBoolFunction(f,...)
+	local params={...}
+	return	function(effect,target)
+				return f(target,table.unpack(params))
+			end
+end
+
+function Auxiliary.FilterEqualFunction(f,value,...)
+	local params={...}
+	return	function(target)
+				return f(target,table.unpack(params))==value
+			end
+end
+
+function Auxiliary.FilterBoolFunctionEx(f,value)
+	return	function(target,scard,sumtype,tp)
+				return f(target,value,scard,sumtype,tp)
+			end
+end
+
+function Auxiliary.FilterBoolFunctionEx2(f,...)
+	local params={...}
+	return	function(target,scard,sumtype,tp)
+				return f(target,scard,sumtype,tp,table.unpack(params))
+			end
+end
+
+function Auxiliary.FilterBoolFunction(f,...)
+	local params={...}
+	return	function(target)
+				return f(target,table.unpack(params))
+			end
+end
+
 --Multi purpose token
 if not c946 then
 	c946 = {}
 	setmetatable(c946, Card)
+	c946.__tostring=Debug.CardToStringWrapper
 	rawset(c946,"__index",c946)
 	c946.initial_effect=function()end
 end
@@ -92,6 +199,36 @@ function Auxiliary.CostWithReplace(base,replacecode,extracon,alwaysexecute)
 	end
 end
 
+
+Card.IsMonster=aux.FilterBoolFunction(Card.IsType,TYPE_MONSTER)
+Card.IsSpell=aux.FilterBoolFunction(Card.IsType,TYPE_SPELL)
+Card.IsTrap=aux.FilterBoolFunction(Card.IsType,TYPE_TRAP)
+Card.IsSpellTrap=aux.FilterBoolFunction(Card.IsType,TYPE_SPELL|TYPE_TRAP)
+
+local function make_exact_type_check(type)
+	return aux.FilterBoolFunction(Card.IsExactType,type)
+end
+
+Card.IsNormalSpell=make_exact_type_check(TYPE_SPELL)
+Card.IsQuickPlaySpell=make_exact_type_check(TYPE_SPELL|TYPE_QUICKPLAY)
+Card.IsContinuousSpell=make_exact_type_check(TYPE_SPELL|TYPE_CONTINUOUS)
+Card.IsEquipSpell=make_exact_type_check(TYPE_SPELL|TYPE_EQUIP)
+Card.IsFieldSpell=make_exact_type_check(TYPE_SPELL|TYPE_FIELD)
+Card.IsRitualSpell=make_exact_type_check(TYPE_SPELL|TYPE_RITUAL)
+Card.IsLinkSpell=make_exact_type_check(TYPE_SPELL|TYPE_LINK)
+
+Card.IsNormalTrap=make_exact_type_check(TYPE_TRAP)
+Card.IsContinuousTrap=make_exact_type_check(TYPE_TRAP|TYPE_CONTINUOUS)
+Card.IsCounterTrap=make_exact_type_check(TYPE_TRAP|TYPE_COUNTER)
+
+Card.IsRitualMonster=make_exact_type_check(TYPE_MONSTER|TYPE_RITUAL)
+Card.IsLinkMonster=make_exact_type_check(TYPE_MONSTER|TYPE_LINK)
+
+function Card.IsNonEffectMonster(c)
+	return c:IsMonster() and not c:IsType(TYPE_EFFECT)
+end
+
+
 local function setcodecondition(e)
 	local c=e:GetHandler()
 	local label=e:GetLabel()
@@ -101,47 +238,6 @@ local function setcodecondition(e)
 		return true
 	end
 end
-
-function Card.IsMonster(c)
-	return c:IsType(TYPE_MONSTER)
-end
-
-function Card.IsSpell(c)
-	return c:IsType(TYPE_SPELL)
-end
-
-function Card.IsTrap(c)
-	return c:IsType(TYPE_TRAP)
-end
-
-function Card.IsSpellTrap(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP)
-end
-
-function Card.IsRitualMonster(c)
-	local tp=TYPE_RITUAL+TYPE_MONSTER
-	return c:GetType() & tp == tp
-end
-
-function Card.IsRitualSpell(c)
-	local tp=TYPE_RITUAL+TYPE_SPELL
-	return c:GetType() & tp == tp
-end
-
-function Card.IsLinkMonster(c)
-	local tp=TYPE_LINK+TYPE_MONSTER
-	return c:GetType() & tp == tp
-end
-
-function Card.IsLinkSpell(c)
-	local tp=TYPE_LINK+TYPE_SPELL
-	return c:GetType() & tp == tp
-end
-
-function Card.IsNonEffectMonster(c)
-	return c:IsMonster() and not c:IsType(TYPE_EFFECT)
-end
-
 
 function Card.AddSetcodesRule(c,code,copyable,...)
 	local prop=0
@@ -391,7 +487,10 @@ function Card.GetScale(c)
 	local sc=0
 	if c:IsLocation(LOCATION_PZONE) then
 		local seq=c:GetSequence()
-		if seq==0 or seq==6 then sc=c:GetLeftScale() else sc=c:GetRightScale() end
+		if seq==0 --mr4+ pzones
+		or seq==1 --three columns field pzones
+		or seq==6 --mr3 pzones
+		then sc=c:GetLeftScale() else sc=c:GetRightScale() end
 	else
 		sc=c:GetLeftScale()
 	end
@@ -417,11 +516,11 @@ function Card.IsBattleDestroyed(c)
 end
 
 function Card.IsInMainMZone(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5 and (not tp or c:IsControler(tp))
+	return c:IsLocation(LOCATION_MMZONE) and (not tp or c:IsControler(tp))
 end
 
 function Card.IsInExtraMZone(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()>4 and (not tp or c:IsControler(tp))
+	return c:IsLocation(LOCATION_EMZONE) and (not tp or c:IsControler(tp))
 end
 
 function Card.AnnounceAnotherAttribute(c,tp)
@@ -444,30 +543,6 @@ end
 function Card.IsDifferentRace(c,race)
 	local _race=c:GetRace()
 	return (_race&race)~=_race
-end
-
-function Card.IsOriginalType(c,val)
-	return c:GetOriginalType() & val > 0
-end
-
-function Card.IsOriginalAttribute(c,val)
-	return c:GetOriginalAttribute() & val > 0
-end
-
-function Card.IsOriginalRace(c,val)
-	return c:GetOriginalRace() & val > 0
-end
-
-function Card.IsSummonPlayer(c,tp)
-	return c:GetSummonPlayer()==tp
-end
-
-function Card.IsPreviousControler(c,tp)
-	return c:GetPreviousControler()==tp
-end
-
-function Card.IsSummonLocation(c,loc)
-	return c:GetSummonLocation() & loc~=0
 end
 
 --Checks whether the card is located at any of the sequences passed as arguments.
@@ -494,29 +569,6 @@ function Card.HasLevel(c)
 	return false
 end
 
-function Card.IsOriginalCode(c,...)
-	local args={...}
-	if #args==0 then
-		error("Card.IsOriginalCode requires at least 2 params",2)
-	end
-	for _,cd in ipairs(args) do
-		if c:GetOriginalCode()==cd then return true end
-	end
-	return false
-end
-
-function Card.IsOriginalCodeRule(c,...)
-	local args={...}
-	if #args==0 then
-		error("Card.IsOriginalCodeRule requires at least 2 params",2)
-	end
-	local c1,c2=c:GetOriginalCodeRule()
-	for _,cd in ipairs(args) do
-		if c1==cd or c2==cd then return true end
-	end
-	return false
-end
-
 function Card.GetMetatable(c,currentCode)
 	if currentCode then return _G["c" .. c:GetCode()] end
 	return c.__index
@@ -539,12 +591,31 @@ function Duel.LoadCardScript(code)
 		self_table=_G[card]
 		setmetatable(self_table, Card)
 		rawset(self_table,"__index",self_table)
+		self_table.__tostring=Debug.CardToStringWrapper
 		self_code=tonumber(string.sub(card,2))
 		Duel.LoadScript(code)
 		self_table=oldtable
 		self_code=oldcode
 	end
 end
+
+
+function Effect.IsMonsterEffect(e)
+	return e:IsActiveType(TYPE_MONSTER)
+end
+
+function Effect.IsSpellEffect(e)
+	return e:IsActiveType(TYPE_SPELL)
+end
+
+function Effect.IsTrapEffect(e)
+	return e:IsActiveType(TYPE_TRAP)
+end
+
+function Effect.IsSpellTrapEffect(e)
+	return e:IsActiveType(TYPE_SPELL|TYPE_TRAP)
+end
+
 
 bit={}
 function bit.band(a,b)
@@ -584,17 +655,6 @@ function bit.replace(r,v,field,width)
 	return (r&~(m<<f))|((v&m)<< f)
 end
 
-local _type=type
-function type(o)
-	local tp=_type(o)
-	if tp~="userdata" then return tp
-	elseif o.GetOriginalCode then return "Card"
-	elseif o.KeepAlive then return "Group"
-	elseif o.SetLabelObject then return "Effect"
-	else return "userdata"
-	end
-end
-
 function Auxiliary.Stringid(code,id)
 	return (id&0xfffff)|code<<20
 end
@@ -614,117 +674,11 @@ function Auxiliary.Next(g)
 end
 Group.Iter=Auxiliary.Next
 
-function Auxiliary.NULL()
-end
-
-function Auxiliary.TRUE()
-	return true
-end
-
-function Auxiliary.FALSE()
-	return false
-end
-
-function Auxiliary.AND(...)
-	local funs={...}
-	return	function(...)
-				for _,f in ipairs(funs) do
-					if not f(...) then return false end
-				end
-				return true
-			end
-end
-
-function Auxiliary.OR(...)
-	local funs={...}
-	return	function(...)
-				for _,f in ipairs(funs) do
-					if f(...) then return true end
-				end
-				return false
-			end
-end
-
-function Auxiliary.tableAND(...)
-	local funs={...}
-	return	function(...)
-				local ret={}
-				for _,f in ipairs(funs) do
-					local res={f(...)}
-					for _,val in pairs(res) do
-						ret[_]=val and (ret[_]==nil or ret[_])
-					end
-				end
-				return ret
-			end
-end
-
-function Auxiliary.tableOR(...)
-	local funs={...}
-	return	function(...)
-				local ret={}
-				for _,f in ipairs(funs) do
-					local res={f(...)}
-					for _,val in pairs(res) do
-						ret[_]=val or not (ret[_]==nil or not ret[_])
-					end
-				end
-				return ret
-			end
-end
-
-function Auxiliary.NOT(f)
-	return	function(...)
-				return not f(...)
-			end
-end
-
-function Auxiliary.TargetEqualFunction(f,value,...)
-	local params={...}
-	return	function(effect,target)
-				return f(target,table.unpack(params))==value
-			end
-end
-
-function Auxiliary.TargetBoolFunction(f,...)
-	local params={...}
-	return	function(effect,target)
-				return f(target,table.unpack(params))
-			end
-end
-
-function Auxiliary.FilterEqualFunction(f,value,...)
-	local params={...}
-	return	function(target)
-				return f(target,table.unpack(params))==value
-			end
-end
-
 --used for Material Types Filter Bool (works for IsRace, IsAttribute, IsType)
 function Auxiliary.FilterSummonCode(...)
 	local params={...}
 	return	function(c,scard,sumtype,tp)
 				return c:IsSummonCode(scard,sumtype,tp,table.unpack(params))
-			end
-end
-
-function Auxiliary.FilterBoolFunctionEx(f,value)
-	return	function(target,scard,sumtype,tp)
-				return f(target,value,scard,sumtype,tp)
-			end
-end
-
-function Auxiliary.FilterBoolFunctionEx2(f,...)
-	local params={...}
-	return	function(target,scard,sumtype,tp)
-				return f(target,scard,sumtype,tp,table.unpack(params))
-			end
-end
-
-function Auxiliary.FilterBoolFunction(f,...)
-	local params={...}
-	return	function(target)
-				return f(target,table.unpack(params))
 			end
 end
 
@@ -809,47 +763,41 @@ function Auxiliary.GetMustBeMaterialGroup(tp,eg,sump,sc,g,r)
 end
 
 --for additional registers
-local regeff=Card.RegisterEffect
-function Card.RegisterEffect(c,e,forced,...)
-	if c:IsStatus(STATUS_INITIALIZING) and not e then
-		error("Parameter 2 expected to be Effect, got nil instead.",2)
-	end
-	--1 == 511002571 - access to effects that activate that detach an Xyz Material as cost
-	--2 == 511001692 - access to Cardian Summoning conditions/effects
-	--4 ==  12081875 - access to Thunder Dragon effects that activate by discarding
-	--8 == 511310036 - access to Allure Queen effects that activate by sending themselves to GY
-	local reg_e = regeff(c,e,forced)
-	if not reg_e then
+Card.RegisterEffect=(function()
+	local oldf=Card.RegisterEffect
+	local function map_to_effect_code(val)
+		if val==1 then return 511002571	end -- access to effects that activate that detach an Xyz Material as cost
+		if val==2 then return 511001692 end -- access to Cardian Summoning conditions/effects
+		if val==4 then return  12081875 end -- access to Thunder Dragon effects that activate by discarding
+		if val==8 then return 511310036	end -- access to Allure Queen effects that activate by sending themselves to GY
 		return nil
 	end
-	local reg={...}
-	local resetflag,resetcount=e:GetReset()
-	for _,val in ipairs(reg) do
-		local prop=EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE
-		if e:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) then prop=prop|EFFECT_FLAG_UNCOPYABLE end
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetProperty(prop,EFFECT_FLAG2_MAJESTIC_MUST_COPY)
-		if val==1 then
-			e2:SetCode(511002571)
-		elseif val==2 then
-			e2:SetCode(511001692)
-		elseif val==4 then
-			e2:SetCode(12081875)
-		elseif val==8 then
-			e2:SetCode(511310036)
+	return function(c,e,forced,...)
+		local reg_e=oldf(c,e,forced)
+		if not reg_e or reg_e<=0 then return reg_e end
+		local resetflag,resetcount=e:GetReset()
+		for _,val in ipairs{...} do
+			local code=map_to_effect_code(val)
+			if code then
+				local prop=EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE
+				if e:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) then prop=prop|EFFECT_FLAG_UNCOPYABLE end
+				local e2=Effect.CreateEffect(c)
+				e2:SetType(EFFECT_TYPE_SINGLE)
+				e2:SetProperty(prop,EFFECT_FLAG2_MAJESTIC_MUST_COPY)
+				e2:SetCode(code)
+				e2:SetLabelObject(e)
+				e2:SetLabel(c:GetOriginalCode())
+				if resetflag and resetcount then
+					e2:SetReset(resetflag,resetcount)
+				elseif resetflag then
+					e2:SetReset(resetflag)
+				end
+				c:RegisterEffect(e2)
+			end
 		end
-		e2:SetLabelObject(e)
-		e2:SetLabel(c:GetOriginalCode())
-		if resetflag and resetcount then
-			e2:SetReset(resetflag,resetcount)
-		elseif resetflag then
-			e2:SetReset(resetflag)
-		end
-		c:RegisterEffect(e2)
+		return reg_e
 	end
-	return reg_e
-end
+end)()
 
 function Card.ListsCodeAsMaterial(c,...)
 	if not c.material then return false end
@@ -1326,14 +1274,10 @@ function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg
 	end
 	return sg
 end
---check for free Zone for monsters to be Special Summoned except from Extra Deck
-function Auxiliary.MZFilter(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5 and c:IsControler(tp)
-end
 --check for Free Monster Zones
 function Auxiliary.ChkfMMZ(sumcount)
 	return	function(sg,e,tp,mg)
-				return sg:FilterCount(Auxiliary.MZFilter,nil,tp)+Duel.GetLocationCount(tp,LOCATION_MZONE)>=sumcount
+				return Duel.GetMZoneCount(tp,sg)>=sumcount
 			end
 end
 --check for cards that can stay on the field, but not always
@@ -1624,6 +1568,14 @@ function Auxiliary.GetRaceStrings(v)
 		end
 	end
 	return pairs(res)
+end
+
+function Auxiliary.GetCoinEffectHintString(coin)
+	if coin==COIN_HEADS then
+		return 62
+	elseif coin==COIN_TAILS then
+		return 63
+	end
 end
 
 --Returns the zones, on the specified player's field, pointed by the specified number of Link markers. Includes Extra Monster Zones.
@@ -1981,10 +1933,10 @@ end
 function Duel.ActivateFieldSpell(c,e,tp,eg,ep,ev,re,r,rp,target_p)
 	if not target_p then target_p=tp end
 	if c then
-		local fc=Duel.GetFieldCard(target_p,LOCATION_SZONE,5)
+		local fc=Duel.GetFieldCard(target_p,LOCATION_FZONE,0)
 		if Duel.IsDuelType(DUEL_1_FIELD) then
 			if fc then Duel.Destroy(fc,REASON_RULE) end
-			of=Duel.GetFieldCard(1-target_p,LOCATION_SZONE,5)
+			of=Duel.GetFieldCard(1-target_p,LOCATION_FZONE,0)
 			if of and Duel.Destroy(of,REASON_RULE)==0 then
 				Duel.SendtoGrave(c,REASON_RULE)
 				return false
@@ -2068,6 +2020,24 @@ function Duel.SelectEffect(tp,...)
 	end
 	if #eff==0 then return nil end
 	return sel[Duel.SelectOption(tp,table.unpack(eff))+1]
+end
+
+--Makes the player call a coin and then toss a coin
+--returns true if the player guessed right, false if he didn't
+function Duel.CallCoin(tp)
+	return Duel.AnnounceCoin(tp)==Duel.TossCoin(tp,1)
+end
+
+--Return the number of COIN_HEADS among the passed values
+function Duel.CountHeads(result,...)
+	if not ... then return (result==COIN_HEADS and 1 or 0) end
+	return (result==COIN_HEADS and 1 or 0) + Duel.CountHeads(...)
+end
+
+--Return the number of COIN_TAILS among the passed values
+function Duel.CountTails(result,...)
+	if not ... then return (result==COIN_TAILS and 1 or 0) end
+	return (result==COIN_TAILS and 1 or 0) + Duel.CountTails(...)
 end
 
 function Duel.CheckPendulumZones(player)
@@ -2209,6 +2179,7 @@ function Auxiliary.DefaultFieldReturnOp(rg)
 	select_field_return_cards(1-turn_p,g1)
 end
 
+Duel.LoadScript("debug_utility.lua")
 Duel.LoadScript("cards_specific_functions.lua")
 Duel.LoadScript("proc_fusion.lua")
 Duel.LoadScript("proc_fusion_spell.lua")

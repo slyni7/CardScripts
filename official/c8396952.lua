@@ -1,7 +1,8 @@
 --アルカナフォースⅠ－THE MAGICIAN
+--Arcana Force I - The Magician
 local s,id=GetID()
 function s.initial_effect(c)
-	--coin
+	--Toss a coin and apply the appropirate effect
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_COIN)
@@ -25,11 +26,7 @@ end
 function s.coinop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-	local res=0
-	if c:IsHasEffect(73206827) then
-		res=1-Duel.SelectOption(tp,60,61)
-	else res=Duel.TossCoin(tp,1) end
-	s.arcanareg(c,res)
+	s.arcanareg(c,Arcana.TossCoin(c,tp))
 end
 function s.arcanareg(c,coin)
 	--disable effect
@@ -40,20 +37,20 @@ function s.arcanareg(c,coin)
 	e1:SetOperation(s.speop)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e1)
-	c:RegisterFlagEffect(36690018,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,coin,63-coin)
+	Arcana.RegisterCoinResult(c,coin)
 end
 function s.speop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	if not re:IsActiveType(TYPE_SPELL) or not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return end
-	local val=c:GetFlagEffectLabel(36690018)
-	if val==1 then
+	local c=e:GetHandler()
+	local val=Arcana.GetCoinResult(c)
+	if val==COIN_HEADS then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e1:SetValue(c:GetBaseAttack()*2)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
-	else
+	elseif val==COIN_TAILS then
 		Duel.Recover(1-tp,500,REASON_EFFECT)
 	end
 end

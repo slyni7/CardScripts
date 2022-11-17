@@ -7,7 +7,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--coin
+	--Toss a coin and draw 1 card
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_DRAW)
@@ -29,8 +29,7 @@ end
 function s.coinop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_COIN)
-	local res=1-Duel.SelectOption(tp,60,61)
+	local res=Duel.AnnounceCoin(tp)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
@@ -44,8 +43,8 @@ function s.coinop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
-	local res=Duel.GetCoinResult()
-	return re==e:GetLabelObject() and res==e:GetLabel()
+	local res,extra=Duel.GetCoinResult()
+	return not extra and re==e:GetLabelObject() and res==e:GetLabel()
 end
 function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)

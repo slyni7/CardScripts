@@ -1,8 +1,9 @@
 --巨大戦艦 カバード・コア
+--B.E.S Covered Core
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableCounterPermit(0x1f)
-	--summon success
+	--Place 2 Counter on itself when it is Normal Summoned
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_COUNTER)
@@ -11,23 +12,23 @@ function s.initial_effect(c)
 	e1:SetTarget(s.addct)
 	e1:SetOperation(s.addc)
 	c:RegisterEffect(e1)
-	--battle indestructable
+	--Cannot be destroyed by battle
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
-	--remove counter
+	--Remove 1 counter at the end of the Damage Step
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_COIN)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_DAMAGE_STEP_END)
-	e3:SetCondition(s.rctcon)
+	e3:SetCondition(function(e) return e:GetHandler():GetCounter(0x1f)~=0 end)
 	e3:SetTarget(s.rcttg)
 	e3:SetOperation(s.rctop)
 	c:RegisterEffect(e3)
-	--destroy
+	--Destroy itself at the end of the Damage Step
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
 	e4:SetCategory(CATEGORY_DESTROY)
@@ -48,17 +49,12 @@ function s.addc(e,tp,eg,ep,ev,re,r,rp)
 		e:GetHandler():AddCounter(0x1f,2)
 	end
 end
-function s.rctcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetCounter(0x1f)~=0
-end
 function s.rcttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
 end
 function s.rctop(e,tp,eg,ep,ev,re,r,rp)
-	local coin=Duel.SelectOption(tp,60,61)
-	local res=Duel.TossCoin(tp,1)
-	if coin==res then
+	if not Duel.CallCoin(tp) then
 		e:GetHandler():RemoveCounter(tp,0x1f,1,REASON_EFFECT)
 	end
 end

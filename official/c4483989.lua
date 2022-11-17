@@ -1,7 +1,8 @@
---モンスターBOX
+--反撃準備
+--Prepare to Strike Back
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -9,7 +10,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.atktg1)
 	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
-	--dice
+	--Toss a coin and apply the appropriate effect
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_COIN)
@@ -50,10 +51,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
 	if a:IsFaceup() and a:IsRelateToEffect(e) and at:IsFaceup() and at:IsRelateToEffect(e) then
-		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_COIN)
-		local coin=Duel.SelectOption(1-tp,60,61)
-		local res=Duel.TossCoin(1-tp,1)
-		if coin~=res then
+		if Duel.CallCoin(tp) then
 			Duel.ChangePosition(at,POS_FACEUP_ATTACK)
 		elseif a:GetAttack()>at:GetDefense() then
 			Duel.Damage(tp,a:GetAttack()-at:GetDefense(),REASON_EFFECT)

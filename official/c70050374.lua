@@ -1,7 +1,8 @@
 --ツインバレル・ドラゴン
+--Twin-Barrel Dragon
 local s,id=GetID()
 function s.initial_effect(c)
-	--destroy
+	--Toss 2 coins and destroy a card the opponent controls
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -23,14 +24,13 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,nil,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,2)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
-		local c1,c2=Duel.TossCoin(tp,2)
-		if c1+c2<2 then return end
+		if Duel.CountHeads(Duel.TossCoin(tp,2))<2 then return end
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end

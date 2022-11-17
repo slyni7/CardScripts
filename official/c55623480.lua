@@ -1,7 +1,8 @@
 --妖精伝姫－シラユキ
+--Fairy Tail - Snow
 local s,id=GetID()
 function s.initial_effect(c)
-	--position
+	--Change 1 face-up monster to face-down Defense position
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_POSITION)
@@ -14,7 +15,7 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
-	--special summon
+	--Special Summon itself from the GY
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -38,27 +39,19 @@ function s.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.posop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)
 	end
 end
 function s.rmfilter(c)
-	return c:IsAbleToRemoveAsCost() and (c:IsLocation(LOCATION_HAND+LOCATION_SZONE) or aux.SpElimFilter(c,false,true))
+	return c:IsAbleToRemoveAsCost() and (c:IsLocation(LOCATION_HAND|LOCATION_SZONE) or aux.SpElimFilter(c,false,true))
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local ct=-ft+1
-	local sg=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_HAND+LOCATION_ONFIELD+LOCATION_GRAVE,0,e:GetHandler())
-	if chk==0 then return #sg>=7 and (ft>0 or sg:FilterCount(aux.MZFilter,nil,tp)>=ct) end
+	local sg=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_HAND|LOCATION_ONFIELD|LOCATION_GRAVE,0,e:GetHandler())
+	if chk==0 then return #sg>=7 and Duel.GetMZoneCount(tp,sg)>0 end
 	local g
-	if ft<=0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-		g=sg:FilterSelect(tp,aux.MZFilter,ct,ct,nil,tp)
-		if ct<7 then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-			local g1=sg:Select(tp,7-ct,7-ct,g)
-			g:Merge(g1)
-		end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then
+		g=aux.SelectUnselectGroup(sg,e,tp,7,7,aux.ChkfMMZ(1),1,tp,HINTMSG_REMOVE)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		g=sg:Select(tp,7,7,nil)
@@ -66,8 +59,9 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

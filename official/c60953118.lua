@@ -2,7 +2,7 @@
 --Arcana Force XIV - Temperance
 local s,id=GetID()
 function s.initial_effect(c)
-	--no damage
+	--Discard to prevent battle damage
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_QUICK_O)
@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e1:SetCost(s.damcost)
 	e1:SetOperation(s.damop)
 	c:RegisterEffect(e1)
-	--Coin toss
+	--Toss a coin and apply the appropriate effect
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_COIN)
@@ -52,11 +52,7 @@ end
 function s.coinop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-	local res=0
-	if c:IsHasEffect(73206827) then
-		res=1-Duel.SelectOption(tp,60,61)
-	else res=Duel.TossCoin(tp,1) end
-	s.arcanareg(c,res)
+	s.arcanareg(c,Arcana.TossCoin(c,tp))
 end
 function s.arcanareg(c,coin)
 	--coin effect
@@ -74,11 +70,11 @@ function s.arcanareg(c,coin)
 	e2:SetTargetRange(0,1)
 	e2:SetCondition(s.rdcon2)
 	c:RegisterEffect(e2)
-	c:RegisterFlagEffect(36690018,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,coin,63-coin)
+	Arcana.RegisterCoinResult(c,coin)
 end
 function s.rdcon1(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffectLabel(36690018)==1
+	return Arcana.GetCoinResult(e:GetHandler())==COIN_HEADS
 end
 function s.rdcon2(e,tp,eg,ep,ev,re,r,rp)
-	return  e:GetHandler():GetFlagEffectLabel(36690018)==0
+	return Arcana.GetCoinResult(e:GetHandler())==COIN_TAILS
 end

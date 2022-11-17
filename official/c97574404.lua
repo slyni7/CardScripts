@@ -1,4 +1,5 @@
 --アルカナフォースⅥ－THE LOVERS
+--Arcana Force VI - The Lovers
 local s,id=GetID()
 function s.initial_effect(c)
 	--coin
@@ -17,7 +18,7 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
 	c:RegisterEffect(e3)
 end
-s.listed_series={0x5}
+s.listed_series={SET_ARCANA_FORCE}
 s.toss_coin=true
 function s.cointg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -26,11 +27,7 @@ end
 function s.coinop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-	local res=0
-	if c:IsHasEffect(73206827) then
-		res=1-Duel.SelectOption(tp,60,61)
-	else res=Duel.TossCoin(tp,1) end
-	s.arcanareg(c,res)
+	s.arcanareg(c,Arcana.TossCoin(c,tp))
 end
 function s.arcanareg(c,coin)
 	--coin effect
@@ -38,7 +35,7 @@ function s.arcanareg(c,coin)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_DOUBLE_TRIBUTE)
 	e1:SetCondition(s.dtcon)
-	e1:SetValue(s.dtval)
+	e1:SetValue(function(_,c) return c:IsSetCard(SET_ARCANA_FORCE) end)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e1)
 	--
@@ -55,17 +52,14 @@ function s.arcanareg(c,coin)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_CANNOT_MSET)
 	c:RegisterEffect(e3)
-	c:RegisterFlagEffect(36690018,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,coin,63-coin)
+	Arcana.RegisterCoinResult(c,coin)
 end
 function s.dtcon(e)
-	return e:GetHandler():GetFlagEffectLabel(36690018)==1
-end
-function s.dtval(e,c)
-	return c:IsSetCard(0x5)
+	return Arcana.GetCoinResult(e:GetHandler())==COIN_HEADS
 end
 function s.sumcon(e)
-	return e:GetHandler():GetFlagEffectLabel(36690018)==0
+	return Arcana.GetCoinResult(e:GetHandler())==COIN_TAILS
 end
 function s.sumtg(e,c,tp,sumtp)
-	return (sumtp&SUMMON_TYPE_TRIBUTE)==SUMMON_TYPE_TRIBUTE and c:IsSetCard(0x5)
+	return (sumtp&SUMMON_TYPE_TRIBUTE)==SUMMON_TYPE_TRIBUTE and c:IsSetCard(SET_ARCANA_FORCE)
 end

@@ -1,4 +1,5 @@
 --幻獣機レイステイルス
+--Mecha Phantom Beast Stealthray
 local s,id=GetID()
 function s.initial_effect(c)
 	--level
@@ -46,8 +47,7 @@ function s.initial_effect(c)
 end
 s.listed_names={TOKEN_MECHA_PHANTOM_BEAST}
 function s.lvval(e,c)
-	local tp=c:GetControler()
-	return Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_MZONE,0,nil,TOKEN_MECHA_PHANTOM_BEAST):GetSum(Card.GetLevel)
+	return Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsCode,TOKEN_MECHA_PHANTOM_BEAST),c:GetControler(),LOCATION_MZONE,0,nil):GetSum(Card.GetLevel)
 end
 function s.indcon(e)
 	return Duel.IsExistingMatchingCard(Card.IsType,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil,TYPE_TOKEN)
@@ -81,7 +81,7 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end

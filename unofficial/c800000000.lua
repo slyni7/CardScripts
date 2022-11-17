@@ -1,9 +1,9 @@
+-- 強引な取引き
 -- Forceful Deal
--- scripted by: UnknownGuest
---fixed by MLD
+-- scripted by UnknownGuest and MLD
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Activate
+	-- Gain control of all summoned monsters
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
@@ -25,8 +25,8 @@ end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g,exg=Duel.GetReleaseGroup(tp):Split(aux.ReleaseCostFilter,nil,tp)
 	e:SetLabel(#g)
-	if chk==0 then return #g>0 and g:FilterCount(aux.MZFilter,nil,tp)+Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
-	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
+	if chk==0 then return #g>0 and Duel.GetMZoneCount(tp,g)>0 end
+	Duel.PayLPCost(tp,Duel.GetLP(tp)//2)
 	if #exg>0 and Duel.SelectYesNo(tp,aux.Stringid(59160188,2)) then
 		g:Merge(exg)
 	end

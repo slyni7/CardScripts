@@ -7,7 +7,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--coin
+	--Toss a coin and apply the appropriate effect
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_COIN+CATEGORY_TOGRAVE+CATEGORY_NEGATE+CATEGORY_CONTROL)
@@ -41,13 +41,9 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local p=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_CONTROLER)
-	local coin=Duel.AnnounceCoin(p)
-	local res=Duel.TossCoin(rp,1)
-	if coin~=res then
-		Duel.SendtoGrave(e:GetHandler(),REASON_EFFECT)
-	else
-		if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
-			Duel.GetControl(re:GetHandler(),1-p)
-		end
+	if Duel.CallCoin(p) then
+		Duel.SendtoGrave(c,REASON_EFFECT)
+	elseif Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+		Duel.GetControl(re:GetHandler(),1-p)
 	end
 end

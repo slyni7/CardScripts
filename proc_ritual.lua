@@ -11,7 +11,7 @@ Duel.GetRitualMaterial=(function()
 	local oldfunc=Duel.GetRitualMaterial
 	return function(tp,check)
 		local res=oldfunc(tp,check)
-		local g=Duel.GetMatchingGroup(Card.IsHasEffect,tp,LOCATION_EXTRA,0,nil,EFFECT_EXTRA_RITUAL_MATERIAL)
+		local g=Duel.GetMatchingGroup(Card.IsHasEffect,tp,LOCATION_DECK|LOCATION_EXTRA,0,nil,EFFECT_EXTRA_RITUAL_MATERIAL)
 		if #g>0 then
 			res:Merge(g)
 		end
@@ -23,7 +23,7 @@ end)()
 Duel.ReleaseRitualMaterial=(function()
 	local oldfunc=Duel.ReleaseRitualMaterial
 	return function(g)
-		local extra_g=g:Filter(Card.IsLocation,nil,LOCATION_EXTRA)
+		local extra_g=g:Filter(Card.IsLocation,nil,LOCATION_DECK|LOCATION_EXTRA)
 		if #extra_g>0 then
 			Duel.SendtoGrave(extra_g,REASON_RITUAL+REASON_EFFECT+REASON_MATERIAL)
 			g:Sub(extra_g)
@@ -109,7 +109,7 @@ local function WrapTableReturn(func)
 	end
 end
 function Ritual.Filter(c,filter,_type,e,tp,m,m2,forcedselection,specificmatfilter,lv,requirementfunc,sumpos)
-	if not c:IsRitualMonster() or (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true,sumpos) then return false end
+	if not (c:IsOriginalType(TYPE_RITUAL) and c:IsOriginalType(TYPE_MONSTER)) or (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true,sumpos) then return false end
 	local lv=(lv and (type(lv)=="function" and lv(c)) or lv) or c:GetLevel()
 	lv=math.max(1,lv)
 	Ritual.SummoningLevel=lv
