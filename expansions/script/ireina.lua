@@ -1786,7 +1786,7 @@ if not CATEGORY_LVCHANGE then
 	CATEGORY_LVCHANGE=0x0
 end
 
-Duel.LoadScript("yukitokisaki.lua")
+pcall(dofile,"expansions/script/yukitokisaki.lua")
 
 local cregeff=Card.RegisterEffect
 function Card.RegisterEffect(c,e,forced,...)
@@ -2346,7 +2346,7 @@ function Duel.XyzSummon(...)
 	end
 	local id=ce:GetHandler():GetOriginalCode()
 	if EDOCard[id] then
-		return cixs(...)
+		return dxs(...)
 	else
 		local t={...}
 		local p=t[1]
@@ -2362,6 +2362,8 @@ function Duel.XyzSummon(...)
 		end
 	end
 end
+
+pcall(dofile,"expansions/script/proc_braveex.lua")
 
 --dofile("expansions/script/proto.lua")
 
