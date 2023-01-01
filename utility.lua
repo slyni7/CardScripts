@@ -154,8 +154,8 @@ function Auxiliary.CostWithReplace(base,replacecode,extracon,alwaysexecute)
 			end
 			return false
 		end
-		if alwaysexecute then alwaysexecute(e,tp,eg,ep,ev,re,r,rp,1) end
 		local effs=cost_replace_getvalideffs(replacecode,extracon,e,tp,eg,ep,ev,re,r,rp,chk)
+		if alwaysexecute then alwaysexecute(e,tp,eg,ep,ev,re,r,rp,1) end
 		if not cost_chk or #effs>0 then
 			local eff=effs[1]
 			if #effs>1 then
@@ -209,7 +209,6 @@ local function make_exact_type_check(type)
 	return aux.FilterBoolFunction(Card.IsExactType,type)
 end
 
-Card.IsNormalSpell=make_exact_type_check(TYPE_SPELL)
 Card.IsQuickPlaySpell=make_exact_type_check(TYPE_SPELL|TYPE_QUICKPLAY)
 Card.IsContinuousSpell=make_exact_type_check(TYPE_SPELL|TYPE_CONTINUOUS)
 Card.IsEquipSpell=make_exact_type_check(TYPE_SPELL|TYPE_EQUIP)
@@ -217,12 +216,19 @@ Card.IsFieldSpell=make_exact_type_check(TYPE_SPELL|TYPE_FIELD)
 Card.IsRitualSpell=make_exact_type_check(TYPE_SPELL|TYPE_RITUAL)
 Card.IsLinkSpell=make_exact_type_check(TYPE_SPELL|TYPE_LINK)
 
-Card.IsNormalTrap=make_exact_type_check(TYPE_TRAP)
 Card.IsContinuousTrap=make_exact_type_check(TYPE_TRAP|TYPE_CONTINUOUS)
 Card.IsCounterTrap=make_exact_type_check(TYPE_TRAP|TYPE_COUNTER)
 
 Card.IsRitualMonster=make_exact_type_check(TYPE_MONSTER|TYPE_RITUAL)
 Card.IsLinkMonster=make_exact_type_check(TYPE_MONSTER|TYPE_LINK)
+
+function Card.IsNormalSpell(c)
+	return c:GetType()==TYPE_SPELL
+end
+
+function Card.IsNormalTrap(c)
+	return c:GetType()==TYPE_TRAP
+end
 
 function Card.IsNonEffectMonster(c)
 	return c:IsMonster() and not c:IsType(TYPE_EFFECT)
@@ -770,6 +776,7 @@ Card.RegisterEffect=(function()
 		if val==2 then return 511001692 end -- access to Cardian Summoning conditions/effects
 		if val==4 then return  12081875 end -- access to Thunder Dragon effects that activate by discarding
 		if val==8 then return 511310036	end -- access to Allure Queen effects that activate by sending themselves to GY
+		if val==16 then return 101112045 end -- access to tellarknights/constellar effects that activate when Normal Summoned
 		return nil
 	end
 	return function(c,e,forced,...)
@@ -1053,18 +1060,17 @@ function Auxiliary.PuzzleOp(e,tp)
 end
 
 
---Cost for cards with "You can tribute this card" (name might be changed)
+--Default cost function for "You can Tribute this card; .."
 function Auxiliary.selfreleasecost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleasable() end
-	Duel.Release(e:GetHandler(),REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsReleasable() end
+	Duel.Release(c,REASON_COST)
 end
 
-
---Cost for effect "You can banish this card from your Graveyard"
+--Default cost function for "You can banish this card; .."
 function Auxiliary.bfgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return (not Duel.IsPlayerAffectedByEffect(e:GetHandlerPlayer(),69832741) or not c:IsMonster()
-		or not c:IsLocation(LOCATION_GRAVE)) and c:IsAbleToRemoveAsCost() end
+	if chk==0 then return c:IsAbleToRemoveAsCost() end
 	Duel.Remove(c,POS_FACEUP,REASON_COST)
 end
 

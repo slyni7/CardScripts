@@ -624,6 +624,8 @@ FLAG_DOUBLE_TRIB_DARK=160317015 --Voidvelgr Globule
 FLAG_DOUBLE_TRIB_GALAXY=160317115
 FLAG_DOUBLE_TRIB_WIND=160011022 -- Bluegrass Stealer
 FLAG_DOUBLE_TRIB_PSYCHIC=160011122
+FLAG_DOUBLE_TRIB_LEVEL7=160205051 -- Double Twin Dragon
+FLAG_DOUBLE_TRIB_GREYSTORM=160414002 -- Cosmo Predictor
 function Card.AddDoubleTribute(c,id,otfilter,eftg,reset,...)
 	for i,flag in ipairs{...} do
 		c:RegisterFlagEffect(flag,reset,0,1)
@@ -709,4 +711,16 @@ end
 --Returns true if a monster can get a piercing effect as per Rush rules
 function Card.CanGetPiercingRush(c)
     return not (c:IsHasEffect(EFFECT_CANNOT_ATTACK) or c:IsHasEffect(EFFECT_PIERCE))
+end
+-- Checks if the monster would be a valid target for the equip card
+-- Needed because Rush cards typically don't need this check after they are equipped
+function Card.CheckEquipTargetRush(equip,monster)
+	local effect=equip:GetActivateEffect()
+	if nil~=effect then
+		local filter=effect:GetTarget()
+		if nil~=filter then
+			return filter(effect,effect:GetHandlerPlayer(),nil,nil,nil,nil,nil,nil,nil,monster)
+		end
+	end
+	return false
 end
