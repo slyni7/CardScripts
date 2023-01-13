@@ -2,7 +2,7 @@
 
 YuL={}
 
-pcall(dofile,"expansions/script/proc_module.lua")
+Duel.LoadScript("proc_module.lua")
 
 --TYPE_SPELL+TYPE_TRAP
 YuL.ST=0x6

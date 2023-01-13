@@ -2140,7 +2140,7 @@ function Auxiliary.ChainDelay(effect)
 		local ci=1<<i
 		if ci==CHAININFO_TRIGGERING_EFFECT then
 			Auxiliary.DelayedChainInfo[effect][ci]=effect
-		else
+		elseif i~=17 then
 			if type(Duel.GetChainInfo(0,ci))=="Group" then
 				local g=Duel.GetChainInfo(0,ci):Clone()
 				g:KeepAlive()
@@ -2807,7 +2807,16 @@ function Card.RegisterEffect(c,e,forced,...)
 	end
 end
 
-pcall(dofile,"expansions/script/proc_braveex.lua")
+EVENT_HORNBLOW=99970561
+local dac=Duel.AnnounceCard
+function Duel.AnnounceCard(p,...)
+	local ac=dac(p,...)
+	Duel.RaiseEvent(Group.CreateGroup(),EVENT_HORNBLOW,Effect.GlobalEffect(),0,p,p,ac)
+	return ac
+end
+
+Duel.LoadScript("proc_braveex.lua")
+Duel.LoadScript("proc_skull.lua")
 
 --dofile("expansions/script/proto.lua")
 
