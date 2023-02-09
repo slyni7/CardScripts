@@ -80,7 +80,7 @@ s[2]=function(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetCurrentChain()>0 then
 		idleindex = idleindex - 1
 	end
-	Debug.Message(idleindex)
+	--Debug.Message(idleindex)
 
 	local latestidle = lastidles[idleindex]
 
