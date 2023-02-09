@@ -37,6 +37,7 @@ function s.stop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
 		e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetDescription(aux.Stringid(id,2))
 		tc:RegisterEffect(e1)
 	end
 end
@@ -55,5 +56,5 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(aux.indoval)
 	e1:SetReset(RESET_PHASE+PHASE_END,2)
 	Duel.RegisterEffect(e1,tp)
-	aux.RegisterClientHint(c,0,tp,1,0,aux.Stringid(id,2),0,2)
+	aux.RegisterClientHint(c,0,tp,1,0,aux.Stringid(id,3),0,2)
 end

@@ -776,7 +776,7 @@ Card.RegisterEffect=(function()
 		if val==2 then return 511001692 end -- access to Cardian Summoning conditions/effects
 		if val==4 then return  12081875 end -- access to Thunder Dragon effects that activate by discarding
 		if val==8 then return 511310036	end -- access to Allure Queen effects that activate by sending themselves to GY
-		if val==16 then return 101112045 end -- access to tellarknights/constellar effects that activate when Normal Summoned
+		if val==16 then return 58858807 end -- access to tellarknights/constellar effects that activate when Normal Summoned
 		return nil
 	end
 	return function(c,e,forced,...)
@@ -1099,7 +1099,7 @@ function Auxiliary.dxmcostgen(min,max,op)
 	end
 	return function(e,tp,eg,ep,ev,re,r,rp,chk)
 		local c=e:GetHandler()
-		local nn=c:IsSetCard(0x14b) and c:IsType(TYPE_XYZ) and Duel.IsPlayerAffectedByEffect(tp,CARD_NUMERON_NETWORK)
+		local nn=c:IsSetCard(SET_NUMERON) and c:IsType(TYPE_XYZ) and Duel.IsPlayerAffectedByEffect(tp,CARD_NUMERON_NETWORK)
 		local crm=c:CheckRemoveOverlayCard(tp,min,REASON_COST)
 		if chk==0 then return (nn and c:IsLocation(LOCATION_MZONE)) or crm end
 		if nn and (not crm or Duel.SelectYesNo(tp,aux.Stringid(CARD_NUMERON_NETWORK,1))) then
@@ -2070,7 +2070,7 @@ function Auxiliary.GetMMZonesPointedTo(player,by_filter,player_location,oppo_loc
 	local loc1=player_location==nil and LOCATION_MZONE or player_location
 	local loc2=oppo_location==nil and loc1 or oppo_location
 	target_player=target_player==nil and player or target_player
-	return Duel.GetMatchingGroup(link_card_filter,player,loc1,loc2,nil,by_filter,...):GetLinkedZone(target_player)&0x1f
+	return Duel.GetMatchingGroup(link_card_filter,player,loc1,loc2,nil,by_filter,...):GetLinkedZone(target_player)&ZONES_MMZ
 end
 
 --[[
@@ -2104,6 +2104,7 @@ function Auxiliary.DelayedOperation(card_or_group,phase,flag,e,tp,oper,cond,rese
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCode(EVENT_PHASE|phase)
 	e1:SetReset(reset,reset_count)
 	e1:SetCountLimit(1)

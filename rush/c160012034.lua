@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Fusion Summon Procedure
 	Fusion.AddProcMixN(c,false,false,160012002,2)
-	--Give Double Attack
+	--Make a Normal monster able to attack twice this turn
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -17,10 +17,9 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--Gain LP
+	--Set 1 "Fusion" from the GY
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
@@ -30,11 +29,13 @@ function s.initial_effect(c)
 	e2:SetOperation(s.operation2)
 	c:RegisterEffect(e2)
 end
+s.listed_names={CARD_FUSION}
 function s.filter(c)
-	return c:IsMonster() and not (c:IsRace(RACE_DRAGON) or c:IsRace(RACE_HIGHDRAGON))
+	return c:IsMonster() and not c:IsRace(RACE_DRAGON|RACE_HIGHDRAGON)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil) 
+	return Duel.IsExistingMatchingCard(Card.IsMonster,tp,LOCATION_GRAVE,0,1,nil)
+		and not Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil) 
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,500) end

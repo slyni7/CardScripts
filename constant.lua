@@ -20,6 +20,9 @@ LOCATION_EMZONE = 0x1000
 --Locations used for redirecting
 LOCATION_DECKBOT = 0x10001
 LOCATION_DECKSHF = 0x20001
+--Constants used to filter monster zones
+ZONES_MMZ = 0x1f
+ZONES_EMZ = 0x60
 --Sequences used for SendtoDeck
 SEQ_DECKTOP     = 0
 SEQ_DECKBOTTOM  = 1
@@ -990,6 +993,6 @@ WIN_REASON_ZERO_GATE           = 0x53
 WIN_REASON_DEUCE               = 0x54
 WIN_REASON_DECK_MASTER         = 0x56
 WIN_REASON_DRAW_OF_FATE        = 0x57
-WIN_REASON_SEKITORI            = 0x58
+WIN_REASON_MUSICAL_SUMO        = 0x58
 Duel.LoadScript("card_counter_constants.lua")
 Duel.LoadScript("archetype_setcode_constants.lua")
