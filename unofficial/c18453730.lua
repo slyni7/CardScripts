@@ -10,7 +10,7 @@ function s.initial_effect(c)
 		Duel.PromisedEnd(tp,c)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_FREE_CHAIN)
+		e1:SetCode(EVENT_ANYTIME)
 		e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
 			local c=e:GetHandler()
 			s[2](e,tp,eg,ep,ev,re,r,rp)
@@ -54,6 +54,8 @@ s[2]=function(e,tp,eg,ep,ev,re,r,rp)
 	local latestidle=0
 	local lastidle=0
 
+	local lastchain=true
+
 	--Debug.Message(playerop_seed)
 
 	for line in f:lines() do
@@ -61,6 +63,17 @@ s[2]=function(e,tp,eg,ep,ev,re,r,rp)
 		if res[1]=="select_idle_command" then
 			latestidle=lastidle
 			lastidle=fl
+		end
+		if res[1]=="select_chain" then
+			if res[3]=="-1" then
+				lastchain=true
+			else
+				if lastchain then
+					latestidle=lastidle
+					lastidle=fl
+				end
+				lastchain=false
+			end
 		end
 		fl=fl+1
 	end
