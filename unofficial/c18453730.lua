@@ -51,8 +51,7 @@ s[2]=function(e,tp,eg,ep,ev,re,r,rp)
 
 	local fl=0
 
-	local latestidle=0
-	local lastidle=0
+	local lastidles={}
 
 	local lastchain=true
 
@@ -61,7 +60,7 @@ s[2]=function(e,tp,eg,ep,ev,re,r,rp)
 	for line in f:lines() do
 		local res=line:split(" ")
 		if res[1]=="select_idle_command" then
-			latestidle=lastidle
+			table.insert(lastidles,fl)
 			lastidle=fl
 		end
 		if res[1]=="select_chain" then
@@ -69,8 +68,7 @@ s[2]=function(e,tp,eg,ep,ev,re,r,rp)
 				lastchain=true
 			else
 				if lastchain then
-					latestidle=lastidle
-					lastidle=fl
+					table.insert(lastidles,fl)
 				end
 				lastchain=false
 			end
@@ -78,7 +76,15 @@ s[2]=function(e,tp,eg,ep,ev,re,r,rp)
 		fl=fl+1
 	end
 
-	if latestidle==0 then
+	local idleindex = #lastidles - 1
+	if Duel.GetCurrentChain()>0 then
+		idleindex = idleindex - 1
+	end
+	Debug.Message(idleindex)
+
+	local latestidle = lastidles[idleindex]
+
+	if latestidle==nil then
 		f:close()
 		return
 	end
