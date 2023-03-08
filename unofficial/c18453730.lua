@@ -127,8 +127,4 @@ s[2]=function(e,tp,eg,ep,ev,re,r,rp)
 	local delf=io.open(playeropvirtualfilename,"w")
 	delf:close()
 	Debug.FromVirtualToReal(true)
-	local g=Duel.GMGroup(Card.IsFacedown,tp,LOCATION_EXTRA,0,nil)
-	local og=Duel.GetOverlayGroup(tp,1,1)
-	g:Merge(og)
-	Duel.PromisedEnd(tp,g)
 end
