@@ -2421,7 +2421,7 @@ function Card.RegisterEffect(c,e,forced,...)
 		end)
 	elseif code==24224830 and mt.eff_ct[c][0]==e then
 		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-			local loc=LOCATION_HAND
+			local loc=LOCATION_GRAVE
 			if Duel.IsPlayerAffectedByEffect(tp,EFFECT_ANGER_DESIGNATOR) then
 				loc=loc|LOCATION_ONFIELD
 			end

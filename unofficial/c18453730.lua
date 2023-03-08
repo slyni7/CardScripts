@@ -126,5 +126,5 @@ s[2]=function(e,tp,eg,ep,ev,re,r,rp)
 
 	local delf=io.open(playeropvirtualfilename,"w")
 	delf:close()
-	Debug.FromVirtualToReal()
+	Debug.FromVirtualToReal(true)
 end
