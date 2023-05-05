@@ -532,18 +532,21 @@ end
 function Card.AnnounceAnotherAttribute(c,tp)
 	local att=c:GetAttribute()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTRIBUTE)
-	return Duel.AnnounceAttribute(tp,1,att&(att-1)==0 and ~att or ATTRIBUTE_ALL)
+	return Duel.AnnounceAttribute(tp,1,att&(att-1)==0 and (~att&ATTRIBUTE_ALL) or ATTRIBUTE_ALL)
 end
 
-function Card.IsDifferentAttribute(c,att)
-	local _att=c:GetAttribute()
+--Returns true if "c" has any Attribute except "att"
+function Card.IsAttributeExcept(c,att,scard,sumtype,playerid)
+	sumtype=sumtype==nil and 0 or sumtype
+	playerid=playerid==nil and PLAYER_NONE or playerid
+	local _att=c:GetAttribute(scard,sumtype,playerid)
 	return (_att&att)~=_att
 end
 
 function Card.AnnounceAnotherRace(c,tp)
 	local race=c:GetRace()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RACE)
-	return Duel.AnnounceRace(tp,1,race&(race-1)==0 and ~race or RACE_ALL)
+	return Duel.AnnounceRace(tp,1,race&(race-1)==0 and (~race&RACE_ALL) or RACE_ALL)
 end
 
 function Card.IsDifferentRace(c,race)
@@ -575,6 +578,40 @@ function Card.HasLevel(c)
 	return false
 end
 
+--Returns true if the Card "c" has the flag effect with code "id"
+function Card.HasFlagEffect(c,id,ct)
+	return c:GetFlagEffect(id)>=(ct or 1)
+end
+--Returns true if the player "tp" has the flag effect with code "id"
+function Duel.HasFlagEffect(tp,id,ct)
+	return Duel.GetFlagEffect(tp,id)>=(ct or 1)
+end
+
+--Negates the effect of the selected card.
+--Useful to reduce clutter with effects like "but its effects are negated".
+function Card.NegateEffects(tc,c,reset,negates_cards,ct)
+	if not reset then reset=RESET_EVENT|RESETS_STANDARD end
+	reset=reset|(RESET_EVENT|RESETS_STANDARD)
+	if not ct then ct=1 end
+	Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+	--Negate its effects
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetCode(EFFECT_DISABLE)
+	e1:SetReset(reset,ct)
+	tc:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_DISABLE_EFFECT)
+	e2:SetValue(RESET_TURN_SET)
+	tc:RegisterEffect(e2)
+	if negates_cards and tc:IsType(TYPE_TRAPMONSTER) then
+		local e3=e1:Clone()
+		e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+		tc:RegisterEffect(e3)
+	end
+end
+
 function Card.GetMetatable(c,currentCode)
 	if currentCode then return _G["c" .. c:GetCode()] end
 	return c.__index
@@ -582,6 +619,21 @@ end
 
 function Duel.GetMetatable(code)
 	return _G["c" .. code]
+end
+
+-- Load the target's card metatable in the duel, and makes so that
+-- the current loaded one gets replaced by it.
+-- This will basically make the script that called this function behave
+-- like script loading for alt arts work
+function Duel.LoadCardScriptAlias(code)
+	for key in pairs(self_table) do
+		if key~="__index" and key~="__tostring" then
+			error("Duel.LoadCardScriptAlias must be called in an empty script context",2)
+		end
+	end
+	local newtable=Duel.LoadCardScript(code)
+	rawset(self_table,"__index",newtable)
+	_G["c"..self_code] = newtable
 end
 
 function Duel.LoadCardScript(code)
@@ -603,6 +655,7 @@ function Duel.LoadCardScript(code)
 		self_table=oldtable
 		self_code=oldcode
 	end
+	return _G[card]
 end
 
 
@@ -1211,13 +1264,13 @@ end
 function Duel.AnnounceAnotherAttribute(g,tp)
 	local att=g:GetBitwiseOr(Card.GetAttribute)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTRIBUTE)
-	return Duel.AnnounceAttribute(tp,1,att&(att-1)==0 and ~att or ATTRIBUTE_ALL)
+	return Duel.AnnounceAttribute(tp,1,att&(att-1)==0 and (~att&ATTRIBUTE_ALL) or ATTRIBUTE_ALL)
 end
 
 function Duel.AnnounceAnotherRace(g,tp)
 	local race=g:GetBitwiseOr(Card.GetRace)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RACE)
-	return Duel.AnnounceRace(tp,1,race&(race-1)==0 and ~race or RACE_ALL)
+	return Duel.AnnounceRace(tp,1,race&(race-1)==0 and (~race&RACE_ALL) or RACE_ALL)
 end
 
 function Auxiliary.ResetEffects(g,eff)
@@ -1622,7 +1675,7 @@ function Card.ListsCounter(c,counter_type)
 	return false
 end
 --Checks whether a card (c) has an effect that places a certain type of counter
-function Card.ListsCounter(c,counter_type)
+function Card.PlacesCounter(c,counter_type)
 	if not c.counter_place_list then return false end
 	for _,ccounter in ipairs(c.counter_place_list) do
 		if counter_type==ccounter then return true end

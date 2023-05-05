@@ -595,9 +595,9 @@ if not AnimeArchetype then
 	Card.IsMagnet=MakeCheck({0x534,0x2066})
 
 	-- Mantis カマキリ
-	-- Empress Mantis
+	-- Empress Mantis,Praying Mantis,Guard Mantis
 	AnimeArchetype.OCGMantis={
-		58818411
+		58818411,31600513,53754104
 	}
 	Card.IsMantis=MakeCheck({0x535},AnimeArchetype.OCGMantis)
 
@@ -674,8 +674,8 @@ if not AnimeArchetype then
 	Card.IsNumeronius=MakeCheck({0x53b},AnimeArchetype.OCGNumeronius)
 
 	-- Papillon パピヨン
-	-- Moonlit Papillon
-	Card.IsPapillon=MakeCheck({0x53c},{16366944})
+	-- Moonlit Papillon/Rose Papillon
+	Card.IsPapillon=MakeCheck({0x53c},{16366944,8910240})
 
 	-- Parasite パラサイト
 	-- Graydle Parasite/Fusion Parasite

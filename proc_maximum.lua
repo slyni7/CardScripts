@@ -147,7 +147,7 @@ function Card.IsMaximumMode(c)
 	return c:IsMaximumModeCenter() or c:IsMaximumModeSide()
 end
 function Card.IsMaximumModeCenter(c)
-	return c:GetFlagEffect(FLAG_MAXIMUM_CENTER)>0
+	return c:HasFlagEffect(FLAG_MAXIMUM_CENTER)
 end
 function Card.IsMaximumModeLeft(c)
 	local m=c:GetMetatable(true)
@@ -160,16 +160,16 @@ function Card.IsMaximumModeRight(c)
 	return m.MaximumSide=="Right"
 end
 function Card.IsMaximumModeSide(c)
-	return c:GetFlagEffect(FLAG_MAXIMUM_SIDE)~=0
+	return c:HasFlagEffect(FLAG_MAXIMUM_SIDE)
 end
 function Card.IsNotMaximumModeSide(c)
-	return not c:GetFlagEffect(FLAG_MAXIMUM_SIDE)~=0
+	return not c:HasFlagEffect(FLAG_MAXIMUM_SIDE)
 end
 function Card.WasMaximumModeSide(c)
-	return c:GetFlagEffect(FLAG_MAXIMUM_SIDE_PREONFIELD)~=0
+	return c:HasFlagEffect(FLAG_MAXIMUM_SIDE_PREONFIELD)
 end
 function Card.WasMaximumMode(c)
-	return c:GetFlagEffect(FLAG_MAXIMUM_SIDE_PREONFIELD)~=0 or c:GetFlagEffect(FLAG_MAXIMUM_CENTER_PREONFIELD)~=0
+	return c:HasFlagEffect(FLAG_MAXIMUM_SIDE_PREONFIELD) or c:HasFlagEffect(FLAG_MAXIMUM_CENTER_PREONFIELD)
 end
 --I used Gemini as a reference for that function, while waiting for more information
 function Auxiliary.IsMaximumMode(effect)
@@ -290,6 +290,21 @@ function Card.AddSideMaximumHandler(c,eff)
 	e11:SetCode(EFFECT_CANNOT_ATTACK)
 	e11:SetCondition(Maximum.sideCon)
 	c:RegisterEffect(e11)
+
+	--cannot activate effect if side piece
+	local e12=baseeff:Clone()
+	e12:SetCode(EFFECT_CANNOT_TRIGGER)
+	c:RegisterEffect(e12)
+
+	--cannot be used as material
+	local e13=Effect.CreateEffect(c)
+	e13:SetType(EFFECT_TYPE_SINGLE)
+	e13:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e13:SetCode(EFFECT_CANNOT_BE_MATERIAL)
+	e13:SetCondition(Maximum.sideCon)
+	e13:SetValue(aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK))
+	c:RegisterEffect(e13)
+
 	baseeff:Reset()
 end
 function Maximum.GetMaximumCenter(tp)
@@ -632,7 +647,7 @@ function Card.AddDoubleTribute(c,id,otfilter,eftg,reset,...)
 	for i,flag in ipairs{...} do
 		c:RegisterFlagEffect(flag,reset,0,1)
 	end
-	local e1=aux.summonproc(c,true,true,1,1,SUMMON_TYPE_TRIBUTE,aux.Stringid(id,0),otfilter)
+	local e1=aux.summonproc(c,true,true,1,1,SUMMON_TYPE_TRIBUTE+100,aux.Stringid(id,0),otfilter)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
 	e2:SetRange(LOCATION_MZONE)
@@ -795,8 +810,12 @@ local LEGEND_LIST={160001000,160205001,160418001,160002000,160421015,160404001,1
 160009000,160007000,160004000,160010000,160318001,160432002,160310001,160318002,160318003,160201009,160202048,
 160203018,160203023,160204048,160204049,160205069,160205070,160206025,160310003,160318006,160408003,160411003,
 160417004,160417006,160421017,160428099,160428100,160432003,160202019,160318005,160417005,160418003,160434005,
-160436005,160437001,160206019}
+160436005,160437001,160206019,160206002,160206008,160206022,160206028,160013020,160440001,160440002}
 -- Returns if a card is a Legend. Can be updated if a GetOT function is added to the core
 function Card.IsLegend(c)
 	return c:IsOriginalCode(table.unpack(LEGEND_LIST))
+end
+function Card.GetMaterialCountRush(c)
+	if c:GetSummonType()==SUMMON_TYPE_TRIBUTE+100 then return c:GetMaterialCount()+1 end
+	return c:GetMaterialCount()
 end

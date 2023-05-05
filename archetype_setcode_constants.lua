@@ -5,9 +5,6 @@
 	Notes:
 - To be formatted, probably alphabetically while keeping sub-archetypes with the original.
 
-- 0x67 Iron (unused, non-existent archetype, アイアン, 9 OCG cards include it in their names)
-- 0x68 Tin (unused, non-existent archetype, ブリキ, 3 OCG cards include it in their names)
-- 0x6c Lightray (unused, non-existent archetype, ライトレイ, 6 OCG cards include it in their names)
 - 0x8c Druid (unused, non-existent archetype, ドルイド, 4 OCG cards include it in their names)
 
 - 0x106d Djinn of Rituals (unused sub-archetype of "Djinn")
@@ -55,6 +52,7 @@ SET_BES                           = 0x15
 SET_ROID                          = 0x16
 SET_VEHICROID                     = 0x1016
 SET_SPEEDROID                     = 0x2016
+SET_SYNCHRO                       = 0x17
 SET_SYNCHRON                      = 0x1017
 SET_SYNCHRO_DRAGON                = 0x2017
 SET_CLOUDIAN                      = 0x18
@@ -90,6 +88,7 @@ SET_ASSAULT_BLACKWING             = 0x1033
 SET_CRYSTAL                       = 0x34
 SET_CRYSTAL_BEAST                 = 0x1034
 SET_ULTIMATE_CRYSTAL              = 0x2034
+SET_ADVANCED_CRYSTAL_BEAST        = 0x5034	
 SET_FABLED                        = 0x35
 SET_MACHINA                       = 0x36
 SET_MIST_VALLEY                   = 0x37
@@ -134,6 +133,7 @@ SET_VENOM                         = 0x50
 SET_STARVING_VENOM                = 0x1050
 SET_GADGET                        = 0x51
 SET_GUARDIAN                      = 0x52
+SET_GATE_GUARDIAN                 = 0x1052
 SET_CONSTELLAR                    = 0x53
 SET_GAGAGA                        = 0x54
 SET_PHOTON                        = 0x55
@@ -181,6 +181,7 @@ SET_FIRE_FIST                     = 0x79
 SET_NOBLE_KNIGHT                  = 0x107a
 SET_INFERNOBLE_KNIGHT             = 0x507a
 SET_NOBLE_ARMS                    = 0x207a
+SET_INFERNOBLE_ARMS               = 0x607a
 SET_GALAXY                        = 0x7b
 SET_GALAXY_EYES                   = 0x107b
 SET_GALAXY_EYES_TACHYON_DRAGON    = 0x307b
@@ -348,8 +349,8 @@ SET_SUPREME_KING_GATE             = 0x10f8
 SET_SUPREME_KING_DRAGON           = 0x20f8
 SET_TRUE_DRACO_KING               = 0xf9
 SET_PHANTASM_SPIRAL               = 0xfa
-SET_GOUKI                         = 0xfb
-SET_TRICKSTAR                     = 0xfc
+SET_TRICKSTAR                     = 0xfb
+SET_GOUKI                         = 0xfc
 SET_WORLD_CHALICE                 = 0xfd
 SET_WORLD_LEGACY                  = 0xfe
 SET_CLEAR_WING                    = 0xff
@@ -509,13 +510,24 @@ SET_RAINBOW_BRIDGE                = 0x188
 SET_BYSTIAL                       = 0x189
 SET_GHOTI                         = 0x18b
 SET_KASHTIRA                      = 0x18a
---Currently unreleased in the TCG, the official English name is unknown
+SET_GOLD_PRIDE                    = 0x193
+SET_KOALA                         = 0x67
+SET_KANGAROO                      = 0x68
 SET_RESCUE_ACE                    = 0x18c
-SET_PURERY                        = 0x18d
+SET_PURRELY                       = 0x18d
 SET_MIKANKO                       = 0x18e
 SET_AQUAMIRROR                    = 0x18f
 SET_FIREWALL                      = 0x190
+SET_LABYRINTH_WALL                = 0x194
+SET_FAVORITE                      = 0x195
+SET_VANQUISH_SOUL                 = 0x196
+SET_NOUVELLES                     = 0x197
+SET_RECIPE                        = 0x198
+SET_HELIOS                        = 0x6c
+SET_VISAS                         = 0x199
+--Currently unreleased in the TCG, the official English name is unknown
 SET_MANADOME                      = 0x191
 SET_NEMURELIA                     = 0x192
 --Beta archetypes
-SET_GOLD_PRIDE                    = 0x28d
+SET_COUNTER                       = 0x294
+SET_BATTLIN_BOXING                = 0x295

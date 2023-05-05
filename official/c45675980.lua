@@ -1,5 +1,5 @@
 --烙印の即凶劇
---Branded Etude
+--Etude of the Branded
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetCode(EFFECT_TO_GRAVE_REDIRECT)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetTargetRange(0,0xff)
+	e3:SetTargetRange(0,LOCATION_ALL)
 	e3:SetCondition(s.rmcon)
 	e3:SetTarget(s.rmtg)
 	e3:SetValue(LOCATION_REMOVED)
@@ -52,8 +52,9 @@ function s.scop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:Select(tp,1,1,nil)
 		Duel.SynchroSummon(tp,sg:GetFirst())
+	else
+		Synchro.CheckAdditional=nil
 	end
-	Synchro.CheckAdditional=nil
 end
 function s.rmcon(e)
 	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_BYSTIAL),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)

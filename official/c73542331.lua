@@ -1,5 +1,5 @@
 --クシャトリラ・シャングリラ
---Kshatri-La Shangri-La
+--Kashtira Shangri-Ira
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
@@ -55,7 +55,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.zfilter(c,tp)
-	return c:IsFacedown() and c:IsControler(1-tp)
+	return c:IsFacedown() and c:IsControler(1-tp) and c:IsPreviousControler(1-tp)
 end
 function s.zcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.zfilter,1,nil,tp)
@@ -79,7 +79,7 @@ function s.zop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetOperation(function(e) return e:GetLabel() end)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 	e1:SetLabel(Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM))
 	c:RegisterEffect(e1)
 end

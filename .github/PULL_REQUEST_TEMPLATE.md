@@ -9,6 +9,7 @@ In this case, replace this comment with a brief summary of your change. What did
 --->
 
 - [ ] I am following the [contributing guidelines](https://github.com/ProjectIgnis/CardScripts/blob/master/CONTRIBUTING.md).
+- [ ] I am making the [changes to modernize the scripts](https://github.com/ProjectIgnis/CardScripts/blob/master/MODERNIZING.md).
 
 **New card checklist**
 
