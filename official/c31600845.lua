@@ -1,5 +1,5 @@
 --恐楽園の死配人 ＜Ａｒｌｅｃｈｉｎｏ＞
---Amazement Dominator Arlekino
+--Amazement Abomination Arlekino
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_AMAZEMENT}
-s.listed_names={94821366,20989253}
+s.listed_names={94821366,20989253} --Amazement Administrator Arlekino, Amazement Family Faces
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_AMAZEMENT),tp,LOCATION_MZONE,0,1,nil)
 end
@@ -67,7 +67,7 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.cfilter(chkc) and chkc~=c end
 	if chk==0 then return c:IsAbleToDeck() and Duel.GetMZoneCount(tp,c)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) 
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
 		and Duel.IsExistingTarget(s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
 	local tc=Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,c):GetFirst()

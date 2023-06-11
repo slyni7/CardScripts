@@ -1,7 +1,7 @@
 --Anime Archtype
 if not AnimeArchetype then
 	AnimeArchetype = {}
-	
+
 	local MakeCheck=function(setcodes,archtable,extrafuncs)
 		return function(c,sc,sumtype,playerid)
 			sumtype=sumtype or 0
@@ -145,7 +145,7 @@ if not AnimeArchetype then
 	Card.IsCelestial=MakeCheck({0x254a},{69865139,25472513})
 
 	-- Cicada
-	-- 蝉 
+	-- 蝉
 	-- せみ
 	-- Number 3: Cicada King, Oily Cicada, Dream Cicada
 	Card.IsCicada=MakeCheck({0x50f},{4997565,79663524,5068132})
@@ -155,7 +155,7 @@ if not AnimeArchetype then
 	-- おうじゃ
 	-- Champion's Vigilance
 	Card.IsChampion=MakeCheck({0x152f},{82382815})
-	
+
 	-- Clear クリアー
 	-- Clear Vice Dragon/Clear World
 	Card.IsClear=MakeCheck({0x510},{97811903,82044279,33900648})
@@ -257,17 +257,7 @@ if not AnimeArchetype then
 		79569173,97169186,26381750,70156997,20590784,77428945,54762426,46918794,95220856,2084239,77754944,
 		7443908,4997565
 	}
-	Card.IsEarth=MakeCheck({0x51a},AnimeArchetype.OCGEarth,{"IsEarthbound","IsHell"})
-
-	-- Earthbound (list to update)
-	-- 地縛
-	-- じばく
-	-- Earthbound Revival/Roar of the Earthbound/Earthbound Whirlwind
-	-- Earthbound Linewalker/Call of the Earthbound
-	AnimeArchetype.OCGEarthbound={
-		64187086,56339050,96907086,67987302,65743242
-	}
-	Card.IsEarthbound=MakeCheck({0x151a,0x21},AnimeArchetype.OCGEarthbound)
+	Card.IsEarth=MakeCheck({0x51a,SET_EARTHBOUND},AnimeArchetype.OCGEarth,{"IsHell"})
 
 	-- Elf エルフ
 	-- Ghost Fairy Elfobia/Wing Egg Elf/Elf's Light
@@ -656,15 +646,6 @@ if not AnimeArchetype then
 	}
 	Card.IsCN39UtopiaRay=MakeCheck({0x1539},AnimeArchetype.OCGCN39UtopiaRay)
 
-	-- Number S
-	-- ＳＮｏ.
-	-- シャイニングナンバーズ
-	-- Number S39: Utopia the Lightning/Number S39: Utopia the Lightning/Number S0: Utopic ZEXAL
-	AnimeArchetype.OCGNumberS={
-		52653092,56832966,86532744
-	}
-	Card.IsNumberS=MakeCheck({0x2048},AnimeArchetype.OCGNumberS)
-
 	-- Numeronius
 	-- ヌメロニアス
 	-- Number C1000: Numeronius/Number iC1000: Numeronius Numeronia
@@ -806,7 +787,7 @@ if not AnimeArchetype then
 	AnimeArchetype.OCGShining={
 		22061412,88820235,25366484,62829077,53347303,90263923,12927849,21481146,2061963
 	}
-	Card.IsShining=MakeCheck({0x548},AnimeArchetype.OCGShining,{"IsNumberS"})
+	Card.IsShining=MakeCheck({0x548,0x2048},AnimeArchetype.OCGShining)
 
 	-- Skiel
 	-- スキエル

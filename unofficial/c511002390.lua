@@ -1,9 +1,10 @@
+--パワーオフ
 --Power Off
-Duel.LoadScript("c419.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOGRAVE+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -14,7 +15,7 @@ function s.initial_effect(c)
 end
 function s.filter(c,e,tp)
 	local mg=c:GetMaterial()
-	return c:IsFaceup() and c:IsType(TYPE_PLUS) and c:IsType(TYPE_MINUS) and c:IsAbleToGrave() and #mg>0 
+	return c:IsFaceup() and c:IsType(TYPE_PLUS) and c:IsType(TYPE_MINUS) and c:IsAbleToGrave() and #mg>0
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>=#mg+1 and not mg:IsExists(s.mgfilter,1,nil,e,tp,c)
 end
 function s.mgfilter(c,e,tp,card)

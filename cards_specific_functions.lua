@@ -746,7 +746,7 @@ function Auxiliary.CreateUrsarcticSpsummon(c,id)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetHintTiming(0,TIMING_MAIN_END)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(Duel.IsMainPhase)
+	e1:SetCondition(function() return Duel.IsMainPhase() end)
 	e1:SetCost(Auxiliary.CostWithReplace(Ursarctic.spcost,CARD_URSARCTIC_BIG_DIPPER))
 	e1:SetTarget(Ursarctic.summontarget)
 	e1:SetOperation(Ursarctic.summonoperation(id))
@@ -1153,7 +1153,7 @@ end
 Infernoid={}
 local InfernoidInt={}
 function InfernoidInt.spfilter(c)
-	return c:IsSetCard(SET_INFERNOID) and c:IsMonster() and c:IsAbleToRemoveAsCost() 
+	return c:IsSetCard(SET_INFERNOID) and c:IsMonster() and c:IsAbleToRemoveAsCost()
 end
 function InfernoidInt.getLocations(c,tp)
 	local locations=LOCATION_HAND

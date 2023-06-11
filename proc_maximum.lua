@@ -4,7 +4,7 @@
 FLAG_MAXIMUM_CENTER=170000000 --flag for center card maximum mode
 FLAG_MAXIMUM_SIDE=170000001 --flag for Left/right maximum card
 FLAG_MAXIMUM_CENTER_PREONFIELD=170000002 --those two flag are used to check is the card was a maximum monster while on the field (handling to improve later)
-FLAG_MAXIMUM_SIDE_PREONFIELD=170000004 
+FLAG_MAXIMUM_SIDE_PREONFIELD=170000004
 if not aux.MaximumProcedure then
 	aux.MaximumProcedure = {}
 	Maximum = aux.MaximumProcedure
@@ -80,6 +80,7 @@ function Maximum.AddProcedure(c,desc,...)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_UPDATE_DEFENSE)
+	e5:SetCondition(Maximum.centerCon)
 	e5:SetValue(-1000000)
 	c:RegisterEffect(e5)
 end
@@ -126,7 +127,7 @@ function Maximum.Operation(mats)
 		--center
 		c:RegisterFlagEffect(FLAG_MAXIMUM_CENTER,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
 		c:RegisterFlagEffect(FLAG_MAXIMUM_CENTER_PREONFIELD,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD-RESET_TOGRAVE-RESET_LEAVE,0,1)
-		
+
 		--side
 		for tc in aux.Next(tg) do
 			tc:RegisterFlagEffect(FLAG_MAXIMUM_SIDE,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
@@ -221,7 +222,7 @@ function Card.AddSideMaximumHandler(c,eff)
 	baseeff:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	baseeff:SetRange(LOCATION_MZONE)
 	baseeff:SetCondition(Maximum.sideCon)
-	
+
 	local e1=baseeff:Clone()
 	e1:SetCode(EFFECT_SET_BASE_ATTACK)
 	e1:SetValue(Maximum.maxCenterVal(Card.GetMaximumAttack))
@@ -231,7 +232,7 @@ function Card.AddSideMaximumHandler(c,eff)
 	e0:SetCode(EFFECT_SET_ATTACK_FINAL)
 	e0:SetValue(Maximum.maxCenterVal(Card.GetAttack))
 	c:RegisterEffect(e0)
-	
+
 	--change level
 	local e2=baseeff:Clone()
 	e2:SetCode(EFFECT_CHANGE_LEVEL)
@@ -261,13 +262,13 @@ function Card.AddSideMaximumHandler(c,eff)
 	e6:SetTarget(Maximum.eftgMax)
 	e6:SetLabelObject(eff)
 	c:RegisterEffect(e6)
-	
+
 	--cannot be battle target
 	local e7=baseeff:Clone()
 	e7:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e7:SetValue(aux.imval1)
 	c:RegisterEffect(e7)
-	
+
 	--cannot be changed to def
 	local e8=baseeff:Clone()
 	e8:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
@@ -275,7 +276,7 @@ function Card.AddSideMaximumHandler(c,eff)
 	local e8=baseeff:Clone()
 	e8:SetCode(EFFECT_CANNOT_CHANGE_POS_E)
 	c:RegisterEffect(e8)
-	
+
 	--cannot be tributed for a tribute summon
 	local e10=Effect.CreateEffect(c)
 	e10:SetType(EFFECT_TYPE_SINGLE)
@@ -304,6 +305,14 @@ function Card.AddSideMaximumHandler(c,eff)
 	e13:SetCondition(Maximum.sideCon)
 	e13:SetValue(aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK))
 	c:RegisterEffect(e13)
+
+	--makes so it virtually cannot have any DEF
+	local e16=Effect.CreateEffect(c)
+	e16:SetType(EFFECT_TYPE_SINGLE)
+	e16:SetCode(EFFECT_UPDATE_DEFENSE)
+	e16:SetCondition(Maximum.sideCon)
+	e16:SetValue(-1000000)
+	c:RegisterEffect(e16)
 
 	baseeff:Reset()
 end
@@ -356,7 +365,7 @@ function Auxiliary.FilterMaximumSideFunctionEx(f,...)
 end
 --function used only in Duel.GetFieldGroupCountRush because the old implementation did not want to work
 function Maximum.GroupCountFunction(c)
-	return ((not c:IsMaximumMode()) or (not (c:IsMaximumMode() and not c:IsMaximumModeCenter()))) 
+	return ((not c:IsMaximumMode()) or (not (c:IsMaximumMode() and not c:IsMaximumModeCenter())))
 end
 -- function that return the count of a location P1 et P2 minus the Maximum Side
 function Duel.GetFieldGroupCountRush(player, p1, p2)
@@ -429,7 +438,7 @@ function Maximum.tribcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(Maximum.cfilter,1,nil,tp)
 end
 function Maximum.tribop(e,tp,eg,ep,ev,re,r,rp)
-	local c=eg:GetFirst()
+	local c=eg:Filter(Card.WasMaximumMode,nil):GetFirst()
 	local g=Duel.GetMatchingGroup(Card.IsMaximumMode,c:GetControler(),LOCATION_MZONE,0,nil)
 	Duel.Sendto(g,c:GetDestination(),0)
 	for tc in aux.Next(g) do
@@ -483,15 +492,15 @@ end
 --Add function to simplify some effect
 
 --c: the card gaining effect
---reset: when the effect should disappear 
+--reset: when the effect should disappear
 --rc: the card giving effect
 --condition: condition for the effect to be "active"
 --properties: properties beside EFFECT_FLAG_CLIENT_HINT
 function Card.AddPiercing(c,reset,rc,condition,properties)
 	local e1=nil
-	if rc then 
+	if rc then
 		e1=Effect.CreateEffect(rc)
-	else 
+	else
 		e1=Effect.CreateEffect(c)
 	end
 	e1:SetDescription(3208)
@@ -505,9 +514,9 @@ function Card.AddPiercing(c,reset,rc,condition,properties)
 end
 function Card.AddDirectAttack(c,reset,rc,condition,properties)
 	local e1=nil
-	if rc then 
+	if rc then
 		e1=Effect.CreateEffect(rc)
-	else 
+	else
 		e1=Effect.CreateEffect(c)
 	end
 	e1:SetDescription(3205)
@@ -522,9 +531,9 @@ end
 --attack each monster once each
 function Card.AddAdditionalAttackOnMonsterAll(c,reset,rc,value,condition,properties)
 	local e1=nil
-	if rc then 
+	if rc then
 		e1=Effect.CreateEffect(rc)
-	else 
+	else
 		e1=Effect.CreateEffect(c)
 	end
 	--Attack all
@@ -540,9 +549,9 @@ function Card.AddAdditionalAttackOnMonsterAll(c,reset,rc,value,condition,propert
 end
 function Card.AddAdditionalAttack(c,atknum,reset,rc,condition,properties)
 	local e1=nil
-	if rc then 
+	if rc then
 		e1=Effect.CreateEffect(rc)
-	else 
+	else
 		e1=Effect.CreateEffect(c)
 	end
 	if atknum==1 then e1:SetDescription(3201) end
@@ -557,9 +566,9 @@ function Card.AddAdditionalAttack(c,atknum,reset,rc,condition,properties)
 end
 function Card.AddAdditionalAttackOnMonster(c,atknum,reset,rc,condition,properties)
 	local e1=nil
-	if rc then 
+	if rc then
 		e1=Effect.CreateEffect(rc)
-	else 
+	else
 		e1=Effect.CreateEffect(c)
 	end
 	if atknum==1 then e1:SetDescription(3202) end
@@ -575,9 +584,9 @@ end
 --ctype: card type that cannot destroy
 function Card.AddCannotBeDestroyedEffect(c,ctype,reset,rc,condition,properties)
 	local e1=nil
-	if rc then 
+	if rc then
 		e1=Effect.CreateEffect(rc)
-	else 
+	else
 		e1=Effect.CreateEffect(c)
 	end
 	if ctype==TYPE_MONSTER then e1:SetDescription(3068)
@@ -601,9 +610,9 @@ end
 function Card.AddCannotBeDestroyedBattle(c,reset,value,rc,condition,properties)
 	--Cannot be destroyed battle
 	local e1=nil
-	if rc then 
+	if rc then
 		e1=Effect.CreateEffect(rc)
-	else 
+	else
 		e1=Effect.CreateEffect(c)
 	end
 	e1:SetDescription(3000)
@@ -622,7 +631,7 @@ end
 -- num: number of card send from the top to the gy
 -- reason: reason of the mill (REASON_EFFECT or REASON_COST)
 function aux.DeckMill(p,num,reason)
-	if Duel.DiscardDeck(p,num,reason)<num then return false else return true end 
+	if Duel.DiscardDeck(p,num,reason)<num then return false else return true end
 end
 
 
@@ -810,7 +819,8 @@ local LEGEND_LIST={160001000,160205001,160418001,160002000,160421015,160404001,1
 160009000,160007000,160004000,160010000,160318001,160432002,160310001,160318002,160318003,160201009,160202048,
 160203018,160203023,160204048,160204049,160205069,160205070,160206025,160310003,160318006,160408003,160411003,
 160417004,160417006,160421017,160428099,160428100,160432003,160202019,160318005,160417005,160418003,160434005,
-160436005,160437001,160206019,160206002,160206008,160206022,160206028,160013020,160440001,160440002}
+160436005,160437001,160206019,160206002,160206008,160206022,160206028,160013020,160440001,160440002,160440003,
+160429002}
 -- Returns if a card is a Legend. Can be updated if a GetOT function is added to the core
 function Card.IsLegend(c)
 	return c:IsOriginalCode(table.unpack(LEGEND_LIST))
