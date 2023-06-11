@@ -10,9 +10,13 @@ Auxiliary.AdditionalSetcardsList={
 --Æ¼¾Æ¶ó
 [0x2c4]={37164373},
 }
-Duel.LoadScript("expand.lua")
+pcall(dofile,"expansions/expand.lua")
 local cisc=Card.IsSetCard
+CARD_NAMESQUARE_PASQUARE=18453732
 function Card.IsSetCard(c,set,...)
+	if c:IsCode(CARD_NAMESQUARE_PASQUARE) then
+		return true
+	end
 	if Auxiliary.AdditionalSetcardsList[set]
 		and c:IsCode(table.unpack(Auxiliary.AdditionalSetcardsList[set])) then
 		return true
