@@ -19,18 +19,21 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_ONFIELD,0)
 	e2:SetTarget(s.indtg)
-	e2:SetValue(aux.indoval)
+	e2:SetValue(s.efilter)
 	c:RegisterEffect(e2)
 end
 function s.eqfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_GALAXY) and not c:IsMaximumModeSide()
 end
 function s.eqlimit(e,c)
-    return c:IsFaceup()
+	return c:IsFaceup()
 end
 function s.value(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsSpellTrap,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,nil)*100
 end
 function s.indtg(e,c)
 	return c:IsSpellTrap()
+end
+function s.efilter(e,te)
+	return te:GetOwnerPlayer()~=e:GetOwnerPlayer()
 end

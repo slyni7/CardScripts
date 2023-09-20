@@ -223,8 +223,7 @@ if not AnimeArchetype then
 		72657739,91939608,85639257,2903036,49563947,82579942,
 		92418590,39806198
 	}
-	Card.IsDoll=MakeCheck({0x517,0x9d},AnimeArchetype.OCGDoll)
-
+	Card.IsDoll=MakeCheck({0x517,0x9d,0x15c},AnimeArchetype.OCGDoll)
 
 	-- Drone
 	-- ドローン
@@ -233,7 +232,6 @@ if not AnimeArchetype then
 		24610207,756652,4474060
 	}
 	Card.IsDrone=MakeCheck({0x581},AnimeArchetype.OCGDrone)
-
 
 	-- Druid ドルイド
 	-- Secret Sect Druid Wid/Secret Sect Druid Dru/Aurkus, Lightsworn Druid
@@ -303,10 +301,6 @@ if not AnimeArchetype then
 		77797992,87624166,14015067,4192696,87430998,46668237,60398723,37322745,36318200,24096499,78010363,42883273,65303664,17733394
 	}
 	Card.IsForest=MakeCheck({0x51f},AnimeArchetype.OCGForest)
-
-	-- Gaia the Dragon Champion
-	-- Gaia the Dragon Champion/Sky Galloping Gaia the Dragon Champion
-	Card.IsGaiatheDragonChampion=MakeCheck({0x521},{66889139,2519690})
 
 	-- Gem-Knight Lady ジェムナイトレディ
 	-- Gem-Knight Lady Brilliant Diamond/Gem-Knight Lady Lapis Lazuli
@@ -993,7 +987,6 @@ if not AnimeArchetype then
 	}
 	Card.IsY=MakeCheck({0x56d,0xc1},AnimeArchetype.OCGY)
 
-
 	-- Yomi 黄泉
 	-- Treeborn Frog
 	-- Yomi Ship
@@ -1002,12 +995,6 @@ if not AnimeArchetype then
 	}
 	Card.IsYomi=MakeCheck({0x563},AnimeArchetype.OCGYomi)
 
-	-- Yubel (archetype) ユベル
-	AnimeArchetype.OCGYubel={
-		-- Yubel, Yubel terror, Yubel nighmare
-		78371393,4779091,31764700
-	}
-	Card.IsYubel=MakeCheck({0x561},AnimeArchetype.OCGYubel)
 
 	--Z
 	AnimeArchetype.OCGZ={
@@ -1087,4 +1074,24 @@ if not AnimeArchetype then
 	-- 軍蚊 (Army Mosquito)
 	-- Ninjitsu Art of Mosquito Marching
 	Card.IsMosquito=MakeCheck({0x536},{94113093})
+
+-----------------------------------------
+	-- Speed Duel
+
+	-- Gaia the Dragon Champion
+	-- Gaia the Dragon Champion/Sky Galloping Gaia the Dragon Champion
+	Card.IsGaiatheDragonChampion=MakeCheck({0x580},{66889139,2519690})
+
+	-- Ancient Gear Golem
+	-- Ancient Gear Golem/Ancient Gear Golem - Ultimate Pound
+	-- Toon Ancient Gear Golem/Ultimate Ancient Gear Golem
+	Card.IsAncientGearGolem=MakeCheck({0x581},{83104731,95735217,7171149,12652643})
+
+	-- Insect Queen
+	-- Insect Queen/Metamorphosed Insect Queen
+	Card.IsInsectQueen=MakeCheck({0x582},{91512835,41456841})
+
+	-- Fortress Whale
+	-- Fortress Whale/Fortress Whale's Oath/Mega Fortress Whale
+	Card.IsFortressWhale=MakeCheck({0x583},{62337487,77454922,96546575})
 end

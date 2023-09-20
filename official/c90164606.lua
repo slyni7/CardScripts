@@ -1,4 +1,4 @@
--- JP Name
+-- ＧＰ－ネック・アンド・ネック
 -- Gold Pride - It's Neck and Neck!
 -- Scripted by Satella
 local s,id=GetID()
@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetHintTiming(0,TIMING_MAIN_END+TIMINGS_CHECK_MONSTER_E)
+	e2:SetHintTiming(0,TIMING_MAIN_END|TIMINGS_CHECK_MONSTER_E)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(s.spcon)
 	e2:SetCost(s.spcost)

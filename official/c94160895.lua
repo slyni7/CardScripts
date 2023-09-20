@@ -41,7 +41,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if ft>-1 then
 		local loc=0
 		if Duel.IsPlayerAffectedByEffect(tp,88581108) then loc=LOCATION_MZONE end
-		g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE+LOCATION_HAND,loc,c)
+		g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE|LOCATION_HAND,loc,c)
 	else
 		g=Duel.GetMatchingGroup(s.desfilter2,tp,LOCATION_MZONE,0,c)
 	end
@@ -58,7 +58,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if ft>-1 then
 		local loc=0
 		if Duel.IsPlayerAffectedByEffect(tp,88581108) then loc=LOCATION_MZONE end
-		g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE+LOCATION_HAND,loc,c)
+		g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE|LOCATION_HAND,loc,c)
 	else
 		g=Duel.GetMatchingGroup(s.desfilter2,tp,LOCATION_MZONE,0,c)
 	end
@@ -93,7 +93,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.thfilter(c)
-	return c:IsAttributeExcept(ATTRIBUTE_WIND)  and c:IsRace(RACE_WYRM) and c:IsAbleToHand()
+	return c:IsAttributeExcept(ATTRIBUTE_WIND) and c:IsRace(RACE_WYRM) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

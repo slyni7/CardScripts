@@ -7,8 +7,12 @@ function s.initial_effect(c)
 	aux.AddEquipProcedure(c,0,s.eqfilter,s.eqlimit,s.cost,nil,s.operation)
 	--Cannot be destroyed by the opponent's card effects
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_EQUIP)
+	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetRange(LOCATION_SZONE)
+	e1:SetTargetRange(LOCATION_ONFIELD,0)
+	e1:SetTarget(s.indtg)
 	e1:SetValue(s.efilter)
 	c:RegisterEffect(e1)
 	--atk up
@@ -25,8 +29,9 @@ end
 function s.eqlimit(e,c)
 	return c:IsFaceup()
 end
-function s.efilter(e,te)
-	return te:GetOwnerPlayer()~=e:GetHandlerPlayer()
+function s.indtg(e,c)
+	if e:GetHandler():GetEquipTarget():IsMaximumMode() then return c:IsMaximumMode() end
+	return c==e:GetHandler():GetEquipTarget()
 end
 function s.tdfilter(c)
 	return c:IsMonster() and c:IsAbleToDeckOrExtraAsCost()
@@ -43,4 +48,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.condition(e)
 	return Duel.IsExistingMatchingCard(Card.IsEquipSpell,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil)
+end
+function s.efilter(e,te)
+	return te:GetOwnerPlayer()~=e:GetOwnerPlayer()
 end

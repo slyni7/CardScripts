@@ -306,6 +306,15 @@ function Card.AddSideMaximumHandler(c,eff)
 	e13:SetValue(aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK))
 	c:RegisterEffect(e13)
 
+	--self destroy
+	local e14=Effect.CreateEffect(c)
+	e14:SetType(EFFECT_TYPE_SINGLE)
+	e14:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e14:SetRange(LOCATION_MZONE)
+	e14:SetCode(EFFECT_SELF_DESTROY)
+	e14:SetCondition(Maximum.SelfDestructCondition)
+	c:RegisterEffect(e14)
+
 	--makes so it virtually cannot have any DEF
 	local e16=Effect.CreateEffect(c)
 	e16:SetType(EFFECT_TYPE_SINGLE)
@@ -315,6 +324,9 @@ function Card.AddSideMaximumHandler(c,eff)
 	c:RegisterEffect(e16)
 
 	baseeff:Reset()
+end
+function Maximum.SelfDestructCondition(e)
+	return e:GetHandler():IsMaximumModeSide() and not Duel.IsExistingMatchingCard(Card.IsMaximumModeCenter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
 function Maximum.GetMaximumCenter(tp)
 	return Duel.GetMatchingGroup(Card.IsMaximumModeCenter,tp,LOCATION_MZONE,0,nil):GetFirst()
@@ -400,7 +412,7 @@ function Card.RegisterEffectRush(c,eff)
 end
 -- summon only in attack
 local function summon_pos_target(e,c)
-	return c:IsSummonType(SUMMON_TYPE_MAXIMUM) and c:IsLocation(LOCATION_HAND)
+	return c:IsMaximumMode()
 end
 local function initial_effect()
 	local e1=Effect.GlobalEffect()
@@ -652,6 +664,7 @@ FLAG_DOUBLE_TRIB_PSYCHIC=160011122
 FLAG_DOUBLE_TRIB_LEVEL7=160205051 -- Double Twin Dragon
 FLAG_DOUBLE_TRIB_GREYSTORM=160414002 -- Cosmo Predictor
 FLAG_DOUBLE_TRIB_200_DEF=160012015 -- Green-Eyes Star Cat
+FLAG_DOUBLE_TRIB_NORMAL=160319014 -- Light Effigy
 function Card.AddDoubleTribute(c,id,otfilter,eftg,reset,...)
 	for i,flag in ipairs{...} do
 		c:RegisterFlagEffect(flag,reset,0,1)
@@ -763,6 +776,7 @@ end
 function aux.ThreeTributeCondition(otfilter)
 	return function (e,c)
 		if c==nil then return true end
+		if not c:IsLevelAbove(7) then return false end
 		local tp=e:GetHandlerPlayer()
 		local rg1=Duel.GetReleaseGroup(tp)
 		local rg2=Duel.GetMatchingGroup(otfilter,tp,LOCATION_MZONE,0,nil,tp)
@@ -820,7 +834,7 @@ local LEGEND_LIST={160001000,160205001,160418001,160002000,160421015,160404001,1
 160203018,160203023,160204048,160204049,160205069,160205070,160206025,160310003,160318006,160408003,160411003,
 160417004,160417006,160421017,160428099,160428100,160432003,160202019,160318005,160417005,160418003,160434005,
 160436005,160437001,160206019,160206002,160206008,160206022,160206028,160013020,160440001,160440002,160440003,
-160429002}
+160429002,160208063,160208064,160208065,160014065}
 -- Returns if a card is a Legend. Can be updated if a GetOT function is added to the core
 function Card.IsLegend(c)
 	return c:IsOriginalCode(table.unpack(LEGEND_LIST))
