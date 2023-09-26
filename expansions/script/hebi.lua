@@ -1,4 +1,4 @@
-hebi=hebi or {}
+﻿hebi=hebi or {}
 Hebi=hebi
 
 --상대 몬스터 존 / 묘지 위치를 소재로 참조하는 의식 소환(제외)

@@ -46,6 +46,13 @@ function Auxiliary.AddFusionProcMix(c,sub,insf,...)
 							return true
 						end
 					else
+						local fp=fc:GetControler()
+						if Duel.IsPlayerAffectedByEffect(fp,18453322) then
+							local fatt=Duel.ReadCard(fcode,CARDDATA_ATTRIBUTE)
+							if c:IsFusionAttribute(fatt) then
+								return true
+							end
+						end
 						if c:IsFusionCode(fcode) or (sub and c:CheckFusionSubstitute(fc)) then
 							return true
 						end
@@ -63,6 +70,13 @@ function Auxiliary.AddFusionProcMix(c,sub,insf,...)
 				if SatoneFusionFilter and SatoneFusionFilter(c,
 					SatoneFusionEffect,SatoneFusionPlayer) then
 					return true
+				end
+				local fp=fc:GetControler()
+				if Duel.IsPlayerAffectedByEffect(fp,18453322) then
+					local fatt=Duel.ReadCard(val[i],CARDDATA_ATTRIBUTE)
+					if c:IsFusionAttribute(fatt) then
+						return true
+					end
 				end
 				return c:IsFusionCode(val[i])
 					or (sub and c:CheckFusionSubstitute(fc))
@@ -185,6 +199,7 @@ function Auxiliary.FCheckMixGoal(sg,tp,fc,sub,chkfnf,ct,...)
 			((fc:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(tp,tp,sg,fc)>0)
 				or (not fc:IsLocation(LOCAION_EXTRA) and Duel.GetMZoneCount(tp,sg,tp)>0)))
 		and (not Auxiliary.FCheckAdditional or Auxiliary.FCheckAdditional(tp,sg,fc))
+		and (not Auxiliary.FGoalCheckAdditional or Auxiliary.FGoalCheckAdditional(tp,sg,fc))
 end
 function Auxiliary.AddFusionProcMixRep(c,sub,insf,fun1,minc,maxc,...)
 	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
@@ -212,6 +227,13 @@ function Auxiliary.AddFusionProcMixRep(c,sub,insf,fun1,minc,maxc,...)
 							return true
 						end
 					else
+						local fp=fc:GetControler()
+						if Duel.IsPlayerAffectedByEffect(fp,18453322) then
+							local fatt=Duel.ReadCard(fcode,CARDDATA_ATTRIBUTE)
+							if c:IsFusionAttribute(fatt) then
+								return true
+							end
+						end
 						if c:IsFusionCode(fcode) or (sub and c:CheckFusionSubstitute(fc)) then
 							return true
 						end
@@ -229,6 +251,13 @@ function Auxiliary.AddFusionProcMixRep(c,sub,insf,fun1,minc,maxc,...)
 				if SatoneFusionFilter and SatoneFusionFilter(c,
 					SatoneFusionEffect,SatoneFusionPlayer) then
 					return true
+				end
+				local fp=fc:GetControler()
+				if Duel.IsPlayerAffectedByEffect(fp,18453322) then
+					local fatt=Duel.ReadCard(val[i],CARDDATA_ATTRIBUTE)
+					if c:IsFusionAttribute(fatt) then
+						return true
+					end
 				end
 				return c:IsFusionCode(val[i])
 					or (sub and c:CheckFusionSubstitute(fc))

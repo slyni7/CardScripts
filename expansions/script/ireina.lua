@@ -1033,7 +1033,15 @@ function Auxiliary.SilentMajorityOperation(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function Auxiliary.LCheckSilentGoal(sg,tp,lc,gf,lmat)
-	return sg:CheckWithSumEqual(Auxiliary.GetLinkCount,lc:GetLink(),#sg,#sg)
+	local lk=lc:GetLink()
+	local eset={Duel.IsPlayerAffectedByEffect(tp,18453522)}
+	for _,te in ipairs(eset) do
+		local val=te:GetValue()
+		if val then
+			lk=val(te,c,lk,TYPE_LINK)
+		end
+	end
+	return sg:CheckWithSumEqual(Auxiliary.GetLinkCount,lk,#sg,#sg)
 		and Duel.GetMZoneCount(tp,sg,tp)>0 and (not gf or gf(sg))
 		and not sg:IsExists(Auxiliary.LUncompatibilityFilter,1,nil,sg,lc,tp)
 		and (not lmat or sg:IsContains(lmat))
@@ -1892,6 +1900,10 @@ function Card.RegisterEffect(c,e,forced,...)
 		local op=e:GetOperation()
 		if op then
 			e:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+				local c=e:GetHandler()
+				if c:IsHasEffect(EFFECT_ALICE_SCARLET) then
+					return
+				end
 				if Duel.IsPlayerAffectedByEffect(tp,EFFECT_ALICE_SCARLET) then
 					return
 				end
@@ -1918,6 +1930,10 @@ function Duel.RegisterEffect(e,p,...)
 		if e:IsHasType(EFFECT_TYPE_ACTIONS) then
 			local op=e:GetOperation()
 			e:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+				local c=e:GetHandler()
+				if c:IsHasEffect(EFFECT_ALICE_SCARLET) then
+					return
+				end
 				if Duel.IsPlayerAffectedByEffect(tp,EFFECT_ALICE_SCARLET) then
 					return
 				end
@@ -2337,7 +2353,11 @@ function Card.RegisterEffect(c,e,forced,...)
 					e2:SetType(EFFECT_TYPE_CONTINUOUS|sf)
 					e2:SetCode(ecode)
 					e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+					e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+						return e:GetLabel()==0
+					end)
 					e2:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+						e:SetLabel(1)
 						local c=e:GetHandler()
 						if sf&EFFECT_TYPE_SINGLE>0 then
 							Duel.RaiseSingleEvent(c,0x10000000|ecode,re,r,rp|(ep<<16),1-c:GetControler(),ev)
@@ -2345,6 +2365,7 @@ function Card.RegisterEffect(c,e,forced,...)
 						if sf&EFFECT_TYPE_FIELD>0 then
 							Duel.RaiseEvent(eg,0x10000000|ecode,re,r,rp|(ep<<16),1-c:GetControler(),ev)
 						end
+						e:SetLabel(0)
 					end)
 					cregeff(c,e2,forced,...)
 				else
@@ -2678,7 +2699,7 @@ function Duel.PayLPCost(player,lp)
 	return dplc(player,lp)
 end
 
-Auxiliary.CounterTrapNegateSpellList={[32415003]=true,[32415004]=true,[32415005]=true,[41420027]=true,[59344077]=true,
+Auxiliary.CounterTrapNegateSpellList={[32415003]=true,[32415004]=true,[32415005]=true,[32415009]=true,[41420027]=true,[59344077]=true,
 [69632396]=true,[77538567]=true,[92512625]=true,[112501015]=true,[112603063]=true}
 
 Auxiliary.SpecialSummonByEffectNegatedGroup=nil
@@ -2919,8 +2940,140 @@ if MOVIE_FILMING then
 	end
 end
 
-Duel.LoadScript("proc_braveex.lua")
-Duel.LoadScript("proc_skull.lua")
+CARD_CARD_EJECTOR=26701483
+
+local cregeff=Card.RegisterEffect
+function Card.RegisterEffect(c,e,forced,...)
+	local code=c:GetOriginalCode()
+	local mt=_G["c"..code]
+	if code==CARD_CARD_EJECTOR and e:IsHasType(EFFECT_TYPE_ACTIONS) then
+		if mt.eff_ct[c][0]==e then
+			cregeff(c,e,forced,...)
+			local tfil=function(c,tp)
+				return c:IsAbleToRemove() and
+					(c:IsLoc("G")
+							or (aux.SpElimFilter(c) and c:IsLoc("M"))
+							or (Duel.IsPlayerAffectedByEffect(tp,18453804) and c:IsOnField())
+						)
+			end
+			e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+				if chkc then
+					return chkc:IsLoc("OG") and chkc:GetControler()~=tp and tfil(chkc,tp)
+				end
+				if chk==0 then
+					return Duel.IETarget(tfil,tp,0,"OG",1,nil,tp)
+				end
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+				local g=Duel.STarget(tp,tfil,tp,0,"OG",1,1,nil,tp)
+				local tc=g:GetFirst()
+				if tc:IsOnField() and not aux.SpElimFilter(tc) then
+					Duel.Hint(HINT_CARD,0,18453804)
+				end
+				if Duel.IsPlayerAffectedByEffect(tp,18453809) then
+					Duel.SOI(0,CATEGORY_REMOVE,g,1,tp,"HOG")
+				else
+					Duel.SOI(0,CATEGORY_REMOVE,g,1,0,0)
+				end
+			end)
+			local ofil=function(c)
+				return c:IsAbleToRemove() and aux.SpElimFilter(c)
+			end
+			e:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+				local tc=Duel.GetFirstTarget()
+				local loc=tc:GetLocation()
+				if tc and tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)>0
+					and Duel.IsPlayerAffectedByEffect(tp,18453809) then
+					local g1=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,nil)
+					local g2=Duel.GetMatchingGroup(ofil,tp,0,LOCATION_MZONE+LOCATION_GRAVE,nil)
+					local g3=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_HAND,nil)
+					if loc&LOCATION_ONFIELD~=0 then
+						g1=Group.CreateGroup()
+					end
+					if loc&LOCATION_GRAVE~=0 then
+						g2=Group.CreateGroup()
+					end
+					local sg=Group.CreateGroup()
+					if #g1>0 then
+						Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+						local sg1=g1:Select(tp,0,1,nil)
+						Duel.HintSelection(sg1)
+						sg:Merge(sg1)
+					end
+					if #g2>0 then
+						Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+						local sg2=g2:Select(tp,0,1,nil)
+						Duel.HintSelection(sg2)
+						sg:Merge(sg2)
+					end
+					if #g3>0 and Duel.SelectYesNo(tp,aux.Stringid(18453809,0)) then
+						Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+						local sg3=g3:RandomSelect(tp,1)
+						sg:Merge(sg3)
+					end
+					if #sg>0 then
+						Duel.Hint(HINT_CARD,0,18453809)
+						Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
+					end
+				end
+			end)
+			local e1=e:Clone()
+			e1:SetType(EFFECT_TYPE_QUICK_O)
+			e1:SetCode(EVENT_FREE_CHAIN)
+			e:SetCost(function(e,tp,eg,ep,ev,re,r,rp,chk)
+				local c=e:GetHandler()
+				if chk==0 then
+					return not Duel.IsPlayerAffectedByEffect(tp,18453807) and c:GetFlagEffect(CARD_CARD_EJECTOR)==0
+				end
+				c:RegisterFlagEffect(CARD_CARD_EJECTOR,RESET_PHASE+PHASE_END+RESET_EVENT+RESETS_STANDARD,0,1)
+			end)
+			e1:SetCost(function(e,tp,eg,ep,ev,re,r,rp,chk)
+				local c=e:GetHandler()
+				if chk==0 then
+					return Duel.IsPlayerAffectedByEffect(tp,18453807) and c:GetFlagEffect(CARD_CARD_EJECTOR)==0
+				end
+				c:RegisterFlagEffect(CARD_CARD_EJECTOR,RESET_PHASE+PHASE_END+RESET_EVENT+RESETS_STANDARD,0,1)
+				Duel.Hint(HINT_CARD,0,18453807)
+			end)
+			cregeff(c,e1,forced,...)
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+			e2:SetCode(EVENT_SUMMON_SUCCESS)
+			e2:SetProperty(EFFECT_FLAG_DELAY)
+			e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+			local tfil2=function(c)
+				return c:IsAbleToHand() and aux.IsCodeListed(c,CARD_CARD_EJECTOR) and c:IsSpellTrap()
+			end
+			e2:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk)
+				if chk==0 then
+					return Duel.IEMCard(tfil2,tp,"D",0,1,nil) and Duel.IsPlayerAffectedByEffect(tp,18453810)
+				end
+				Duel.Hint(HINT_CARD,0,18453810)
+				Duel.SOI(0,CATEGORY_TOHAND,nil,1,tp,"D")
+			end)
+			e2:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+				local g=Duel.SMCard(tp,tfil2,tp,"D",0,1,1,nil)
+				if #g>0 then
+					Duel.SendtoHand(g,nil,REASON_EFFECT)
+					Duel.ConfirmCards(1-tp,g)
+				end
+			end)
+			cregeff(c,e2)
+			local e3=e2:Clone()
+			e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+			cregeff(c,e3)
+			local e4=e2:Clone()
+			e4:SetCode(EVENT_FLIP)
+			cregeff(c,e4)
+		end
+	else
+		cregeff(c,e,forced,...)
+	end
+end
+
+pcall(dofile,"expansions/script/proc_braveex.lua")
+
+pcall(dofile,"expansions/script/proc_skull.lua")
 
 --dofile("expansions/script/proto.lua")
 

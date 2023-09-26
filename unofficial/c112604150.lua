@@ -5,7 +5,6 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(s.thtg)
@@ -43,7 +42,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if not sc then return end
 	aux.ToHandOrElse(sc,tp,
 		function(sc)
-			return ft>0 and sc:IsCanBeSpecialSummoned(e,0,tp,false,false) and not sc:IsCode(id)
+			return ft>0 and sc:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 		end,
 		function(sc)
 			return Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)

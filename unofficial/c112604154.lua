@@ -67,7 +67,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.SelectMatchingCard(tp,s.tfil3,tp,LOCATION_GRAVE,0,1,1,nil)
 		local tc=g:GetFirst()
 		if tc then
-			Duel.SendtoHand(tc,nil,REASON_EFFECT)
+			Duel.SendtoHand(tc,nil,REASON_EFECT)
 		end
 	end
 end

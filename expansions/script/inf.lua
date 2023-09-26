@@ -2,4 +2,4 @@
 
 inf=inf or {}
 
-Duel.LoadScript("inflibs/infspace.lua")
+pcall(dofile,"expansions/script/inflibs/infspace.lua")

@@ -1,10 +1,12 @@
 CUSTOMTYPE_EQUAL=0x10
 CUSTOMREASON_EQUAL=0x2
+SUMMON_TYPE_EQUAL=0x40009000
 
 EFFECT_MUST_BE_EQUAL_MATERIAL=27182799
 EFFECT_EQUAL_CHART=27182798
 EFFECT_EQUAL_NOTE=27182797
 EFFECT_UPDATE_NOTE=27182796
+EFFECT_FINALE_STATE=27182795
 
 function Card.GetChart(c)
 	local mt=getmetatable(c)
@@ -26,6 +28,9 @@ function Card.GetNote(c)
 	if nt and nt<0 then
 		nt=0
 	end
+	if nt>c:GetChart() then
+		nt=c:GetChart()
+	end
 	return nt
 end
 function Card.IsChart(c,ch)
@@ -33,6 +38,12 @@ function Card.IsChart(c,ch)
 end
 function Card.IsNote(c,nt)
 	return c:GetNote()==nt
+end
+function Card.IsFinaleState(c)
+	if c:IsHasEffect(EFFECT_FINALE_STATE) then
+		return true
+	end
+	return c:GetChart() and c:GetNote() and c:GetChart()==c:GetNote()
 end
 
 function Auxiliary.AddEqualProcedure(c,chart,note,f1,f2,min,max,gf)
@@ -47,6 +58,7 @@ function Auxiliary.AddEqualProcedure(c,chart,note,f1,f2,min,max,gf)
 	e1:SetRange(LOCATION_EXTRA)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetDescription(aux.Stringid(27182800,0))
+	e1:SetValue(SUMMON_TYPE_EQUAL)
 	e1:SetCondition(Auxiliary.EqualCondition(f1,f2,min,max,gf))
 	e1:SetTarget(Auxiliary.EqualTarget(f1,f2,min,max,gf))
 	e1:SetOperation(Auxiliary.EqualOperation(f1,f2,min,max,gf))

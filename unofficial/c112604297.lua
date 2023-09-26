@@ -48,7 +48,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g1=Duel.SelectTarget(tp,s.tfil1,tp,LOCATION_MZONE+LOCATION_FZONE,0,1,1,nil)
 	local g2=Duel.SelectTarget(tp,s.tfil2,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,1,1,nil)
 	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g1,#g1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g1,0,0)
 end
 function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -1,4 +1,6 @@
-Duel.LoadScript("proc_version_check.lua")
+dofile("expansions/script/deprefunc_nodebug.lua")
+
+dofile("expansions/script/proc_version_check.lua")
 
 function Auxiliary.FilterBoolFunctionEx(f,...)
 	local params={...}
@@ -125,6 +127,15 @@ function Effect.SetCountLimit(e,max,code,flag,...)
 	global_eff_count_limit_flag[e]=flag
 	setcl(e,max,code,flag,...)
 end
+local setrang=Effect.SetRange
+global_eff_rang={}
+function Effect.SetRange(e,range)
+	global_eff_rang[e]=range
+	setrang(e,range)
+end
+function Effect.GetRange(e)
+	return global_eff_rang[e]
+end
 if YGOPRO_VERSION~="Percy/EDO" then
 	function Auxiliary.FilterFaceupFunction(f,...)
 		local params={...}
@@ -138,34 +149,38 @@ function GetID()
 	return self_table,self_code
 end
 
-Duel.LoadScript("AuxCard_CustomType.lua")
+dofile("expansions/script/sungak.lua")
+
+dofile("expansions/script/AuxCard_CustomType.lua")
 if YGOPRO_VERSION~="Percy/EDO" then
-	Duel.LoadScript("proc_fusion_koishi.lua")
-	Duel.LoadScript("proc_synchro_koishi.lua")
-	Duel.LoadScript("proc_xyz_koishi.lua")
+	pcall(dofile,"expansions/script/proc_fusion_koishi.lua")
+	pcall(dofile,"expansions/script/proc_synchro_koishi.lua")
+	pcall(dofile,"expansions/script/proc_xyz_koishi.lua")
 end
-Duel.LoadScript("proc_equation.lua")
---Duel.LoadScript("proc_access.lua")
-Duel.LoadScript("proc_order.lua")
-Duel.LoadScript("proc_diffusion.lua")
-Duel.LoadScript("proc_beyond.lua")
-Duel.LoadScript("proc_square.lua")
-Duel.LoadScript("proc_delight.lua")
-Duel.LoadScript("proc_scripted.lua")
-Duel.LoadScript("inf.lua")
-Duel.LoadScript("ireina.lua")
-Duel.LoadScript("BELCH.lua")
-Duel.LoadScript("mirror.lua")
-Duel.LoadScript("Spinel.lua")
-Duel.LoadScript("YuL.lua")
---Duel.LoadScript("cyan.lua")
-Duel.LoadScript("Rune.lua")
-Duel.LoadScript("hebi.lua")
-Duel.LoadScript("cirukiru9.lua")
-Duel.LoadScript("additional_setcards.lua")
-Duel.LoadScript("remove_xyz_which_have_rank.lua")
-Duel.LoadScript("kaos.lua")
-Duel.LoadScript("SSSS.lua")
+pcall(dofile,"expansions/script/proc_equation.lua")
+--pcall(dofile,"expansions/script/proc_access.lua")
+pcall(dofile,"expansions/script/proc_order.lua")
+pcall(dofile,"expansions/script/proc_diffusion.lua")
+dofile("expansions/script/proc_beyond.lua")
+dofile("expansions/script/proc_square.lua")
+dofile("expansions/script/proc_delight.lua")
+dofile("expansions/script/proc_scripted.lua")
+dofile("expansions/script/proc_equal.lua")
+dofile("expansions/script/proc_sequence.lua")
+pcall(dofile,"expansions/script/inf.lua")
+dofile("expansions/script/ireina.lua")
+pcall(dofile,"expansions/script/BELCH.lua")
+pcall(dofile,"expansions/script/mirror.lua")
+pcall(dofile,"expansions/script/Spinel.lua")
+pcall(dofile,"expansions/script/YuL.lua")
+--pcall(dofile,"expansions/script/cyan.lua")
+pcall(dofile,"expansions/script/Rune.lua")
+pcall(dofile,"expansions/script/hebi.lua")
+pcall(dofile,"expansions/script/cirukiru9.lua")
+pcall(dofile,"expansions/script/additional_setcards.lua")
+pcall(dofile,"expansions/script/remove_xyz_which_have_rank.lua")
+pcall(dofile,"expansions/script/kaos.lua")
+dofile("expansions/script/SSSS.lua")
 local cregeff=Card.RegisterEffect
 Auxiliary.MetatableEffectCount=true
 function Card.RegisterEffect(c,e,forced,...)
@@ -192,4 +207,5 @@ function Card.RegisterEffect(c,e,forced,...)
 	end
 	cregeff(c,e,forced,...)
 end
---Duel.LoadScript("RDD.lua")
+--dofile("expansions/script/proto.lua")
+--dofile("expansions/script/RDD.lua")

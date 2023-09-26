@@ -41,14 +41,14 @@ end
 cm.listed_series={0xe74}
 function cm.regop(e,tp,eg,ep,ev,re,r,rp)
 	if rp~=tp or not re:GetHandler():IsSetCard(0xe74) then return end
-	e:GetHandler():RegisterFlagEffect(m,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_CHAIN,0,1)
+	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_CHAIN,0,1)
 end
 function cm.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return ep~=tp or not re:GetHandler():IsSetCard(0xe74) and c:GetFlagEffect(m)~=0 
+	return ep~=tp or not re:GetHandler():IsSetCard(0xe74) and c:GetFlagEffect(id)~=0 
 end
 function cm.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,m)
+	Duel.Hint(HINT_CARD,0,id)
 	Duel.SetLP(1-tp,Duel.GetLP(1-tp)-100)
 end
 function cm.operation(e,tp,eg,ep,ev,re,r,rp)
