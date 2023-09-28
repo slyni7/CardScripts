@@ -149,7 +149,7 @@ function s.spcheck(sg,tp,exg,dg,ec)
 			if dg:IsContains(tc) then a=a+1 end
 		end
 	end
-	return #dg-a>=#sg
+	return #dg-a>=#sg and sg:IsContains(ec)
 end
 function s.cfilter(c)
 	return c:IsAttribute(ATTRIBUTE_FIRE)
