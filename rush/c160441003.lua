@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	Fusion.AddProcMixN(c,true,true,160009002,1,s.matfilter,2)
+	Fusion.AddProcMixN(c,true,true,CARD_GALACTICA_OBLIVION,1,s.matfilter,2)
 	-- Mill and gain atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -18,6 +18,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.mlop)
 	c:RegisterEffect(e1)
 end
+s.named_material={CARD_GALACTICA_OBLIVION}
 function s.matfilter(c,scard,sumtype,tp)
 	return c:IsAttribute(ATTRIBUTE_LIGHT,scard,sumtype,tp) and c:IsRace(RACE_GALAXY,scard,sumtype,tp)
 end
