@@ -1900,7 +1900,7 @@ if not CATEGORY_LVCHANGE then
 	CATEGORY_LVCHANGE=0x0
 end
 
-pcall(dofile,"expansions/script/yukitokisaki.lua")
+Duel.LoadScript("yukitokisaki.lua")
 
 local cregeff=Card.RegisterEffect
 function Card.RegisterEffect(c,e,forced,...)
@@ -3500,11 +3500,11 @@ function Duel.RegisterEffect(e,...)
 	end
 end
 
-pcall(dofile,"expansions/script/proc_braveex.lua")
+Duel.LoadScript("proc_braveex.lua")
 
-pcall(dofile,"expansions/script/proc_skull.lua")
+Duel.LoadScript("proc_skull.lua")
 
-dofile("expansions/script/ireina_playing_cards.lua")
+--dofile("expansions/script/ireina_playing_cards.lua")
 
 --dofile("expansions/script/proto.lua")
 
