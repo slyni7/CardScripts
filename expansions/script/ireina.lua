@@ -3334,7 +3334,7 @@ EFFECT_COINBEAT_MISFIRE=18453924
 local cregeff=Card.RegisterEffect
 function Card.RegisterEffect(c,e,forced,...)
 	cregeff(c,e,forced,...)
-	if e:IsHasType(EFFECT_TYPE_ACTIONS) then
+	if e:IsHasType(EFFECT_TYPE_ACTIONS) and not e:IsHasType(EFFECT_TYPE_CONTINUOUS) then
 		local con=e:GetCondition()
 		local cost=e:GetCost()
 		local tg=e:GetTarget()
@@ -3421,7 +3421,7 @@ end
 local dregeff=Duel.RegisterEffect
 function Duel.RegisterEffect(e,...)
 	dregeff(e,...)
-	if e:IsHasType(EFFECT_TYPE_ACTIONS) then
+	if e:IsHasType(EFFECT_TYPE_ACTIONS) and not e:IsHasType(EFFECT_TYPE_CONTINUOUS) then
 		local con=e:GetCondition()
 		local cost=e:GetCost()
 		local tg=e:GetTarget()
