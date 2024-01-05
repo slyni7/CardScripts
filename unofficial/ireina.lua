@@ -3185,6 +3185,7 @@ function Auxiliary.NewHeavenAndEarth()
 			end
 			if (tc:GetPreviousAttributeOnField()&ATTRIBUTE_LIGHT>0
 				or (tc:GetPreviousLocation()&LOCATION_ONFIELD==0 and tc:GetOriginalAttribute()&ATTRIBUTE_LIGHT>0))
+				and not tc:IsReason(REASON_BATTLE+REASON_EFFECT)
 				and trc then
 				local e1=Effect.CreateEffect(tc)
 				e1:SetType(EFFECT_TYPE_SINGLE)
