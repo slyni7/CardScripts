@@ -3378,7 +3378,9 @@ function Card.RegisterEffect(c,e,forced,...)
 					return
 				end
 			end
-			cost(e,tp,eg,ep,ev,re,r,rp,0)
+			if cost then
+				cost(e,tp,eg,ep,ev,re,r,rp,0)
+			end
 		end)
 		if tg then
 			e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -3463,7 +3465,9 @@ function Duel.RegisterEffect(e,...)
 					return
 				end
 			end
-			cost(e,tp,eg,ep,ev,re,r,rp,0)
+			if cost then
+				cost(e,tp,eg,ep,ev,re,r,rp,0)
+			end
 		end)
 		if tg then
 			e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
