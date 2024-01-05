@@ -1,13 +1,14 @@
---블렌디아 피치-크러시
-local m=47570010
+--블렌디아 엘-디아블로
+
+local m=47570027
 local cm=_G["c"..m]
 
 function cm.initial_effect(c)
-
+	
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcFun2(c,cm.matfilter,aux.TRUE,true)
-
+	aux.AddFusionProcCodeFun(c,aux.FilterBoolFunction(Card.IsSetCard,0xb2d),aux.TRUE,1,true,true)
+	
 	--equip
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_EQUIP)
@@ -20,32 +21,22 @@ function cm.initial_effect(c)
 	e0:SetOperation(cm.eqop)
 	c:RegisterEffect(e0)
 
-	--attack all
+	--toDeck
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_ATTACK_ALL)
-	e1:SetValue(1)
+	e1:SetCategory(CATEGORY_TODECK+CATEGORY_DESTROY)
+	e1:SetRange(LOCATION_SZONE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,m+100)
+	e1:SetTarget(cm.tdtg)
+	e1:SetOperation(cm.tdop)
 	c:RegisterEffect(e1)
 
-	--atk up
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetHintTiming(TIMING_DAMAGE_STEP)
-	e2:SetCountLimit(1)
-	e2:SetCondition(cm.condition)
-	e2:SetCost(cm.effcost)
-	e2:SetOperation(cm.operation)
-	c:RegisterEffect(e2)
-
 end
+
+
 cm.material_setcode=0xb2d
-function cm.matfilter(c)
-	return c:IsFusionType(TYPE_MODULE) and c:IsFusionSetCard(0xb2d)
-end
-
 
 function cm.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE+LOCATION_EXTRA)
@@ -85,30 +76,21 @@ function cm.eqlimit(e,c)
 end
 
 
-function cm.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetEquipGroup():IsExists(aux.TRUE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=e:GetHandler():GetEquipGroup():FilterSelect(tp,aux.TRUE,1,1,nil)
-	Duel.Destroy(g,REASON_COST)
+function cm.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local loc=LOCATION_ONFIELD+LOCATION_GRAVE
+	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(loc) and chkc:IsAbleToDeck() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToDeck,tp,0,loc,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,0,loc,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
 end
 
-function cm.condition(e,tp,eg,ep,ev,re,r,rp)
-	local phase=Duel.GetCurrentPhase()
-	if phase~=PHASE_DAMAGE or Duel.IsDamageCalculated() then return false end
-	local tc=Duel.GetAttacker()
+function cm.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if tc:IsControler(1-tp) then tc=Duel.GetAttackTarget() end
-	e:SetLabelObject(tc)
-	return tc and tc:IsSetCard(0xb2d) and tc:IsRelateToBattle() and Duel.GetAttackTarget()~=nil
-end
-function cm.operation(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tc=e:GetLabelObject()
-	if tc:IsRelateToBattle() and tc:IsFaceup() and tc:IsControler(tp) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(2000)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e1)
+	local tc=Duel.GetFirstTarget()
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
+		Duel.SendtoDeck(tc,nil,SEQ_DECKBOTTOM,REASON_EFFECT)
+		Duel.Destroy(c,REASON_EFFECT)
 	end
 end
+

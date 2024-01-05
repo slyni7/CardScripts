@@ -109,7 +109,7 @@ function cm.op3(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function cm.aclimit(e,re,tp)
-	return re:GetActivateLocation()==LOCATION_GRAVE+LOCATION_HAND
+	return re:GetActivateLocation()==LOCATION_GRAVE or re:GetActivateLocation()==LOCATION_HAND
 end
 
 --노블체인
