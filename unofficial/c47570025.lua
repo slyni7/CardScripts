@@ -1,6 +1,6 @@
---블렌디아 데킬라
+--블렌디아 비어
 
-local m=47570003
+local m=47570025
 local cm=_G["c"..m]
 
 function cm.initial_effect(c)
@@ -8,9 +8,9 @@ function cm.initial_effect(c)
 	--equip
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_EQUIP)
-	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e0:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e0:SetCode(EVENT_TO_GRAVE)
+	e0:SetType(EFFECT_TYPE_QUICK_O)
+	e0:SetRange(LOCATION_HAND+LOCATION_GRAVE)
+	e0:SetCode(EVENT_FREE_CHAIN)
 	e0:SetCountLimit(1,m)
 	e0:SetCondition(cm.eqcon)
 	e0:SetTarget(cm.eqtg)
@@ -19,20 +19,19 @@ function cm.initial_effect(c)
 
 	--equip grave
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOHAND)
+	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_TO_GRAVE)
 	e1:SetCountLimit(1,m+1)
-	e1:SetCondition(cm.thcon)
-	e1:SetTarget(cm.thtg)
-	e1:SetOperation(cm.thop)
+	e1:SetCondition(cm.drcon)
+	e1:SetOperation(cm.drop)
 	c:RegisterEffect(e1)
 
 end
 
 function cm.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE+LOCATION_HAND)
+	return e:GetHandler():IsLocation(LOCATION_HAND+LOCATION_GRAVE)
 end
 
 function cm.eqfilter(c)
@@ -45,7 +44,10 @@ function cm.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,cm.eqfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
+end
+
+function cm.eqlimit(e,c)
+	return c==e:GetLabelObject()
 end
 
 function cm.eqop(e,tp,eg,ep,ev,re,r,rp)
@@ -64,26 +66,12 @@ function cm.eqop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
-function cm.eqlimit(e,c)
-	return c==e:GetLabelObject()
-end
 
-function cm.thcon(e,tp,eg,ep,ev,re,r,rp)
+function cm.drcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:GetPreviousLocation()==LOCATION_SZONE
 end
-function cm.thfilter(c)
-	return not c:IsCode(m) and c:IsSetCard(0xb2d) and c:IsFaceup()
-end
-function cm.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cm.thfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
-end
-function cm.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cm.thfilter),tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
-	end
+
+function cm.drop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Draw(tp,1,REASON_EFFECT)
 end

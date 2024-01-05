@@ -33,7 +33,7 @@ end
 
 function cm.mttg(e,c)
 	local tc=c:GetEquipTarget()
-	return tc and tc:IsSetCard(0xb2d)
+	return tc
 end
 function cm.mtval(e,c)
 	if not c then return false end
@@ -124,7 +124,7 @@ function cm.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function cm.exfilter(c,tp)
-	return c:GetSummonLocation()==LOCATION_EXTRA and c:GetSummonPlayer()==tp and c:GetSummonType()==SUMMON_TYPE_MODULE and c:IsFaceup()
+	return c:GetSummonPlayer()==tp and c:GetSummonType()==SUMMON_TYPE_MODULE and c:IsFaceup() and c:IsSetCard(0xb2d)
 end
 function cm.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(cm.exfilter,1,nil,tp)

@@ -1,9 +1,9 @@
---블렌디아 클로버-클럽
-local m=47570012
+--블렌디아 화이트-레이디
+local m=47570028
 local cm=_G["c"..m]
 
 function cm.initial_effect(c)
-
+	
 	--module material
 	c:EnableReviveLimit()
 	aux.AddModuleProcedure(c,cm.pfil1,nil,1,10,nil)
@@ -20,18 +20,19 @@ function cm.initial_effect(c)
 	e0:SetOperation(cm.eqop)
 	c:RegisterEffect(e0)
 
-	--destroy and search
+	--destroy and special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
+	e1:SetCountLimit(1,m+100)
 	e1:SetCost(cm.effcost)
-	e1:SetTarget(cm.thtg)
-	e1:SetOperation(cm.thop)
+	e1:SetTarget(cm.sptg)
+	e1:SetOperation(cm.spop)
 	c:RegisterEffect(e1)
 
 end
+
 
 function cm.pfil1(c)
 	return c:IsSetCard(0xb2d) and not c:IsCode(m)
@@ -76,7 +77,6 @@ function cm.eqlimit(e,c)
 end
 
 
-
 function cm.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetEquipGroup():IsExists(aux.TRUE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
@@ -84,19 +84,33 @@ function cm.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Destroy(g,REASON_COST)
 end
 
-function cm.thfilter(c)
-	return c:IsSetCard(0xb2d) and c:IsType(TYPE_SPELL+TYPE_TRAP)
+function cm.spfilter(c,e,tp)
+	return c:IsSetCard(0xb2d) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(m)
 end
-function cm.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cm.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+function cm.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(cm.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_SZONE)
 end
-function cm.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,cm.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+function cm.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,cm.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
-		Duel.ShuffleDeck(tp)
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+
+		local e2=Effect.CreateEffect(e:GetHandler())
+		e2:SetDescription(aux.Stringid(m,0))
+		e2:SetType(EFFECT_TYPE_FIELD)
+		e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+		e2:SetTargetRange(1,0)
+		e2:SetTarget(cm.splimit)
+		e2:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(e2,tp)
 	end
+end
+
+function cm.splimit(e,c)
+	return not c:IsSetCard(0xb2d)
 end

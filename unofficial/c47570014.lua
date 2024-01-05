@@ -29,14 +29,14 @@ function cm.initial_effect(c)
 	e0:SetOperation(cm.eqop)
 	c:RegisterEffect(e0)
 
-	--cannot activate & special summon
+	--equip2
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e1:SetCategory(CATEGORY_EQUIP)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(0,1)
-	e1:SetValue(cm.aclimit)
+	e1:SetTarget(cm.eq2tg)
+	e1:SetOperation(cm.eq2op)
 	c:RegisterEffect(e1)
 
 	--remove
@@ -100,9 +100,37 @@ function cm.eqlimit(e,c)
 end
 
 
-function cm.aclimit(e,re,tp)
-	local loc=re:GetActivateLocation()
-	return loc==LOCATION_GRAVE or loc==LOCATION_REMOVED
+function cm.eq2filter(c)
+	return c:IsSetCard(0xb2d) and c:IsType(TYPE_MONSTER)
+end
+
+function cm.eq2tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+		and Duel.IsExistingMatchingCard(cm.eq2filter,tp,LOCATION_GRAVE,0,1,nil) end
+
+end
+
+function cm.eq2op(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+	local g=Duel.SelectMatchingCard(tp,cm.eq2filter,tp,LOCATION_GRAVE,0,1,1,nil)
+
+	local tc=g:GetFirst()
+	if tc and c:IsRelateToEffect(e) then
+		if not Duel.Equip(tp,tc,c) then return end
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_EQUIP_LIMIT)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetValue(cm.eqlimit2)
+		tc:RegisterEffect(e1)
+	end
+end
+
+function cm.eqlimit2(e,c)
+	return e:GetOwner()==c and not c:IsDisabled()
 end
 
 
@@ -116,11 +144,6 @@ end
 
 function cm.srtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,1,nil) end
-	Duel.SetChainLimit(cm.chlimit)
-end
-
-function cm.chlimit(e,ep,tp)
-	return tp==ep
 end
 
 function cm.srop(e,tp,eg,ep,ev,re,r,rp)

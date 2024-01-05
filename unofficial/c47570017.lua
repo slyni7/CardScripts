@@ -91,7 +91,7 @@ end
 
 
 function cm.exfilter(c,tp)
-	return c:GetSummonLocation()==LOCATION_EXTRA and c:GetSummonPlayer()==tp and c:GetSummonType()==SUMMON_TYPE_FUSION and c:IsFaceup()
+	return c:GetSummonPlayer()==tp and c:GetSummonType()==SUMMON_TYPE_FUSION and c:IsFaceup() and c:IsSetCard(0xb2d)
 end
 function cm.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(cm.exfilter,1,nil,tp)

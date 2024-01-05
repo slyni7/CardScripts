@@ -76,7 +76,7 @@ function cm.eqlimit(e,c)
 end
 
 function cm.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return aux.exccon(e) and Duel.GetTurnPlayer()==tp
+	return aux.exccon(e)
 end
 function cm.spfilter(c,e,tp)
 	return c:IsSetCard(0xb2d) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
