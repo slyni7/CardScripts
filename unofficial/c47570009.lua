@@ -7,7 +7,7 @@ function cm.initial_effect(c)
 
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcCodeFun(c,aux.FilterBoolFunction(Card.IsSetCard,0xb2d),aux.TRUE,1,true,true)
+	aux.AddFusionProcCodeFun(c,aux.FilterBoolFunction(Card.IsSetCard,0xb2d),aux.FilterBoolFunction(Card.IsType,TYPE_MONSTER),1,true,true)
 	
 	--equip
 	local e0=Effect.CreateEffect(c)
@@ -36,7 +36,6 @@ function cm.initial_effect(c)
 	c:RegisterEffect(e1)
 
 end
-cm.material_setcode=0xb2d
 
 function cm.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE+LOCATION_EXTRA)

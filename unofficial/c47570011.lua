@@ -6,7 +6,7 @@ function cm.initial_effect(c)
 
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcCode2FunRep(c,cm.matfilter,aux.FilterBoolFunction(Card.IsFusionSetCard,0xb2d),aux.TRUE,1,1,true,true,true)
+	aux.AddFusionProcCode2FunRep(c,cm.matfilter,aux.FilterBoolFunction(Card.IsFusionSetCard,0xb2d),aux.FilterBoolFunction(Card.IsType,TYPE_MONSTER),1,1,true,true,true)
 
 	--splimit
 	local e99=Effect.CreateEffect(c)
@@ -153,7 +153,12 @@ function cm.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
+		Duel.SetChainLimit(cm.chlimit)
 	end
+end
+
+function cm.chlimit(e,ep,tp)
+	return tp==ep
 end
 
 function cm.negop(e,tp,eg,ep,ev,re,r,rp)
