@@ -1619,7 +1619,8 @@ function Auxiliary.GetRaceStrings(v)
 		[RACE_DIVINE] = 1041,
 		[RACE_CREATORGOD] = 1042,
 		[RACE_WYRM] = 1043,
-		[RACE_CYBERSE] = 1044
+		[RACE_CYBERSE] = 1044,
+		[RACE_ILLUSION] = 1045
 	}
 	local res={}
 	local ct=0
@@ -2038,20 +2039,6 @@ function Duel.ActivateFieldSpell(c,e,tp,eg,ep,ev,re,r,rp,target_p)
 		return true
 	end
 	return false
-end
-
-function Duel.IsMainPhase()
-	local phase=Duel.GetCurrentPhase()
-	return phase==PHASE_MAIN1 or phase==PHASE_MAIN2
-end
-
-function Duel.IsBattlePhase()
-	local phase=Duel.GetCurrentPhase()
-	return phase>=PHASE_BATTLE_START and phase<=PHASE_BATTLE
-end
-
-function Duel.IsTurnPlayer(player)
-	return Duel.GetTurnPlayer()==player
 end
 
 function Duel.GoatConfirm(tp,loc)
