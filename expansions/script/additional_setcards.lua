@@ -10,7 +10,7 @@ Auxiliary.AdditionalSetcardsList={
 --Æ¼¾Æ¶ó
 [0x2c4]={37164373},
 }
-pcall(dofile,"expansions/expand.lua")
+LoadScript("expand.lua")
 local cisc=Card.IsSetCard
 CARD_NAMESQUARE_PASQUARE=18453732
 function Card.IsSetCard(c,set,...)
