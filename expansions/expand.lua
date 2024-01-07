@@ -399,6 +399,7 @@ data_setname[18453872]={"레이트 블루"}
 data_setname[18453873]={"레이트 블루"}
 data_setname[7359741]={"메카 헌터"}
 data_setname[18453874]={"메카 헌터"}
+data_setname[18453801]={"신천지"}
 data_setname[18453875]={"신천지"}
 data_setname[18453876]={"신천지"}
 data_setname[18453877]={"신천지"}
