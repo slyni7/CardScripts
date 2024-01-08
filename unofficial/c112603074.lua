@@ -4,7 +4,7 @@ local cm=_G["c"..m]
 function cm.initial_effect(c)
 	
 	--spirit return
-	aux.EnableSpiritReturn(c,EVENT_SUMMON_SUCCESS,EVENT_FLIP)
+	Spirit.AddProcedure(c,EVENT_SUMMON_SUCCESS,EVENT_FLIP)
 	
 	--negate
 	local e2=Effect.CreateEffect(c)
@@ -14,7 +14,7 @@ function cm.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
-	e2:SetRange(LOCATION_MZONE)
+	e2:SetRange(LOCATION_HAND)
 	e2:SetCountLimit(1,m)
 	e2:SetCost(cm.cost)
 	e2:SetCondition(cm.condition)
@@ -68,7 +68,6 @@ function cm.cfilter(c)
 end
 function cm.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(cm.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
-		and aux.dscon()
 end
 function cm.filter(c)
 	return c:IsFaceup() and c:GetAttack()>0

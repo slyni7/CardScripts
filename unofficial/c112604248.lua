@@ -31,7 +31,7 @@ function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function s.tfil1(c)
-	return c:IsFaceup() and c:IsSetCard(0xe78)
+	return c:IsFaceup() and c:IsSetCard(0xe78) and c:IsType(TYPE:MONSTER)
 end
 function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetMatchingGroupCount(s.tfil1,tp,LOCATION_ONFIELD,0,nil)

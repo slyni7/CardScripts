@@ -90,7 +90,7 @@ function cm.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function cm.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return not c:IsType(TYPE_SPIRIT)
+	return not (c:IsType(TYPE_SPIRIT) or c:IsSetCard(0xe92))
 end
 function cm.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SPIRIT) and not c:IsCode(m)
