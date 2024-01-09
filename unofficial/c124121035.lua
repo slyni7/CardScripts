@@ -72,7 +72,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 				if cp~=tp then
 					Duel.NegateActivation(cc-1)
 				end
-			else
+			end
 		end
 	end	
 end
