@@ -62,7 +62,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 		local tc=g:GetFirst()
 		local result=false
 		if tc:IsSSetable() then
-			result=Duel.SSet(g,tp)>0
+			result=Duel.SSet(tp,g)>0
 		elseif Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE) then
 			result=Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)>0
 		end
