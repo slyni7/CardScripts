@@ -33,14 +33,18 @@ function s.initial_effect(c)
 	e4:SetOperation(s.op4)
 	c:RegisterEffect(e4)
 	local e5=Effect.CreateEffect(c)
+	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e5:SetType(EFFECT_TYPE_QUICK_O)
 	e5:SetCode(EVENT_FREE_CHAIN)
-	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e5:SetRange(LOCATION_GRAVE)
 	e5:SetCountLimit(1,{id,2},EFFECT_COUNT_CODE_OATH)
 	e5:SetCost(aux.bfgcost)
 	e5:SetTarget(s.tar5)
 	e5:SetOperation(s.op5)
 	c:RegisterEffect(e5)
+end
+function s.ofil1(c,e,tp)
+	return c:IsType(TYPE_SPIRIT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
 end
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -48,7 +52,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 		return
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.ofil1,tp,LOCATION_DECK,0,0,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.ofil1,tp,LOCATION_DECK,0,0,1,nil,e,tp)
 	local tc=g:GetFirst()
 	if tc then
 		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
@@ -84,19 +88,18 @@ function s.tfil5(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false) and (c:IsSetCard(0xe90) or c:IsSetCard(0xe78) or c:IsSetCard(0xe92))
 end
 function s.tar5(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		return Duel.IsExistingMatchingCard(s.tfil5,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nli,e,tp)
-			and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-	end
-	Duel.SetOperationInfo(0,CATEGORY_SEPCIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+	local loc=LOCATION_DECK+LOCATION_GRAVE
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then loc=0 end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tfil5,tp,loc,0,1,nli,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function s.op5(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then
 		return
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.tfil5,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.tfil5,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-	end	
+	end 
 end

@@ -31,7 +31,7 @@ function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function s.tfil1(c)
-	return c:IsFaceup() and c:IsSetCard(0xe78) and c:IsType(TYPE:MONSTER)
+	return c:IsFaceup() and c:IsSetCard(0xe78)
 end
 function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetMatchingGroupCount(s.tfil1,tp,LOCATION_ONFIELD,0,nil)
@@ -60,6 +60,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)

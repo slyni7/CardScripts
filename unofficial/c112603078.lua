@@ -4,7 +4,7 @@ local cm=_G["c"..m]
 function cm.initial_effect(c)
 	
 	--spirit return
-	aux.EnableSpiritReturn(c,EVENT_SUMMON_SUCCESS,EVENT_FLIP,EVENT_SPSUMMON_SUCCESS)
+	Spirit.AddProcedure(c,EVENT_SUMMON_SUCCESS,EVENT_FLIP,EVENT_SPSUMMON_SUCCESS)
 	
 	--spsummon1
 	local e7=Effect.CreateEffect(c)
@@ -90,7 +90,7 @@ function cm.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function cm.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return not (c:IsType(TYPE_SPIRIT) or c:IsSetCard(0xe92))
+	return not c:IsType(TYPE_SPIRIT)
 end
 function cm.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SPIRIT) and not c:IsCode(m)
