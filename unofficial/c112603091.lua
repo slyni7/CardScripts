@@ -29,7 +29,7 @@ function cm.initial_effect(c)
 	e24:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e24:SetDescription(aux.Stringid(m,2))
 	e24:SetCode(EVENT_TO_HAND)
-	e21:SetCountLimit(1,m+2)
+	e24:SetCountLimit(1,m+2)
 	e24:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e24:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e24:SetCondition(kaos.ksrgcon1)
@@ -125,8 +125,7 @@ function cm.spop(e,tp,eg,ep,ev,re,r,rp)
 			local tc=g:GetFirst()
 			if c:IsAbleToHand() and Duel.SelectEffectYesNo(tp,c,aux.Stringid(m,3)) then
 				Duel.SendtoHand(tc,nil,REASON_EFFECT)
-			end
-			if c:IsAbleToHand() and Duel.SelectEffectYesNo(tp,c,aux.Stringid(m,4)) then
+			elseif c:IsAbleToHand() and Duel.SelectEffectYesNo(tp,c,aux.Stringid(m,4)) then
 				Duel.SendtoGrave(tc,nil,REASON_EFFECT)
 			end
 		end
