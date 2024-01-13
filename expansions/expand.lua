@@ -454,3 +454,5 @@ data_setname[18453931]={"코인비터"}
 data_setname[18453932]={"코인비터"}
 data_setname[18453933]={"코인비터"}
 data_setname[18453934]={"코인비터"}
+data_setname[18453937]={"아세리마"}
+data_setname[18453938]={"아세리마"}
