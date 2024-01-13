@@ -14,10 +14,11 @@ function cm.initial_effect(c)
 	e1:SetTarget(cm.sptg1)
 	e1:SetOperation(cm.spop1)
 	c:RegisterEffect(e1)
+	Duel.AddCustomActivityCounter(m,ACTIVITY_SPSUMMON,cm.counterfilter)
 	--
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EFFECT_SEND_REPLACE)
+	e3:SetCode(EFFECT_DESTROY_REPLACE)
 	e3:SetRange(LOCATION_ONFIELD+LOCATION_GRAVE)
 	e3:SetTarget(cm.reptg)
 	e3:SetCountLimit(1,m+1)
@@ -48,8 +49,11 @@ function cm.initial_effect(c)
 	e90:SetOperation(cm.spop)
 	c:RegisterEffect(e90)
 end
+function cm.counterfilter(c)
+	return (c:IsSetCard(0xe92) or c:IsType(TYPE_SPIRIT))
+end
 function cm.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not e:GetHandler():IsPublic() and Duel.GetCustomActivityCount(m,tp,ACTIVITY_SPSUMMON)==0 end
+	if chk==0 then return not e:GetHandler():IsPublic() and Duel.GetCustomActivityCount(m,tp,ACTIVITY_SPSUMMON)<1 end
 	Duel.ConfirmCards(1-tp,e:GetHandler())
 	Duel.ShuffleHand(tp)
 	local e1=Effect.CreateEffect(e:GetHandler())
