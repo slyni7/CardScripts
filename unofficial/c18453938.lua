@@ -1,7 +1,7 @@
 --아세리마 오버로드
 local s,id=GetID()
 function s.initial_effect(c)
-	local e1=Effect.CreateEffect(c)
+	local e1=MakeEff(c,"A")
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)

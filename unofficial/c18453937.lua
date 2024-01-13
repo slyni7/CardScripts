@@ -152,6 +152,7 @@ function s.tar6(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SOI(0,CATEGORY_DISABLE,sg,2,0,0)
 end
 function s.op6(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local g=Duel.GetTargetCards(e)
 	local tc=g:GetFirst()
 	while tc do
