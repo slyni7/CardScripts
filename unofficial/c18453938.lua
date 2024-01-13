@@ -9,13 +9,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_NORMALSUMMON,s.afil1)
 end
-s.listed_series={0x9b}
 function s.afil1(c)
 	return c:IsSetCard("酒技府付")
 end
 function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then
 		return Duel.GetCustomActivityCount(id,tp,ACTIVITY_NORMALSUMMON)==0
+			and Duel.CheckLPCost(tp,1000)
 	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -29,6 +30,7 @@ function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_CANNOT_MSET)
 	Duel.RegisterEffect(e2,tp)
+	Duel.PayLPCost(tp,1000)
 end
 function s.ctar11(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsSetCard("酒技府付")
