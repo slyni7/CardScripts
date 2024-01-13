@@ -16,7 +16,7 @@ function c47450004.initial_effect(c)
 		e1:SetCode(EVENT_BATTLE_START)
 		e1:SetRange(LOCATION_HAND)
 		e1:SetCountLimit(1,47450004)
-		e1:SetCost(c47450004.batcos)
+		e1:SetTarget(c47450004.battg)
 		e1:SetOperation(c47450004.ssop)
 		c:RegisterEffect(e1)
 
@@ -28,8 +28,9 @@ function c47450004.initial_effect(c)
 		e2:SetCode(EVENT_CHAINING)
 		e2:SetRange(LOCATION_HAND)
 		e2:SetCountLimit(1,47450004)
-		e2:SetCost(c47450004.efcos)
-		e2:SetOperation(c47450004.ssop)
+		e2:SetCondition(c47450004.efcon)
+		e2:SetTarget(c47450004.eftg)
+		e2:SetOperation(c47450004.ssop2)
 		c:RegisterEffect(e2)
 
 		--destroy & bounce
@@ -44,34 +45,52 @@ function c47450004.initial_effect(c)
 		c:RegisterEffect(e3)
 end
 
+function c47450004.batfilter(c)
+	return c:IsRelateToBattle()
+end
 
-function c47450004.batcos(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local tc=Duel.GetAttacker()
-	local tc2=Duel.GetAttackTarget()
+function c47450004.battg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsSpecialSummonable() end
+	local tg=Duel.GetMatchingGroup(c47450004.batfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 
-	if tc and tc2 then
-	Duel.Destroy(tc,REASON_COST)
-	Duel.Destroy(tc2,REASON_COST)
-	end
+	if #tg~=2 then return end
 end
 
 function c47450004.ssop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	local tg=Duel.GetMatchingGroup(c47450004.batfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+
+	if #tg~=2 then return end
+	if Duel.Destroy(tg,REASON_EFFECT)==2 and c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
 end
 
 
-
-function c47450004.efcos(e,tp,eg,ep,ev,re,r,rp,chk)
+function c47450004.efcon(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
-	if chk==0 then return rc and rc:IsType(TYPE_MONSTER) end
-	if rc:IsType(TYPE_MONSTER) and rc:IsRelateToEffect(re) and rc:IsDestructable() then
-	Duel.Destroy(rc,REASON_COST)
-end
+	return rc:IsLocation(LOCATION_ONFIELD) and re:IsActiveType(TYPE_MONSTER) and rc:IsFaceup()
 end
 
+function c47450004.eftg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local rc=re:GetHandler()
+
+	if chk==0 then return rc:IsFaceup() and rc:IsType(TYPE_MONSTER) and rc:IsLocation(LOCATION_ONFIELD) and e:GetHandler():IsSpecialSummonable() end
+
+	Duel.SetTargetCard(rc)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,rc,1,rc:GetControler(),LOCATION_ONFIELD)
+end
+
+function c47450004.ssop2(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+
+	local rc=re:GetHandler()
+	if rc:IsRelateToEffect(e) then
+		if Duel.Destroy(rc,REASON_EFFECT) and c:IsRelateToEffect(e) then
+			Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+		end
+	end
+end
 
 
 function c47450004.descofilter(c,e)
