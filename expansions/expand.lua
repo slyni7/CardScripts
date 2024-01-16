@@ -466,3 +466,7 @@ data_setname[18453948]={"원색"}
 data_setname[18453949]={"원색"}
 data_setname[18453950]={"원색"}
 data_setname[18453951]={"원색"}
+data_setname[18453952]={"XX(익스트림 엑시즈)"}
+data_setname[18453953]={"XX(익스트림 엑시즈)"}
+data_setname[18453954]={"XX(익스트림 엑시즈)"}
+data_setname[18453955]={"XX(익스트림 엑시즈)"}
