@@ -41,6 +41,7 @@ function s.initial_effect(c)
 	local e7=e2:Clone()
 	e7:SetType(EFFECT_TYPE_QUICK_O)
 	e7:SetCode(EVENT_FREE_CHAIN)
+	e7:SetD(id,2)
 	WriteEff(e7,7,"C")
 	c:RegisterEffect(e7)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_CHAIN,s.afil1)
@@ -280,7 +281,7 @@ end
 function s.cost7(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
-		return Duel.GetFlagEffect(tp,76859518)<1
+		return Duel.GetFlagEffect(tp,76859518)<1 and Duel.IsPlayerAffectedByEffect(tp,76859518)
 	end
 	Duel.Hint(HINT_CARD,0,76859518)
 	Duel.RegisterFlagEffect(tp,76859518,RESET_PHASE+PHASE_END,0,1)
