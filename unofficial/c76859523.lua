@@ -37,12 +37,25 @@ function s.initial_effect(c)
 	local e6=e5:Clone()
 	e6:SetCode(EFFECT_SET_PROC)
 	c:RegisterEffect(e6)
+	Duel.AddCustomActivityCounter(id,ACTIVITY_CHAIN,s.afil1)
+end
+function s.afil1(re,tp,cid)
+	local rc=re:GetHandler()
+	return not (re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_FIELD) and not rc:IsSetCard(0x2c6))
 end
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.GetLocCount(tp,"M")>0
+		and Duel.GetCustomActivityCount(id,tp,ACTIVITY_CHAIN)==0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0x2c6,TYPES_TOKEN,2100,1200,7,RACE_PLANT,ATTRIBUTE_LIGHT,POS_FACEUP_DEFENSE)
 		and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		local e1=MakeEff(c,"F")
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+		e1:SetTargetRange(1,0)
+		e1:SetValue(s.oval11)
+		e1:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(e1,tp)
 		local token=Duel.CreateToken(tp,id+1)
 		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 		local e1=MakeEff(c,"FC","M")
@@ -85,6 +98,10 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummonComplete()
 	end
 end
+function s.oval11(e,re,tp)
+	local rc=re:GetHandler()
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_FIELD) and not rc:IsSetCard(0x2c6)
+end
 function s.oop11(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:GetDefense()<800 then
@@ -122,6 +139,7 @@ function s.tar2(e,tp,eg,ep,ev,re,r,rp,chk)
 			and Duel.IsPlayerCanDraw(tp,1)
 			and Duel.GetLocCount(tp,"M")>0
 			and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0x2c6,TYPES_TOKEN,2100,1200,7,RACE_PLANT,ATTRIBUTE_LIGHT,POS_FACEUP_DEFENSE)
+			and Duel.GetCustomActivityCount(id,tp,ACTIVITY_CHAIN)==0
 	end
 	Duel.SOI(0,CATEGORY_TOHAND,nil,1,tp,"D")
 	Duel.SOI(0,CATEGORY_DRAW,nil,0,tp,1)
@@ -133,6 +151,13 @@ function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SMCard(tp,s.tfil2,tp,"D",0,1,1,nil)
 	if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
+		local e1=MakeEff(c,"F")
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+		e1:SetTargetRange(1,0)
+		e1:SetValue(s.oval11)
+		e1:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(e1,tp)
 		Duel.ConfirmCards(1-tp,g)
 		Duel.ShuffleDeck(tp)
 		Duel.BreakEffect()
@@ -212,7 +237,7 @@ function s.con5(e,c,minc)
 	end
 	local tp=c:GetControler()
 	local mg=Duel.GMGroup(s.nfil5,tp,"M","M",nil,tp)
-	return Duel.CheckTribute(c,1,1,mg)
+	return Duel.CheckTribute(c,1,1,mg) and Duel.GetCustomActivityCount(id,tp,ACTIVITY_CHAIN)==0
 end
 function s.tar51(e,c)
 	return c:IsSetCard(0x2c6)
@@ -238,4 +263,11 @@ function s.op5(e,tp,eg,ep,ev,re,r,rp,c)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 	sg:DeleteGroup()
+	local e1=MakeEff(c,"F")
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e1:SetTargetRange(1,0)
+	e1:SetValue(s.oval11)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
 end
