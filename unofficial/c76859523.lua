@@ -9,6 +9,7 @@ function s.initial_effect(c)
 	local e2=MakeEff(c,"I","F")
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_DRAW+CATEGORY_TOKEN+CATEGORY_SPECIAL_SUMMON)
 	e2:SetCL(1,0,EFFECT_COUNT_CODE_SINGLE)
+	e2:SetD(id,1)
 	WriteEff(e2,2,"TO")
 	c:RegisterEffect(e2)
 	local e3=MakeEff(c,"FTo","F")
@@ -37,6 +38,11 @@ function s.initial_effect(c)
 	local e6=e5:Clone()
 	e6:SetCode(EFFECT_SET_PROC)
 	c:RegisterEffect(e6)
+	local e7=e2:Clone()
+	e7:SetType(EFFECT_TYPE_QUICK_O)
+	e7:SetCode(EVENT_FREE_CHAIN)
+	WriteEff(e7,7,"C")
+	c:RegisterEffect(e7)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_CHAIN,s.afil1)
 end
 function s.afil1(re,tp,cid)
@@ -270,4 +276,12 @@ function s.op5(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetValue(s.oval11)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+end
+function s.cost7(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then
+		return Duel.GetFlagEffect(tp,76859518)<1
+	end
+	Duel.Hint(HINT_CARD,0,76859518)
+	Duel.RegisterFlagEffect(tp,76859518,RESET_PHASE+PHASE_END,0,1)
 end
