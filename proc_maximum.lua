@@ -351,11 +351,6 @@ function Maximum.sideConGrant(e)
 	local tc=Maximum.GetMaximumCenter(e:GetHandlerPlayer())
 	return tc and e:GetHandler():IsMaximumModeSide()
 end
---function that return false if the monster don't have defense stats
---wait for ruling
-function Card.HasDefense(c)
-	return not (c:IsType(TYPE_LINK) or (c:IsType(TYPE_MAXIMUM) and c:IsMaximumMode()))
-end
 
 --functions to handle counting monsters but without the side Maximum monsters (the L/R max monsters are subtracted from the count)
 function Duel.GetMatchingGroupCountRush(f,tp,LOCP1,LOCP2,exclude,...)
@@ -808,7 +803,7 @@ function aux.ThreeTributeTarget(otfilter)
 			local sg=mg1:GetFirst()
 			local rg2=Duel.GetTributeGroup(e:GetHandler())
 			rg2:RemoveCard(sg)
-			local mg2=aux.SelectUnselectGroup(rg2,e,tp,1,1,aux.ChkfMMZ(1),1,tp,HINTMSG_RELEASE,nil,nil,true)
+			local mg2=aux.SelectUnselectGroup(rg2,e,tp,1,1,nil,1,tp,HINTMSG_RELEASE,nil,nil,true)
 			mg1:Merge(mg2)
 		end
 		if #mg1==2 then
@@ -830,7 +825,10 @@ function aux.ThreeTributeOperation()
 end
 --Returns true if a monster can get a piercing effect as per Rush rules
 function Card.CanGetPiercingRush(c)
-    return not (c:IsHasEffect(EFFECT_CANNOT_ATTACK) or c:IsHasEffect(EFFECT_PIERCE))
+	if c:IsHasEffect(EFFECT_CANNOT_ATTACK) then return false end
+	local e=c:IsHasEffect(EFFECT_PIERCE)
+	if e==nil then return true end
+    return e:GetReset()==0
 end
 -- Checks if the monster would be a valid target for the equip card
 -- Needed because Rush cards typically don't need this check after they are equipped
@@ -852,7 +850,7 @@ local LEGEND_LIST={160001000,160205001,160418001,160002000,160421015,160404001,1
 160417004,160417006,160421017,160428099,160428100,160432003,160202019,160318005,160417005,160418003,160434005,
 160436005,160437001,160206019,160206002,160206008,160206022,160206028,160013020,160440001,160440002,160440003,
 160429002,160208063,160208064,160208065,160014065,160446002,160015056,160210001,160207060,160210032,160210029,
-160210058,160440010}
+160210058,160440010,160016033,160016034,160440011,160211080}
 -- Returns if a card is a Legend. Can be updated if a GetOT function is added to the core
 function Card.IsLegend(c)
 	return c:IsOriginalCode(table.unpack(LEGEND_LIST))
