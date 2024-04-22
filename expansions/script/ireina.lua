@@ -3345,7 +3345,7 @@ function Card.RegisterEffect(c,e,forced,...)
 				return not cost or cost(e,tp,eg,ep,ev,re,r,rp,0)
 			end
 			local coinbeat_misfire=false
-			local eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_COINBEAT_EFFECT)}
+			local eset={Duel.GetPlayerEffect(tp,EFFECT_COINBEAT_EFFECT)}
 			for _,te in ipairs(eset) do
 				local tep=te:GetHandlerPlayer()
 				local tc=te:GetHandler()
@@ -3372,7 +3372,7 @@ function Card.RegisterEffect(c,e,forced,...)
 				e1:SetReset(RESET_CHAIN)
 				Duel.RegisterEffect(e1,tp)
 			end
-			local eset2={Duel.IsPlayerAffectedByEffect(tp,EFFECT_COINBEAT_MISFIRE)}
+			local eset2={Duel.GetPlayerEffect(tp,EFFECT_COINBEAT_MISFIRE)}
 			for _,te in ipairs(eset2) do
 				local val=te:GetValue()
 				local lo=te:GetLabelObject()
@@ -3392,7 +3392,7 @@ function Card.RegisterEffect(c,e,forced,...)
 				if chk==0 then
 					return tg(e,tp,eg,ep,ev,re,r,rp,chk)
 				end
-				local eset2={Duel.IsPlayerAffectedByEffect(tp,EFFECT_COINBEAT_MISFIRE)}
+				local eset2={Duel.GetPlayerEffect(tp,EFFECT_COINBEAT_MISFIRE)}
 				for _,te in ipairs(eset2) do
 					local val=te:GetValue()
 					local lo=te:GetLabelObject()
@@ -3405,7 +3405,7 @@ function Card.RegisterEffect(c,e,forced,...)
 		end
 		if op then
 			e:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
-				local eset2={Duel.IsPlayerAffectedByEffect(tp,EFFECT_COINBEAT_MISFIRE)}
+				local eset2={Duel.GetPlayerEffect(tp,EFFECT_COINBEAT_MISFIRE)}
 				for _,te in ipairs(eset2) do
 					local val=te:GetValue()
 					local lo=te:GetLabelObject()
@@ -3432,7 +3432,7 @@ function Duel.RegisterEffect(e,...)
 				return not cost or cost(e,tp,eg,ep,ev,re,r,rp,0)
 			end
 			local coinbeat_misfire=false
-			local eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_COINBEAT_EFFECT)}
+			local eset={Duel.GetPlayerEffect(tp,EFFECT_COINBEAT_EFFECT)}
 			for _,te in ipairs(eset) do
 				local tep=te:GetHandlerPlayer()
 				local tc=te:GetHandler()
@@ -3459,7 +3459,7 @@ function Duel.RegisterEffect(e,...)
 				e1:SetReset(RESET_CHAIN)
 				Duel.RegisterEffect(e1,tp)
 			end
-			local eset2={Duel.IsPlayerAffectedByEffect(tp,EFFECT_COINBEAT_MISFIRE)}
+			local eset2={Duel.GetPlayerEffect(tp,EFFECT_COINBEAT_MISFIRE)}
 			for _,te in ipairs(eset2) do
 				local val=te:GetValue()
 				local lo=te:GetLabelObject()
@@ -3479,7 +3479,7 @@ function Duel.RegisterEffect(e,...)
 				if chk==0 then
 					return tg(e,tp,eg,ep,ev,re,r,rp,chk)
 				end
-				local eset2={Duel.IsPlayerAffectedByEffect(tp,EFFECT_COINBEAT_MISFIRE)}
+				local eset2={Duel.GetPlayerEffect(tp,EFFECT_COINBEAT_MISFIRE)}
 				for _,te in ipairs(eset2) do
 					local val=te:GetValue()
 					local lo=te:GetLabelObject()
@@ -3492,7 +3492,7 @@ function Duel.RegisterEffect(e,...)
 		end
 		if op then
 			e:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
-				local eset2={Duel.IsPlayerAffectedByEffect(tp,EFFECT_COINBEAT_MISFIRE)}
+				local eset2={Duel.GetPlayerEffect(tp,EFFECT_COINBEAT_MISFIRE)}
 				for _,te in ipairs(eset2) do
 					local val=te:GetValue()
 					local lo=te:GetLabelObject()
