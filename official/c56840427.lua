@@ -4,8 +4,9 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Xyz Summon
 	c:EnableReviveLimit()
-	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_LIGHT),4,3,s.ovfilter,aux.Stringid(id,1))
-	--Increase ATK by 1000 for each Xyz Material detached
+	--Xyz Summon procedure: 3 Level 4 LIGHT monsters / 1 "Number 39: Utopia"
+	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_LIGHT),4,3,s.ovfilter,aux.Stringid(id,0))
+	--Make this card gain 500 ATK and 1 monster your opponent controls lose 1000 ATK until the end of that turn
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -13,7 +14,8 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(s.condition)
 	e1:SetCost(aux.dxmcostgen(1,1,nil))
-	e1:SetOperation(s.operation)
+	e1:SetTarget(s.atktg)
+	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
 end
 s.xyz_number=39
@@ -24,7 +26,11 @@ end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetLP(tp)<=1000
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
+end
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLP(tp)>1000 then return end
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		local e1=Effect.CreateEffect(c)

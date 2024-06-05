@@ -141,6 +141,7 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local turnp=Duel.GetTurnPlayer()
 	if chkc then return chkc:IsControler(turnp) and chkc:IsLocation(LOCATION_MZONE) and s.desfilter(chkc) end
 	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(turnp,s.desfilter,turnp,LOCATION_MZONE,0,1,1,nil)
 	if #g>0 then
@@ -154,8 +155,10 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
-function s.hdcon(e,tp,eg,ep,ev,re,r,rp)
-	return (s[Duel.GetTurnPlayer()]&ATTRIBUTE_WATER)~=0
+function s.discardtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
 end
 function s.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -171,25 +174,10 @@ function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local turnp=Duel.GetTurnPlayer()
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,turnp,1000)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,1000)
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
-	if (s[Duel.GetTurnPlayer()]&ATTRIBUTE_FIRE)==0 then return end
-	Duel.Damage(Duel.GetTurnPlayer(),1000,REASON_EFFECT)
-end
-function s.windcon1(e)
-	return (s[e:GetHandlerPlayer()]&ATTRIBUTE_WIND)~=0
-end
-function s.windcon2(e)
-	return (s[1-e:GetHandlerPlayer()]&ATTRIBUTE_WIND)~=0
-end
-function s.actarget(e,te,tp)
-	return te:IsHasType(EFFECT_TYPE_ACTIVATE) and te:IsSpellEffect()
-end
-function s.costchk(e,te_or_c,tp)
-	return Duel.CheckLPCost(tp,500)
-end
-function s.costop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.PayLPCost(tp,500)
+	if not s.PlayerIsAffectedByClearWorld(tp,ATTRIBUTE_FIRE) then return end
+	Duel.Damage(tp,1000,REASON_EFFECT)
 end
