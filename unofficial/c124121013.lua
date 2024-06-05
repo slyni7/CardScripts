@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--synchro summon
-	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0xfa1),1,1,aux.TRUE,1,1)
+	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0xfa1),1,1,aux.TRUE,1,99)
 	c:EnableReviveLimit()
 	--synchro level
 	local e1=Effect.CreateEffect(c)
@@ -19,18 +19,21 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,id)
-	e2:SetCondition(function(e,tp) return Duel.IsTurnPlayer(tp) end)
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.operation)
+	--e2:SetCountLimit(1,id)
+	--e2:SetCondition(function(e,tp) return Duel.IsTurnPlayer(tp) end)
+	e2:SetTarget(s.destg)
+	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
+	local e4=e2:Clone()
+	e4:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	c:RegisterEffect(e4)
 	--Banish itself
 	local e3=Effect.CreateEffect(c)
 	--e3:SetDescription(aux.Stringid(id,1))
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCondition(function() return Duel.IsMainPhase() end)
+	--e3:SetCondition(function() return Duel.IsMainPhase() end)
 	e3:SetCost(s.cost)
 	e3:SetOperation(s.op3)
 	c:RegisterEffect(e3)
@@ -57,41 +60,24 @@ function s.synop(e,tg,ntg,sg,lv,sc,tp)
 	end,lv,#sg,#sg,sc)
 	return res,true
 end
-function s.cfilter(c)
-	return c:IsSetCard(0xfa1) and c:IsAbleToGrave()
+--destroy
+function s.resfilter(c,tp)
+	return c:IsControler(tp) and c:IsFaceup() and c:IsSetCard(0xfa1)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g1=Duel.GetMatchingGroup(s.cfilter,tp,tp,LOCATION_HAND+LOCATION_ONFIELD,nil)
-	local g2=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,1-tp,LOCATION_ONFIELD,nil)
-	if chk==0 then return #g1>0 and #g2>0 end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_HAND+LOCATION_ONFIELD)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g2,1,0,0)
+function s.rescon(sg,e,tp,mg)
+    return sg:IsExists(s.resfilter,1,nil,tp)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g1=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,nil)
-	local g2=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,nil)
-	if #g1<1 then return end
-	local c1=g1:Select(tp,1,1,nil)
-	Duel.HintSelection(c1)
-	if Duel.SendtoGrave(c1,REASON_EFFECT)>0 and #g2>0 then
-		local c2=g2:Select(tp,1,1,nil)
-		Duel.SendtoDeck(c2,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
-	end
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local rg=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+	if chk==0 then return aux.SelectUnselectGroup(rg,e,tp,2,2,s.rescon,0) end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,rg,2,0,0)
 end
-function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,nil)
-	if #g>0 then
-		Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
-		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,500)
-	end
-	Duel.SetChainLimit(aux.FALSE)
-end
-function s.tdop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,1,1,nil)
-	if #g>0 and Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)~=0 then
-		Duel.Damage(1-tp,500,REASON_EFFECT)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	local rg=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+	local g=aux.SelectUnselectGroup(rg,e,tp,2,2,s.rescon,1,tp,HINTMSG_TODECK)
+	if #g==2 then
+		Duel.HintSelection(g,true)
+		Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 	end
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -119,7 +105,7 @@ function s.op3(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetReset(RESET_PHASE+PHASE_END,2)
 	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetValue(1000)
+	e1:SetValue(2000)
 	e1:SetLabel(ct)
 	e1:SetCondition(s.ocon31)
 	e1:SetTarget(s.otar31)
@@ -127,11 +113,25 @@ function s.op3(e,tp,eg,ep,ev,re,r,rp)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_UPDATE_DEFENSE)
 	Duel.RegisterEffect(e2,tp)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_IMMUNE_EFFECT)
+	e3:SetValue(s.efilter)
+	e3:SetReset(RESET_PHASE+PHASE_END,2)
+	e3:SetTargetRange(LOCATION_MZONE,0)
+	e3:SetLabel(ct)
+	e3:SetCondition(s.ocon31)
+	e3:SetTarget(s.otar31)
+	e3:SetOwnerPlayer(tp)
+	Duel.RegisterEffect(e3,tp)
 end
 function s.ocon31(e)
 	local ct=e:GetLabel()
-	return Duel.GetTurnCount()~=ct
+	return Duel.GetTurnCount()~=ct and Duel.GetCurrentPhase()>PHASE_MAIN1 and Duel.GetCurrentPhase()<PHASE_MAIN2
 end
 function s.otar31(e,c)
 	return c:IsSetCard(0xfa1)
+end
+function s.oval33(e,re)
+	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end

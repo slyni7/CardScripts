@@ -6,11 +6,12 @@ function c47550013.initial_effect(c)
 	e99:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e99:SetType(EFFECT_TYPE_SINGLE)
 	e99:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e99:SetValue(aux.linklimit)
+	e99:SetValue(aux.lnklimit)
 	c:RegisterEffect(e99)
 
+
 	--link summon
-	aux.AddLinkProcedure(c,nil,3,99,c47550013.lcheck)
+	Link.AddProcedure(c,nil,3,5,c47550013.lcheck)
 	c:EnableReviveLimit()
 
 	--attribute dark
@@ -71,11 +72,11 @@ function c47550013.eqcon(e)
 	return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)<3
 end
 
-function c47550013.lcheck(g,lc)
-	return g:IsExists(c47550013.mzfilter,1,nil)
+function c47550013.mfilter(g,lc)
+	return g:IsExists(c47550013.mzfilter,1,nil,lc)
 end
-function c47550013.mzfilter(c)
-	return c:IsLinkSetCard(0x487) and c:IsLinkType(TYPE_LINK)
+function c47550013.mzfilter(c,lc)
+	return c:IsSetCard(0xcc7) and c:IsType(TYPE_LINK)
 end
 
 function c47550013.con1(e,tp,eg,ep,ev,re,r,rp)
@@ -102,28 +103,23 @@ function c47550013.ndcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsAttribute(ATTRIBUTE_LIGHT)
 end
 function c47550013.ndtar(e,c)
-	return (c:IsLinkState() and c:IsSetCard(0x487)) or c==e:GetHandler()
+	return (c:IsLinked() and c:IsSetCard(0xcc7)) or c==e:GetHandler()
 end
 
 function c47550013.effectfilter(e,ct)
 	local p=e:GetHandler():GetControler()
 	local te,tp,loc=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER,CHAININFO_TRIGGERING_LOCATION)
-	return p==tp and te:GetHandler():IsSetCard(0x487)
+	return p==tp and te:GetHandler():IsSetCard(0xcc7)
 end
 
 
 function c47550013.cfilter(c,g)
-	return not c:IsStatus(STATUS_BATTLE_DESTROYED) and g:IsContains(c) and c:IsSetCard(0x487)
+	return not c:IsStatus(STATUS_BATTLE_DESTROYED) and g:IsContains(c) and c:IsSetCard(0xcc7)
 end
 function c47550013.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local lg=e:GetHandler():GetLinkedGroup()
 	if chk==0 then return e:GetHandler():GetAttackAnnouncedCount()==0 and Duel.CheckReleaseGroup(tp,c47550013.cfilter,2,nil,lg) end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_OATH)
-	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-	e:GetHandler():RegisterEffect(e1)
+
 	local g=Duel.SelectReleaseGroup(tp,c47550013.cfilter,2,2,nil,lg)
 	Duel.Release(g,REASON_COST)
 

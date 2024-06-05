@@ -3,32 +3,48 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	Xyz.AddProcedure(c,s.xyzfilter,nil,2,nil,nil,nil,nil,false,s.xyzcheck)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SELF_DESTROY)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetTarget(s.distg)
-	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_ADJUST)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetOperation(s.op2)
-	c:RegisterEffect(e2)
+	--adjust
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_ADJUST)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCondition(s.adjustcon)
+	e3:SetOperation(s.adjustop)
+	c:RegisterEffect(e3)
 end
-function s.distg(e,c)
-	return not c:IsSetCard(0x903) and not c:IsHasLevel()
-end
+s.listed_series={0x903}
+--xyz summon
 function s.xyzfilter(c,xyz,sumtype,tp)
-	return c:IsSetCard(0x903,xyz,sumtype,tp)
+	return c:IsSetCard(0x903,xyz,sumtype,tp) and not c:IsXyzLevel(xyz,0)
 end
 function s.xyzcheck(g,tp,xyz)
 	local mg=g:Filter(function(c) return not c:IsHasEffect(511001175) end,nil)
 	return mg:GetClassCount(Card.GetLevel)==1
 end
-function s.op2(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetOverlayGroup(tp,1,1)
-	if #g==0 then return end
-	Duel.SendtoGrave(g,REASON_EFFECT)
+--adjust
+function s.desfilter(c,e)
+	return not c:IsImmuneToEffect(e) and c:IsDestructable(e)
+		and not c:IsSetCard(0x903) and not c:HasLevel()
+end
+function s.adjustcon(e,tp,eg,ep,ev,re,r,rp)
+	local phase=Duel.GetCurrentPhase()
+	if (phase==PHASE_DAMAGE and not Duel.IsDamageCalculated()) or phase==PHASE_DAMAGE_CAL then return end
+	local og=Duel.GetOverlayGroup(tp,1,1)
+	local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e)
+	if #og>0 or #g>0 then
+		e:GetHandler():CreateEffectRelation(e)
+		return true
+	end
+	return false
+end
+function s.adjustop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local og=Duel.GetOverlayGroup(tp,1,1)
+	local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e)
+	if #og>0 or #g>0 then
+		Duel.Hint(HINT_CARD,0,id)
+		if #og>0 then Duel.SendtoGrave(og,REASON_EFFECT,PLAYER_NONE,tp) end
+		if #g>0 then Duel.SendtoGrave(g,REASON_EFFECT|REASON_DESTROY,PLAYER_NONE,tp) end
+		Duel.Readjust()
+	end
 end

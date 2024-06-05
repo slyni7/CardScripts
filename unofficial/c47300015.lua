@@ -4,7 +4,7 @@ local cm=_G["c"..m]
 
 function cm.initial_effect(c)
 	aux.AddSquareProcedure(c)
-	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xe3e),nil,1,99)
+	aux.AddSynchroMixProcedure(c,cm.pfil1,nil,nil,aux.NonTuner(nil),1,99,cm.pfun1)
 	c:EnableReviveLimit()
 	
 	--cannot special summon
@@ -56,7 +56,13 @@ end
 cm.square_mana={0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}
 cm.custom_type=CUSTOMTYPE_SQUARE
 
-
+function cm.pfil1(c)
+	return c:IsSynchroType(TYPE_TUNER)
+end
+function cm.pfun1(g)
+	local st=cm.square_mana
+	return aux.IsFitSquare(g,st)
+end
 
 function cm.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -138,7 +144,7 @@ function cm.tcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
 function cm.tfilter2(c,e,tp)
-	return c:IsSetCard(0xe3e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelBelow(5) and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED))
+	return c:IsSetCard(0xcce) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelBelow(5) and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED))
 end
 function cm.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

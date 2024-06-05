@@ -27,7 +27,7 @@ function c47550001.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetCountLimit(1,47550002)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCondition(c47550001.thcon)
@@ -49,7 +49,7 @@ function c47550001.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if tc:IsControler(1-tp) then tc=Duel.GetAttackTarget() end
 	e:SetLabelObject(tc)
-	return tc and tc:IsSetCard(0x487) and tc:IsRelateToBattle() and Duel.GetAttackTarget()~=nil and c:IsAttribute(ATTRIBUTE_LIGHT)
+	return tc and tc:IsSetCard(0xcc7) and tc:IsRelateToBattle() and Duel.GetAttackTarget()~=nil and c:IsAttribute(ATTRIBUTE_LIGHT)
 end
 function c47550001.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsDiscardable() end
@@ -73,7 +73,7 @@ function c47550001.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsAttribute(ATTRIBUTE_DARK)
 end
 function c47550001.thfilter(c,e,tp)
-	return c:IsSetCard(0x487) and not c:IsCode(47550001) and c:IsAbleToHand()
+	return c:IsSetCard(0xcc7) and not c:IsCode(47550001) and c:IsAbleToHand()
 end
 function c47550001.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c47550001.thfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
@@ -84,5 +84,6 @@ function c47550001.thop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		local tc=g:GetFirst()
 		Duel.SendtoHand(tc,tp,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
 end

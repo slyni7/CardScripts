@@ -4,7 +4,8 @@ local cm=_G["c"..m]
 
 function cm.initial_effect(c)
 	aux.AddSquareProcedure(c)
-	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xe3e),nil,1,99)
+
+	aux.AddSynchroMixProcedure(c,cm.pfil1,nil,nil,aux.NonTuner(nil),1,99,cm.pfun1)
 	c:EnableReviveLimit()
 
 	--to hand
@@ -38,13 +39,20 @@ end
 cm.square_mana={0x0,0x0,0x0,0x0,0x0}
 cm.custom_type=CUSTOMTYPE_SQUARE
 
+function cm.pfil1(c)
+	return c:IsSynchroType(TYPE_TUNER)
+end
+function cm.pfun1(g)
+	local st=cm.square_mana
+	return aux.IsFitSquare(g,st)
+end
 
 function cm.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:GetManaCount(ATTRIBUTE_DARK)+c:GetManaCount(ATTRIBUTE_DIVINE)+c:GetManaCount(ATTRIBUTE_EARTH)+c:GetManaCount(ATTRIBUTE_FIRE)+c:GetManaCount(ATTRIBUTE_LIGHT)+c:GetManaCount(ATTRIBUTE_WATER)+c:GetManaCount(ATTRIBUTE_WIND)>0
 end
 function cm.filter(c)
-	return c:IsSetCard(0xe3e) and c:IsAbleToHand()
+	return c:IsSetCard(0xcce) and c:IsAbleToHand()
 end
 function cm.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cm.filter,tp,LOCATION_DECK,0,1,nil) end
@@ -80,7 +88,7 @@ function cm.tcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsSummonType(SUMMON_TYPE_SYNCHRO)
 end
 function cm.tfilter2(c,e,tp)
-	return c:IsSetCard(0xe3e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelBelow(3) and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED))
+	return c:IsSetCard(0xcce) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelBelow(3) and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED))
 end
 function cm.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

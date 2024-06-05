@@ -30,6 +30,7 @@ function cm.initial_effect(c)
 	e1:SetOperation(cm.tdoperation)
 	c:RegisterEffect(e1)
 end
+cm.CardType_Order=true
 function cm.thcfilter(c,tp)
 	return c:IsRace(RACE_CYBERSE+RACE_MACHINE) and not c:IsCode(m)
 end

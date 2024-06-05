@@ -7,7 +7,7 @@ function cm.initial_effect(c)
 	
 	--synchro summon
 	c:EnableReviveLimit()
-	aux.AddSynchroMixProcedure(c,cm.matfilter1,nil,nil,aux.NonTuner(nil),1,99)
+	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_FIEND),1,1,Synchro.NonTuner(nil),1,99,cm.matfilter)
 
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -35,8 +35,8 @@ function cm.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 
-function cm.matfilter1(c)
-	return c:IsRace(RACE_FIEND) and (c:IsSynchroType(TYPE_TUNER) or c:IsSetCard(0x859))
+function cm.matfilter(c,scard,sumtype,tp)
+	return c:IsSetCard(0x859,scard,sumtype,tp)
 end
 
 function cm.spcon(e,tp,eg,ep,ev,re,r,rp)

@@ -31,6 +31,7 @@ function cm.initial_effect(c)
 	e1:SetOperation(cm.desop)
 	c:RegisterEffect(e1)
 end
+cm.CardType_Order=true
 cm.listed_series={0xe74,0xe97}
 --destroy
 function cm.thcon(e,tp,eg,ep,ev,re,r,rp)
@@ -45,6 +46,7 @@ function cm.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function cm.operation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,cm.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()

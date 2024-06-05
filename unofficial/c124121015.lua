@@ -54,9 +54,25 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 		local tc=g:GetFirst()
-		if Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
-			and tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
-			Duel.SpecialSummon(g,0,tp,1-tp,false,false,POS_FACEUP)
+		if tc then
+			local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and tc:IsCanBeSpecialSummoned(e,0,tp,false,false)
+			local b2=Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 and tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
+			if not b1 and not b2 then
+				return
+			end
+			local op=0
+			if b1 and b2 then
+				op=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))
+			elseif b1 then
+				op=Duel.SelectOption(tp,aux.Stringid(id,2))
+			elseif b2 then
+				op=Duel.SelectOption(tp,aux.Stringid(id,3))+1
+			else return end
+			if op==0 then
+				Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+			else
+				Duel.SpecialSummon(tc,0,tp,1-tp,false,false,POS_FACEUP)
+			end
 		end
 	end
 end
@@ -79,11 +95,11 @@ function s.filter2(c,tp)
 	return c:IsType(TYPE_FIELD) and c:IsCode(124121016) and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
 function s.target2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,tp) end
 	if not Duel.CheckPhaseActivity() then Duel.RegisterFlagEffect(tp,CARD_MAGICAL_MIDBREAKER,RESET_CHAIN,0,1) end
 end
 function s.activate2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,0))
-	local tc=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,tp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil,tp):GetFirst()
 	Duel.ActivateFieldSpell(tc,e,tp,eg,ep,ev,re,r,rp)
 end

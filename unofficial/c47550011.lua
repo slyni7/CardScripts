@@ -10,7 +10,7 @@ function c47550011.initial_effect(c)
 	c:RegisterEffect(e99)
 
 	--link summon
-	aux.AddLinkProcedure(c,nil,2,3,c47550011.lcheck)
+	Link.AddProcedure(c,nil,2,3,c47550011.lcheck)
 	c:EnableReviveLimit()
 
 	--attribute dark
@@ -63,8 +63,8 @@ function c47550011.eqcon(e)
 	return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)<3
 end
 
-function c47550011.lcheck(g,lc)
-	return g:IsExists(Card.IsLinkSetCard,1,nil,0x487)
+function c47550011.mfilter(g,lc,sumtype,tp)
+	return g:IsExists(Card.IsSetCard,1,nil,0xcc7,lc,sumtype,tp)
 end
 
 function c47550011.con1(e,tp,eg,ep,ev,re,r,rp)
@@ -92,13 +92,13 @@ function c47550011.ndcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsAttribute(ATTRIBUTE_LIGHT)
 end
 function c47550011.ndtar(e,c)
-	return (c:IsLinkState() and c:IsSetCard(0x487)) or c==e:GetHandler()
+	return (c:IsLinked() and c:IsSetCard(0xcc7)) or c==e:GetHandler()
 end
 
 
 
 function c47550011.cfilter(c,g)
-	return not c:IsStatus(STATUS_BATTLE_DESTROYED) and g:IsContains(c) and c:IsSetCard(0x487)
+	return not c:IsStatus(STATUS_BATTLE_DESTROYED) and g:IsContains(c) and c:IsSetCard(0xcc7)
 end
 function c47550011.cacost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local lg=e:GetHandler():GetLinkedGroup()

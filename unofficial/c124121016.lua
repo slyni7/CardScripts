@@ -118,17 +118,18 @@ function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.nfil3(c,tp)
-	return c:GetSummonPlayer()==tp and c:IsSetCard(0xfa1) and c:IsFaceup()
+	return c:IsSetCard(0xfa1) and c:IsFaceup()
 end
 function s.con3(e,tp,eg,ep,ev,re,r,rp)
-	return eg:FilterCount(s.nfil3,nil,tp)==1
+	return eg:FilterCount(s.nfil3,nil,tp)
 end
 function s.filter(c,e,tp)
-	return c:IsSetCard(0xfa1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
+	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	local b2=Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
+	return c:IsSetCard(0xfa1) and (b1 or b2)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -139,7 +140,19 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
-	if Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 and tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp) then
+	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and tc:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	local b2=Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 and tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
+	local op=0
+	if b1 and b2 then
+		op=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))
+	elseif b1 then
+		op=Duel.SelectOption(tp,aux.Stringid(id,2))
+	elseif b2 then
+		op=Duel.SelectOption(tp,aux.Stringid(id,3))+1
+	else return end
+	if op==0 then
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	else
 		Duel.SpecialSummon(tc,0,tp,1-tp,false,false,POS_FACEUP)
 	end
 end

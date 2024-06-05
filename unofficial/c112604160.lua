@@ -36,6 +36,7 @@ function cm.initial_effect(c)
 	e3:SetCode(EVENT_SPSUMMON)
 	c:RegisterEffect(e3)
 end
+cm.CardType_Order=true
 function cm.filter(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevel(1) and not c:IsCode(m)
 end

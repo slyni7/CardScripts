@@ -8,7 +8,7 @@ function c47550019.initial_effect(c)
 	e99:SetOperation(c47550019.op1)
 	c:RegisterEffect(e99)
 	--link summon
-	aux.AddLinkProcedure(c,nil,2,2,c47550019.lcheck)
+	Link.AddProcedure(c,nil,2,2,c47550019.mfilter)
 	c:EnableReviveLimit()
 
 	--attribute dark
@@ -55,8 +55,8 @@ function c47550019.eqcon(e)
 	return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)<3
 end
 
-function c47550019.lcheck(g,lc)
-	return g:IsExists(Card.IsLinkSetCard,1,nil,0x487)
+function c47550019.mfilter(g,lc,sumtype,tp)
+	return g:IsExists(Card.IsSetCard,1,nil,0xcc7,lc,sumtype,tp)
 end
 
 function c47550019.con1(e,tp,eg,ep,ev,re,r,rp)
@@ -94,7 +94,7 @@ function c47550019.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function c47550019.filter(c,e,tp)
-	return c:IsSetCard(0x487) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xcc7) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 
 function c47550019.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -110,7 +110,7 @@ function c47550019.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<=0 then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local sg=g:Filter(c47550016.filter,nil,e)
+	local sg=g:Filter(c47550016.filter,nil,e,tp)
 	if sg:GetCount()>1 and Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
 	if sg:GetCount()>ft then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -128,7 +128,7 @@ function c47550019.spcon2(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function c47550019.tdfilter(c)
-	return c:IsSetCard(0x487) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck() and c:IsFaceup()
+	return c:IsSetCard(0xcc7) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck() and c:IsFaceup()
 end
 
 function c47550019.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

@@ -40,5 +40,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(sc,tc)
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()
+		local c=e:GetHandler()
+		Duel.Overlay(sc,c)
+		c:CancelToGrave()
 	end
 end

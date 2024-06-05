@@ -7,7 +7,7 @@ genesis = false
 function cm.initial_effect(c)
 
 	--synchro summon
-	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x859),aux.NonTuner(Card.IsRace,RACE_FIEND),2)
+	Synchro.AddProcedure(c,cm.matfilter1,1,1,Synchro.NonTuner(Card.IsRace,RACE_FIEND),2,99)
 	c:EnableReviveLimit()
 
 	--cannot special summon
@@ -64,6 +64,10 @@ function cm.initial_effect(c)
 	e5:SetOperation(cm.op)
 	c:RegisterEffect(e5)
 
+end
+
+function cm.matfilter1(c)
+	return c:IsSynchroType(TYPE_TUNER) and c:IsSetCard(0x859)
 end
 
 function cm.lpcost(e,tp,eg,ep,ev,re,r,rp,chk)

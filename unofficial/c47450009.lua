@@ -6,7 +6,7 @@ function cm.initial_effect(c)
 	
 	--module material
 	c:EnableReviveLimit()
-	aux.AddModuleProcedure(c,cm.pfil1,nil,3,10,nil)
+	aux.AddModuleProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_MODULE),nil,3,10,nil)
 
 	--splimit
 	local e99=Effect.CreateEffect(c)
@@ -62,10 +62,6 @@ function cm.initial_effect(c)
 	e4:SetOperation(cm.dmop)
 	c:RegisterEffect(e4)
 
-end
-
-function cm.pfil1(c)
-	return c:GetSummonLocation()==LOCATION_EXTRA
 end
 
 function cm.splimit(e,se,sp,st)

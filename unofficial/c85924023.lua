@@ -86,7 +86,7 @@ function cm.e2con(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function cm.e2filter(c,e,tp,lv)
-	return c:IsLevelBelow(lv-1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
+	return c:IsLevelBelow(lv-1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE) and c:IsSetCard(0x859)
 end
 
 function cm.e2tg(e,tp,eg,ep,ev,re,r,rp,chk)
