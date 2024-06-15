@@ -2,12 +2,12 @@ Duel.LoadScript("deprefunc_nodebug.lua")
 
 Duel.LoadScript("proc_version_check.lua")
 
-function Auxiliary.FilterBoolFunctionEx(f,...)
+--[[function Auxiliary.FilterBoolFunctionEx(f,...)
 	local params={...}
 	return function(target)
 			return f(target,table.unpack(params))
 		end
-end
+end]]--
 function Auxiliary.AddEquipProcedure(c,p,f,eqlimit,cost,tg,op,con)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(1068)

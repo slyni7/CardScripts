@@ -70,7 +70,7 @@ function cm.tar2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		return chkc:IsLoc("MG") and cm.tfil2(chkc,e,tp)
 	end
 	if chk==0 then
-		return true
+		return Duel.IETarget(cm.tfil2,tp,"G","MG",1,nil,e,tp)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g=Duel.STarget(tp,cm.tfil2,tp,"G","MG",1,1,nil,e,tp)
