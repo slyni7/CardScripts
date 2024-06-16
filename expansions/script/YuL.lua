@@ -65,14 +65,14 @@ function YuL.Set()
 	YuL.SetActivateTurn()
 	YuL.SetEquipTurn()
 end
-RegEff.sgref(function(e,c) if not YuL.GlobalSet then YuL.Set() end end)
+--RegEff.sgref(function(e,c) if not YuL.GlobalSet then YuL.Set() end end)
 
 --엑시즈 베일
-RegEff.scref(96457619,1,function(e,c)
+--[[RegEff.scref(96457619,1,function(e,c)
 	e:SetTarget(function(e,c)
 		return c:IsType(TYPE_XYZ) and c:GetOverlayCount()~=0
 	end)
-end)
+end)]]--
 
 --이 턴에 발동된
 function YuL.SetActivateTurn()
@@ -966,7 +966,7 @@ else
 		return rand%(max-min)+min
 	end
 	YuL.random=YuL.Random
-	RegEff.sgref(function(e,c) if not YuL.RandomSeed then YuL.SetRandomSeed() end end)
+	--RegEff.sgref(function(e,c) if not YuL.RandomSeed then YuL.SetRandomSeed() end end)
 end
 --콜로서스: 만들고 있어요
 function Duel.GetHandLimit(player)
