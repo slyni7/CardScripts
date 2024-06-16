@@ -2,7 +2,6 @@ Duel.LoadScript("deprefunc_nodebug.lua")
 
 Duel.LoadScript("proc_version_check.lua")
 
---[[
 if not Auxiliary.FilterBoolFunctionEx then
 
 	function Auxiliary.FilterBoolFunctionEx(f,...)
@@ -13,7 +12,6 @@ if not Auxiliary.FilterBoolFunctionEx then
 	end
 
 end
-]]--
 
 function Auxiliary.AddEquipProcedure(c,p,f,eqlimit,cost,tg,op,con)
 	local e1=Effect.CreateEffect(c)
