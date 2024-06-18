@@ -41,7 +41,7 @@ function s.initial_effect(c)
 end
 
 function s.op1fil(c)
-	return c:IsCode(99970907) and c:IsSSetable()
+	return c:IsCode(id+4) and c:IsSSetable()
 end
 function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -50,29 +50,30 @@ function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		local g=Duel.GetMatchingGroup(s.op1fil,tp,LOCATION_DECK,0,1,1,nil)
-		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0
+		and Duel.IsExistingMatchingCard(s.op1fil,tp,LOCATION_DECK,0,1,nil) then
+		local tc=Duel.GetFirstMatchingCard(s.op1fil,tp,LOCATION_DECK,0,nil)
+		if tc and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 			Duel.BreakEffect()
-			Duel.SSet(tp,g)
+			Duel.SSet(tp,tc)
 		end
 	end
 end
 
 function s.tar2fil(c)
-	return c:IsFaceup() and c:IsDefenseAbove(0)
+	return c:IsFaceup() and c:GetAttack()>0
 end
 function s.tar2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tar2fil,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.SetTargetPlayer(tp)
 	local g=Duel.GetMatchingGroup(s.tar2fil,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	local ct=g:GetMaxGroup(Card.GetDefense):GetFirst():GetDefense()
+	local ct=g:GetMaxGroup(Card.GetDefense):GetFirst():GetDefense()/2
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,ct)
 end
 function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	local g=Duel.GetMatchingGroup(s.tar2fil,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	local ct=g:GetMaxGroup(Card.GetDefense):GetFirst():GetDefense()
+	local ct=g:GetMaxGroup(Card.GetDefense):GetFirst():GetDefense()/2
 	Duel.Recover(p,ct,REASON_EFFECT)
 end
 
