@@ -156,6 +156,7 @@ function GetID()
 	return self_table,self_code
 end
 
+Duel.LoadScript("_register_effect.lua")
 Duel.LoadScript("sungak.lua")
 
 Duel.LoadScript("AuxCard_CustomType.lua")
