@@ -191,54 +191,7 @@ pcall(Duel.LoadScript,"kaos.lua")
 Duel.LoadScript("SSSS.lua")
 local cregeff=Card.RegisterEffect
 Auxiliary.MetatableEffectCount=true
-Card.RegisterEffect = function(c,e,forced,...)
-	--init
-	local code = c:GetOriginalCode()
-	local mt = _G["c"..code]
-	if not mt.eff_ct then
-		mt.eff_ct = {}
-	end
-	if not mt.eff_ct[c] then
-		mt.eff_ct[c] = {}
-	end
-	--get new effect(s)
-	local e_or_t = e
-	if cREFTable[code] then
-		local res = (cREFTable[code])(e_or_t,c)
-		if res then e_or_t = res end
-	end
-	for k,f in ipairs(cREFTable[0]) do
-		if type(e_or_t)~="table" then
-			local res = f(e_or_t,c)
-			if res then e_or_t = res end
-		else
-			local tt = {table.unpack(e_or_t)}
-			e_or_t = {}
-			for _,te in ipairs(tt) do
-				local re_or_rt = f(te,c)
-				if not re_or_rt then
-					table.insert(e_or_t,te)
-				elseif type(re_or_rt)~="table" then
-					table.insert(e_or_t,re_or_rt)
-				else
-					for _,re in ipairs(re_or_rt) do table.insert(e_or_t,re) end
-				end
-			end
-		end
-	end
-	if c:IsStatus(STATUS_INITIALIZING) then
-		local ct=c:GetRegisteredEffectCount()
-		mt.eff_ct[c][ct] = e_or_t
-	end
-	--register effect(s)
-	if type(e_or_t)~="table" then return cRegEff(c,e_or_t,forced,...) end
-	local result = {}
-	for k,v in ipairs(e_or_t) do
-		table.insert(result,cRegEff(c,v,forced,...))
-	end
-	return table.unpack(result)
-end
---[[function Card.RegisterEffect(c,e,forced,...)
+function Card.RegisterEffect(c,e,forced,...)
 	local code=c:GetOriginalCode()
 	local mt=_G["c"..code]
 	if c:IsStatus(STATUS_INITIALIZING) and Auxiliary.MetatableEffectCount then
@@ -261,6 +214,6 @@ end
 		end
 	end
 	cregeff(c,e,forced,...)
-end]]--
+end
 --Duel.LoadScript("proto.lua")
 --Duel.LoadScript("RDD.lua")
