@@ -87,6 +87,25 @@ Card.RegisterEffect = function(c,e,forced,...)
 		local ct=c:GetRegisteredEffectCount()
 		mt.eff_ct[c][ct] = e_or_t
 	end]]--
+	if c:IsStatus(STATUS_INITIALIZING) then
+		if not mt.eff_ct then
+			mt.eff_ct={}
+		end
+		if not mt.eff_ct[c] then
+			mt.eff_ct[c]={}
+		end
+		local ct=0
+		while true do
+			if mt.eff_ct[c][ct]==e then
+				break
+			end
+			if not mt.eff_ct[c][ct] then
+				mt.eff_ct[c][ct]=e
+				break
+			end
+			ct=ct+1
+		end
+	end
 	--register effect(s)
 	if type(e_or_t)~="table" then return cRegEff(c,e_or_t,forced,...) end
 	local result = {}
