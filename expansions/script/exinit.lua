@@ -188,6 +188,7 @@ pcall(Duel.LoadScript,"additional_setcards.lua")
 pcall(Duel.LoadScript,"remove_xyz_which_have_rank.lua")
 pcall(Duel.LoadScript,"kaos.lua")
 Duel.LoadScript("SSSS.lua")
+Duel.LoadScript("YuL.lua")
 local cregeff=Card.RegisterEffect
 Auxiliary.MetatableEffectCount=true
 function Card.RegisterEffect(c,e,forced,...)
@@ -214,6 +215,5 @@ function Card.RegisterEffect(c,e,forced,...)
 	end
 	cregeff(c,e,forced,...)
 end
-Duel.LoadScript("YuL.lua")
 --Duel.LoadScript("proto.lua")
 --Duel.LoadScript("RDD.lua")
