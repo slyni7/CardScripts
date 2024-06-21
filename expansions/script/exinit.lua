@@ -180,7 +180,6 @@ Duel.LoadScript("ireina.lua")
 pcall(Duel.LoadScript,"BELCH.lua")
 pcall(Duel.LoadScript,"mirror.lua")
 pcall(Duel.LoadScript,"Spinel.lua")
-Duel.LoadScript("YuL.lua")
 --pcall(Duel.LoadScript,"cyan.lua")
 pcall(Duel.LoadScript,"Rune.lua")
 pcall(Duel.LoadScript,"hebi.lua")
@@ -191,7 +190,7 @@ pcall(Duel.LoadScript,"kaos.lua")
 Duel.LoadScript("SSSS.lua")
 local cregeff=Card.RegisterEffect
 Auxiliary.MetatableEffectCount=true
---[[function Card.RegisterEffect(c,e,forced,...)
+function Card.RegisterEffect(c,e,forced,...)
 	local code=c:GetOriginalCode()
 	local mt=_G["c"..code]
 	if c:IsStatus(STATUS_INITIALIZING) and Auxiliary.MetatableEffectCount then
@@ -214,6 +213,7 @@ Auxiliary.MetatableEffectCount=true
 		end
 	end
 	cregeff(c,e,forced,...)
-end]]--
+end
+Duel.LoadScript("YuL.lua")
 --Duel.LoadScript("proto.lua")
 --Duel.LoadScript("RDD.lua")
