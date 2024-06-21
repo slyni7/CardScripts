@@ -191,7 +191,7 @@ pcall(Duel.LoadScript,"kaos.lua")
 Duel.LoadScript("SSSS.lua")
 local cregeff=Card.RegisterEffect
 Auxiliary.MetatableEffectCount=true
-function Card.RegisterEffect(c,e,forced,...)
+--[[function Card.RegisterEffect(c,e,forced,...)
 	local code=c:GetOriginalCode()
 	local mt=_G["c"..code]
 	if c:IsStatus(STATUS_INITIALIZING) and Auxiliary.MetatableEffectCount then
@@ -214,6 +214,6 @@ function Card.RegisterEffect(c,e,forced,...)
 		end
 	end
 	cregeff(c,e,forced,...)
-end
+end]]--
 --Duel.LoadScript("proto.lua")
 --Duel.LoadScript("RDD.lua")
