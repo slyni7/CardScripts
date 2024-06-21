@@ -48,6 +48,7 @@ function Card.GetRegisteredEffectCount(c)
 	end
 	return -1
 end
+--[[
 Card.RegisterEffect = function(c,e,forced,...)
 	--init
 	local code = c:GetOriginalCode()
@@ -95,6 +96,7 @@ Card.RegisterEffect = function(c,e,forced,...)
 	end
 	return table.unpack(result)
 end
+]]--
 
 --dregeff는 한 번이면 충분하잖아?
 local dRegEff = Duel.RegisterEffect --void Duel.RegisterEffect(Effect e, int player)
