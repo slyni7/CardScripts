@@ -11,6 +11,7 @@ ELABEL_IS_DELIGHT_SUMMONING=0x1
 
 Auxiliary.DelayZone={}
 Auxiliary.DelayGroup={}
+Auxiliary.DelayTurnEffect={}
 for p=0,1 do
 	Auxiliary.DelayZone[p]={}
 	Auxiliary.DelayGroup[p]=Group.CreateGroup()
@@ -35,6 +36,11 @@ function Auxiliary.DelayByTurn(c,tp,ct,lab)
 	e3:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
 	e3:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
 	c:RegisterEffect(e3)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_UNRELEASABLE_SUM)
+	e0:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	c:RegisterEffect(e0)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e5:SetCode(EVENT_ADJUST)
@@ -51,13 +57,16 @@ function Auxiliary.DelayByTurn(c,tp,ct,lab)
 		e4:SetLabel(0)
 	end
 	e4:SetCondition(Auxiliary.DelOpCon4)
-	e4:SetOperation(Auxiliary.DelOpOp4(e1,e2,e3,e5))
+	e4:SetOperation(Auxiliary.DelOpOp4(e1,e2,e3,e5,e0))
 	Duel.RegisterEffect(e4,tp)
+	Auxiliary.DelayTurnEffect[c]=e4
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_SINGLE)
 	e6:SetCode(EFFECT_DELAY_TURN)
 	e6:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
-	e6:SetLabel(lab)
+	if lab then
+		e6:SetLabel(lab)
+	end
 	e6:SetValue(rct)
 	e4:SetLabelObject(e6)
 	e5:SetLabelObject(e6)
@@ -104,6 +113,12 @@ function Auxiliary.DelayTillPhase(c,tp,phase,ct)
 	e3:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
 	e3:SetReset(RESET_PHASE+phase,ct)
 	c:RegisterEffect(e3)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_UNRELEASABLE_SUM)
+	e0:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	e0:SetReset(RESET_PHASE+phase,ct)
+	c:RegisterEffect(e0)
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e6:SetCode(EVENT_ADJUST)
@@ -119,7 +134,7 @@ function Auxiliary.DelayTillPhase(c,tp,phase,ct)
 	e8:SetCountLimit(1)
 	e8:SetReset(RESET_PHASE+phase,ct)
 	e8:SetCondition(Auxiliary.DelOpCon8)
-	e8:SetOperation(Auxiliary.DelOpOp8(e1,e2,e3,e6))
+	e8:SetOperation(Auxiliary.DelOpOp8(e1,e2,e3,e6,e0))
 	Duel.RegisterEffect(e8,tp)
 	local e9=Effect.CreateEffect(c)
 	e9:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -137,7 +152,7 @@ end
 function Auxiliary.DelOpCon8(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetLabel()==Duel.GetTurnCount()
 end
-function Auxiliary.DelOpOp8(e1,e2,e3,e5)
+function Auxiliary.DelOpOp8(e1,e2,e3,e5,e0)
 	return
 		function(e,tp,eg,ep,ev,re,r,rp)
 			local c=e:GetHandler()
@@ -149,10 +164,11 @@ function Auxiliary.DelOpOp8(e1,e2,e3,e5)
 			e2:Reset()
 			e3:Reset()
 			e5:Reset()
+			e0:Reset()
 			e:Reset()
 		end
 end
-function Auxiliary.DelOpOp8(e1,e2,e3,e5)
+function Auxiliary.DelOpOp8(e1,e2,e3,e5,e0)
 	return
 		function(e,tp,eg,ep,ev,re,r,rp)
 			local c=e:GetHandler()
@@ -166,6 +182,7 @@ function Auxiliary.DelOpOp8(e1,e2,e3,e5)
 			e2:Reset()
 			e3:Reset()
 			e5:Reset()
+			e0:Reset()
 			e:Reset()
 		end
 end
@@ -196,7 +213,7 @@ function Card.IsCanBeDelightMaterial(c,del)
 	return true
 end
 
-function Auxiliary.AddDelightProcedure(c,f,min,max,gf)
+function Auxiliary.AddDelightProcedure(c,f,min,max,gf,mgf)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC_G)
@@ -208,15 +225,15 @@ function Auxiliary.AddDelightProcedure(c,f,min,max,gf)
 	end
 	e1:SetValue(SUMMON_TYPE_DELIGHT)
 	e1:SetLabel(0)
-	e1:SetCondition(Auxiliary.DelightCondition(f,min,max,gf))
-	e1:SetOperation(Auxiliary.DelightOperation(f,min,max,gf))
+	e1:SetCondition(Auxiliary.DelightCondition(f,min,max,gf,mgf))
+	e1:SetOperation(Auxiliary.DelightOperation(f,min,max,gf,mgf))
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_DELIGHT_SUMMON)
 	e2:SetLabel(10000)
-	e2:SetCondition(Auxiliary.DelightCondition(f,min,max,gf))
-	e2:SetOperation(Auxiliary.DelightOperation(f,min,max,gf))
+	e2:SetCondition(Auxiliary.DelightCondition(f,min,max,gf,mgf))
+	e2:SetOperation(Auxiliary.DelightOperation(f,min,max,gf,mgf))
 	c:RegisterEffect(e2)
 	local mt=_G["c"..c:GetOriginalCode()]
 	mt.CardType_Delight=true
@@ -235,11 +252,12 @@ function Auxiliary.GetDelightMaterials(tp,f,dc)
 	return mg
 end
 function Auxiliary.DelCheckGoal(sg,e,tp,dc,gf)
-	return Duel.GetLocationCountFromEx(tp,tp,sg,dc)>0 and (not gf or gf(sg))
+	return (not gf or gf(sg))
 		and sg:FilterCount(Card.IsLocation,nil,LOCATION_MZONE)<=Duel.GetTurnCount()
+		and Duel.GetLocationCountFromEx(tp,tp,sg,dc)>0
 		and dc:IsCanBeSpecialSummoned(e,SUMMON_TYPE_DELIGHT,tp,false,false)
 end
-function Auxiliary.DelightCondition(f,min,max,gf)
+function Auxiliary.DelightCondition(f,min,max,gf,mgf)
 	return
 		function(e,c,og)
 			if c==nil then
@@ -252,10 +270,20 @@ function Auxiliary.DelightCondition(f,min,max,gf)
 				return false
 			end
 			Duel.SetSelectedCard(fg)
-			return mg:CheckSubGroup(Auxiliary.DelCheckGoal,min,max,e,tp,c,gf)
+			if mgf and not mgf(mg) then
+				return false
+			end
+			local res=false
+			for i=min,#mg do
+				res=mg:CheckSubGroup(Auxiliary.DelCheckGoal,i,i,e,tp,c,gf)
+				if res then
+					break
+				end
+			end
+			return res
 		end
 end
-function Auxiliary.DelightOperation(f,min,max,gf)
+function Auxiliary.DelightOperation(f,min,max,gf,mgf)
 	return
 		function(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
 			local mg=Auxiliary.GetDelightMaterials(tp,f,c)
@@ -328,16 +356,21 @@ function Auxiliary.DelOpOp4(e1,e2,e3,e5)
 			if c:GetTurnCounter()>0 then
 				return
 			end
-			if Duel.HintSpSummon then
-				Duel.HintSpSummon(c)
+			if te:GetLabel()&ELABEL_IS_DELIGHT_SUMMONING~=0 then
+				if Duel.HintSpSummon then
+					Duel.HintSpSummon(c)
+				else
+					Duel.Hint(HINT_CARD,0,c:GetCode())
+				end
+				c:SetStatus(STATUS_SPSUMMON_STEP,false)
+				c:SetStatus(STATUS_SPSUMMON_TURN,true)
+				c:SetStatus(STATUS_EFFECT_ENABLED,true)
+				Duel.RaiseSingleEvent(c,EVENT_SPSUMMON_SUCCESS,e,0,tp,tp,0)
+				Duel.RaiseEvent(Group.FromCards(c),EVENT_SPSUMMON_SUCCESS,e,0,tp,tp,0)
 			else
-				Duel.Hint(HINT_CARD,0,c:GetCode())
+				c:SetStatus(STATUS_SPSUMMON_STEP,false)
+				c:SetStatus(STATUS_EFFECT_ENABLED,true)
 			end
-			c:SetStatus(STATUS_SPSUMMON_STEP,false)
-			c:SetStatus(STATUS_SPSUMMON_TURN,true)
-			c:SetStatus(STATUS_EFFECT_ENABLED,true)
-			Duel.RaiseSingleEvent(c,EVENT_SPSUMMON_SUCCESS,e,0,tp,tp,0)
-			Duel.RaiseEvent(Group.FromCards(c),EVENT_SPSUMMON_SUCCESS,e,0,tp,tp,0)
 			e1:Reset()
 			e2:Reset()
 			e3:Reset()
@@ -578,14 +611,14 @@ end
 end
 --
 	local itype=Card.IsType
-	Card.IsType=function(c,t)
+	Card.IsType=function(c,t,...)
 	if c.CardType_Delight then
 		if t==TYPE_FUSION then
 			return false
 		end
-		return itype(c,bit.bor(t,TYPE_FUSION)-TYPE_FUSION)
+		return itype(c,bit.bor(t,TYPE_FUSION)-TYPE_FUSION,...)
 	end
-	return itype(c,t)
+	return itype(c,t,...)
 end
 --
 	local iftype=Card.IsFusionType
