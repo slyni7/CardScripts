@@ -19,7 +19,7 @@ for p=0,1 do
 end
 
 function Auxiliary.DelayByTurn(c,tp,ct,lab)
-	local rct=Duel.GetCurrentPhase()==PHASE_STANDBY and ct+1 or ct
+	local rct=ct --Duel.GetCurrentPhase()==PHASE_STANDBY and ct+1 or ct
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CANNOT_ATTACK)
@@ -315,8 +315,8 @@ function Auxiliary.DelightOperation(f,min,max,gf,mgf)
 						--[[c:SetStatus(STATUS_SPSUMMON_STEP,true)
 						c:SetStatus(STATUS_EFFECT_ENABLED,false)]]--
 						sg:AddCard(c)
+						aux.DelayByTurn(c,tp,#rg,ELABEL_IS_DELIGHT_SUMMONING)
 					end
-					aux.DelayByTurn(c,tp,#rg,ELABEL_IS_DELIGHT_SUMMONING)
 				end
 				if e:GetLabel()==10000 then
 					if #rg>0 then
