@@ -45,7 +45,9 @@ function s.indestg(e,c)
 	return c==handler or c==handler:GetBattleTarget()
 end
 function s.setfilter(c)
-	return c:IsContinuousTrap() and c:IsTrapMonster() and c:IsSSetable()
+	return c:IsContinuousTrap()
+		and (Card.IsTrapMonster and c:IsTrapMonster() or c:GetOriginalRace()~=0)
+		and c:IsSSetable()
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil) end
