@@ -166,6 +166,7 @@ if YGOPRO_VERSION~="Percy/EDO" then
 	pcall(Duel.LoadScript,"proc_xyz_koishi.lua")
 end
 pcall(Duel.LoadScript,"proc_equation.lua")
+pcall(Duel.LoadScript,"proc_module.lua")
 --pcall(Duel.LoadScript,"proc_access.lua")
 pcall(Duel.LoadScript,"proc_order.lua")
 pcall(Duel.LoadScript,"proc_diffusion.lua")
