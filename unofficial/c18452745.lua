@@ -8,8 +8,10 @@ function cm.initial_effect(c)
 	e2:SetCondition(cm.con2)
 	c:RegisterEffect(e2)
 	local e3=MakeEff(c,"E")
-	e3:SetCode(EFFECT_ADD_FUSION_SETCODE)
+	--e3:SetCode(EFFECT_ADD_FUSION_SETCODE)
+	e3:SetCode(EFFECT_ADD_SETCODE)
 	e3:SetCondition(cm.con3)
+	e3:SetOperation(cm.op3)
 	e3:SetValue(0x2d2)
 	c:RegisterEffect(e3)
 	local e4=MakeEff(c,"I","S")
@@ -33,6 +35,10 @@ function cm.con3(e)
 	local ec=c:GetEquipTarget()
 	return not ec:IsSetCard(0x2d2)
 end
+function cm.op3(sc,st,tp)
+	return (st&MATERIAL_FUSION)~=0
+end
+
 function cm.tfil4(c,e,tp,m,ec,f,chkf)
 	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x2d2) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
