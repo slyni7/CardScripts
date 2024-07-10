@@ -53,7 +53,7 @@ function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.onfil21(c)
-	return c:IsAttribute(ATTRIBUTE_DEVINE) and c:IsFaceup()
+	return c:IsAttribute(ATTRIBUTE_DIVINE) and c:IsFaceup()
 end
 function s.onfil22(c)
 	return c:IsSetCard("∂Û¿œ∂Ù") and c:IsType(TYPE_TRAP) and c:IsAbleToGrave() and not c:IsCode(id)
