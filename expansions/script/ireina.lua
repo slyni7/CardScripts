@@ -3866,6 +3866,41 @@ function Duel.RegisterEffect(e,...)
 	end
 end
 
+EFFECT_LILAC_ADDOP=18454143
+local cregeff=Card.RegisterEffect
+function Card.RegisterEffect(c,e,...)
+	cregeff(c,e,...)
+	if e:IsHasType(EFFECT_TYPE_ACTIONS) and not e:IsHasType(EFFECT_TYPE_CONTINUOUS) then
+		local op=e:GetOperation()
+		e:SetOperation(function(e,tp,...)
+			if op then
+				op(e,tp,...)
+			end
+			while true do
+				local eset={Duel.GetPlayerEffect(tp,EFFECT_LILAC_ADDOP)}
+				if #eset>0 then
+					local g=Group.CreateGroup()
+					local gt={}
+					for i=1,#eset do
+						local te=eset[i]
+						local token=Duel.CreateToken(tp,te:GetHandler():GetOriginalCode())
+						g:AddCard(token)
+						gt[token]=i
+					end
+					Duel.Hint(HINT_SELECTMSG,tp,0)
+					local sg=g:Select(tp,1,1,nil)
+					local tc=sg:GetFirst()
+					local te=eset[gt[tc]]
+					te:GetOperation()(e,tp,...)
+					te:Reset()
+				else
+					break
+				end
+			end
+		end)
+	end
+end
+
 Duel.LoadScript("yukitokisaki.lua")
 
 Duel.LoadScript("proc_braveex.lua")
