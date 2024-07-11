@@ -87,6 +87,7 @@ function s.oop21(e,tp,eg,ep,ev,re,r,rp)
 			if #g>0 then
 				Duel.DisableShuffleCheck()
 				Duel.SendtoDeck(g,nil,0,REASON_EFFECT)
+				Duel.DisableShuffleCheck(false)
 			end
 		end
 	elseif op==2 then
