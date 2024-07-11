@@ -2,6 +2,8 @@
 --Clear World
 local s,id=GetID()
 function s.initial_effect(c)
+	local fid=c:GetFieldID()
+	local copying=c:IsStatus(STATUS_COPYING_EFFECT)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -34,31 +36,48 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 	--DARK monsters: cannot declare attack
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD)
-	e5:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	e5:SetDescription(aux.Stringid(id,1))
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e5:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e5:SetRange(LOCATION_FZONE)
-	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e5:SetTargetRange(1,0)
-	e5:SetCondition(s.darkcon1)
-	c:RegisterEffect(e5)
-	local e6=e5:Clone()
-	e6:SetCondition(s.darkcon2)
-	e6:SetTargetRange(0,1)
-	c:RegisterEffect(e6)
-	--EARTH monsters: destroy a monster in Defense Position
+	e5:SetCondition(function(e,tp) return Duel.IsTurnPlayer(tp) and s.PlayerControlsAttributeOrIsAffectedByClearWall(tp,ATTRIBUTE_EARTH) and c:IsHasEffect(id) and not c:HasFlagEffect(id) and (not copying or c:IsFieldID(fid)) end)
+	e5:SetOperation(s.desop)
+	if copying then
+		e5:SetReset(RESET_PHASE|PHASE_END)
+	end
+	Duel.RegisterEffect(e5,0)
+	local e5b=e5:Clone()
+	Duel.RegisterEffect(e5b,1)
+	--● WATER: Discard 1 card
+	local e6=Effect.CreateEffect(c)
+	e6:SetDescription(aux.Stringid(id,2))
+	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e6:SetCode(EVENT_PHASE+PHASE_END)
+	e6:SetRange(LOCATION_FZONE)
+	e6:SetCountLimit(1)
+	e6:SetCondition(function(e,tp) return Duel.IsTurnPlayer(tp) and s.PlayerControlsAttributeOrIsAffectedByClearWall(tp,ATTRIBUTE_WATER) and c:IsHasEffect(id) and not c:HasFlagEffect(id+1) and (not copying or c:IsFieldID(fid)) end)
+	e6:SetOperation(s.discardop)
+	if copying then
+		e6:SetReset(RESET_PHASE|PHASE_END)
+	end
+	Duel.RegisterEffect(e6,0)
+	local e6b=e6:Clone()
+	Duel.RegisterEffect(e6b,1)
+	--● FIRE: Take 1000 damage
 	local e7=Effect.CreateEffect(c)
-	e7:SetDescription(aux.Stringid(id,1))
-	e7:SetCategory(CATEGORY_DESTROY)
-	e7:SetCode(EVENT_PHASE+PHASE_STANDBY)
-	e7:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e7:SetDescription(aux.Stringid(id,3))
+	e7:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e7:SetCode(EVENT_PHASE+PHASE_END)
 	e7:SetRange(LOCATION_FZONE)
-	e7:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e7:SetCountLimit(1)
-	e7:SetCondition(s.descon)
-	e7:SetTarget(s.destg)
-	e7:SetOperation(s.desop)
-	c:RegisterEffect(e7)
-	--WATER monsters: discard 1 card
+	e7:SetCondition(function(e,tp) return Duel.IsTurnPlayer(tp) and s.PlayerControlsAttributeOrIsAffectedByClearWall(tp,ATTRIBUTE_FIRE) and c:IsHasEffect(id) and not c:HasFlagEffect(id+2) and (not copying or c:IsFieldID(fid)) end)
+	e7:SetOperation(s.damop)
+	if copying then
+		e7:SetReset(RESET_PHASE|PHASE_END)
+	end
+	Duel.RegisterEffect(e7,0)
+	local e7b=e7:Clone()
+	Duel.RegisterEffect(e7b,1)
+	--● WIND: You must pay 500 Life Points to activate a Spell Card
 	local e8=Effect.CreateEffect(c)
 	e8:SetDescription(aux.Stringid(id,2))
 	e8:SetCategory(CATEGORY_HANDES)
@@ -82,28 +101,24 @@ function s.initial_effect(c)
 	e9:SetTarget(s.damtg)
 	e9:SetOperation(s.damop)
 	c:RegisterEffect(e9)
-	--WIND monsters: must pay 500 Lp to activate Spell cards
+	--Apply a dummy effect on itself to track whether the card's effects are currently active or not
 	local e10=Effect.CreateEffect(c)
-	e10:SetType(EFFECT_TYPE_FIELD)
-	e10:SetCode(EFFECT_ACTIVATE_COST)
+	e10:SetType(EFFECT_TYPE_SINGLE)
+	e10:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e10:SetCode(id)
 	e10:SetRange(LOCATION_FZONE)
-	e10:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e10:SetTargetRange(1,0)
-	e10:SetTarget(s.actarget)
-	e10:SetCondition(s.windcon1)
-	e10:SetCost(s.costchk)
-	e10:SetOperation(s.costop)
 	c:RegisterEffect(e10)
-	local e11=e10:Clone()
-	e11:SetTargetRange(0,1)
-	e11:SetCondition(s.windcon2)
-	c:RegisterEffect(e11)
 end
-s[0]=0
-s[1]=0
-local CARD_CLEAR_VICE_DRAGON=97811903
-function s.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.CheckLPCost(tp,500) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+function s.maintop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,id)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+	local b1=Duel.CheckLPCost(tp,500)
+	local b2=true
+	--Pay 500 LP or destroy this card
+	local op=b1 and Duel.SelectEffect(tp,
+		{b1,aux.Stringid(id,4)},
+		{b2,aux.Stringid(id,5)}) or 2
+	if op==1 then
 		Duel.PayLPCost(tp,500)
 	else
 		Duel.Destroy(e:GetHandler(),REASON_COST)
@@ -137,47 +152,30 @@ end
 function s.desfilter(c)
 	return c:IsPosition(POS_FACEUP_DEFENSE)
 end
-function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local turnp=Duel.GetTurnPlayer()
-	if chkc then return chkc:IsControler(turnp) and chkc:IsLocation(LOCATION_MZONE) and s.desfilter(chkc) end
-	if chk==0 then return true end
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(id,RESETS_STANDARD_PHASE_END,0,1)
+	if not s.PlayerIsAffectedByClearWorld(tp,ATTRIBUTE_EARTH)
+		or not Duel.IsExistingMatchingCard(Card.IsPosition,tp,LOCATION_MZONE,0,1,nil,POS_FACEUP_DEFENSE) then return end
+	Duel.Hint(HINT_CARD,0,id)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(turnp,s.desfilter,turnp,LOCATION_MZONE,0,1,1,nil)
-	if #g>0 then
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-	end
+	local g=Duel.SelectMatchingCard(tp,Card.IsPosition,tp,LOCATION_MZONE,0,1,1,nil,POS_FACEUP_DEFENSE)
+	if #g==0 then return end
+	Duel.HintSelection(g)
+	Duel.Destroy(g,REASON_EFFECT)
 end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	if (s[Duel.GetTurnPlayer()]&ATTRIBUTE_EARTH)==0 then return end
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and tc:IsPosition(POS_FACEUP_DEFENSE) then
-		Duel.Destroy(tc,REASON_EFFECT)
-	end
-end
-function s.discardtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+function s.discardop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(id+1,RESETS_STANDARD_PHASE_END,0,1)
+	if not s.PlayerIsAffectedByClearWorld(tp,ATTRIBUTE_WATER)
+		or Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0 then return end
+	Duel.Hint(HINT_CARD,0,id)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
-end
-function s.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local turnp=Duel.GetTurnPlayer()
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,turnp,1)
-end
-function s.hdop(e,tp,eg,ep,ev,re,r,rp)
-	if (s[Duel.GetTurnPlayer()]&ATTRIBUTE_WATER)==0 then return end
-	Duel.DiscardHand(Duel.GetTurnPlayer(),nil,1,1,REASON_EFFECT|REASON_DISCARD)
-end
-function s.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return (s[Duel.GetTurnPlayer()]&ATTRIBUTE_FIRE)~=0
-end
-function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,1000)
+	Duel.DiscardHand(tp,nil,1,1,REASON_EFFECT|REASON_DISCARD)
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(id+2,RESETS_STANDARD_PHASE_END,0,1)
 	if not s.PlayerIsAffectedByClearWorld(tp,ATTRIBUTE_FIRE) then return end
+	Duel.Hint(HINT_CARD,0,id)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Damage(tp,1000,REASON_EFFECT)
 end

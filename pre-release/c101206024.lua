@@ -1,4 +1,5 @@
---마루챠미 후와로스
+--マルチャミー・フワロス
+--Mulcharmy Fuwaross
 local s,id=GetID()
 function s.initial_effect(c)
 	--Apply effects for the rest of the turn
@@ -14,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.efftg)
 	e1:SetOperation(s.effop)
 	c:RegisterEffect(e1)
-	--Keep track of the activations of a "Multchummy" monster's effect
+	--Keep track of the activations of a "Mulcharmy" monster's effect
 	Duel.AddCustomActivityCounter(id,ACTIVITY_CHAIN,function(re) return not (re:GetHandler():IsSetCard(SET_MULTCHUMMY) and re:IsMonsterEffect()) end)
 end
 s.listed_series={SET_MULTCHUMMY}
@@ -22,7 +23,7 @@ function s.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsDiscardable() and Duel.GetCustomActivityCount(id,tp,ACTIVITY_CHAIN)<2 end
 	Duel.SendtoGrave(c,REASON_COST|REASON_DISCARD)
-	--You can only activate the effects of other "Multchummy" monsters once the turn you activate this effect
+	--You can only activate 1 other "Mulcharmy" monster effect, the turn you activate this effect
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -41,7 +42,7 @@ function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.effop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	--Draw 1 card each time your opponent Normal or Special Summons a monster(s) from the hand
+	--Draw 1 card each time your opponent Special Summons a monster(s) from the Deck and/or Extra Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
