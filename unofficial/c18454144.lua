@@ -85,6 +85,7 @@ function s.oop21(e,tp,eg,ep,ev,re,r,rp)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 			local g=Duel.SMCard(tp,s.onfil21,tp,"HO",0,1,1,nil)
 			if #g>0 then
+				Duel.DisableShuffleCheck()
 				Duel.SendtoDeck(g,nil,0,REASON_EFFECT)
 			end
 		end
