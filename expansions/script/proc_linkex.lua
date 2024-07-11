@@ -209,7 +209,14 @@ function Link.Operation(f,minc,maxc,specialchk)
 					end
 				end
 				c:SetMaterial(g)
-				Duel.SendtoGrave(g,REASON_MATERIAL+REASON_LINK)
+				local gg=g:Filter(Card.IsLocation,nil,LOCATION_GRAVE)
+				g:Sub(gg)
+				if #gg>0 then
+					Duel.Remove(gg,POS_FACEUP,REASON_MATERIAL+REASON_LINK)
+				end
+				if #g>0 then
+					Duel.SendtoGrave(g,REASON_MATERIAL+REASON_LINK)
+				end
 				g:DeleteGroup()
 				aux.DeleteExtraMaterialGroups(emt)
 			end
