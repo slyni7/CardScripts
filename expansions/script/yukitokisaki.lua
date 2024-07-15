@@ -46,6 +46,30 @@ function Duel.SpecialSummonComplete(...)
 				YukitokisakiErrorCall(cp,OPCODE_AND,OPCODE_AND)
 			end
 		end
+		return res
+	else
+		return res
+	end
+end
+
+EFFECT_KURIBOHEMIAN=18454157
+
+local dds=Duel.Destroy
+function Duel.Destroy(...)
+	local res=dds(...)
+	if res then
+		local cp=Duel.GetChainInfo(0,CHAININFO_TRIGGERING_PLAYER)
+		if cp==nil then
+			return res
+		end
+		local eset={Duel.IsPlayerAffectedByEffect(cp,EFFECT_KURIBOHEMIAN)}
+		for _,te in pairs(eset) do
+			if te:GetLabel()==Duel.GetCurrentChain() then
+				Debug.Message("Kuribohemian calls an error function!")
+				YukitokisakiErrorCall(cp,OPCODE_AND,OPCODE_AND)
+			end
+		end
+		return res
 	else
 		return res
 	end
