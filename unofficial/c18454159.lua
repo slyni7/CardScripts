@@ -154,7 +154,7 @@ function s.oop72(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:GetFlagEffect(id)==0 and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then
 		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-		if rp~=tp and g and g:IsExists(s.oofil72,1,nil,tp) and Duel.IsChainDisablale(ev) then
+		if rp~=tp and g and g:IsExists(s.oofil72,1,nil,tp) and Duel.IsChainDisablable(ev) then
 			if Duel.NegateEffect(ev) then
 				Duel.Destroy(eg,REASON_EFFECT)
 				Duel.Hint(HINT_CARD,1-tp,id)

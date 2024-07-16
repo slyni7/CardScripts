@@ -151,7 +151,7 @@ end
 function s.oop72(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:GetFlagEffect(id)==0 then
-		if rp~=tp and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainDisablale(ev) then
+		if rp~=tp and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainDisablable(ev) then
 			if Duel.NegateEffect(ev) then
 				Duel.Destroy(eg,REASON_EFFECT)
 				Duel.Hint(HINT_CARD,1-tp,id)

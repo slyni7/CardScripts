@@ -43,7 +43,7 @@ function s.val1(e,te)
 		local rk=e:GetHandler():GetRank()
 		local ec=te:GetOwner()
 		if ec:IsType(TYPE_LINK) then
-			return ec:GetOriginalLink()>rk
+			return ec:GetLink()>rk
 		elseif ec:IsType(TYPE_XYZ) then
 			return ec:GetOriginalRank()>rk
 		else
