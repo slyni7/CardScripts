@@ -3901,6 +3901,15 @@ function Card.RegisterEffect(c,e,...)
 	end
 end
 
+local cregeff=Card.RegisterEffect
+function Card.RegisterEffect(c,e,...)
+	cregeff(c,e,...)
+	local code=c:GetOriginalCode()
+	if code==20065322 then
+		c20065322.listed_names={40640057,57116033}
+	end
+end
+
 Duel.LoadScript("yukitokisaki.lua")
 
 Duel.LoadScript("proc_braveex.lua")
