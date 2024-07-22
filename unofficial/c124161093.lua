@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_DISABLE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
-	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
+	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.con1)
 	e1:SetCost(s.cst1)
@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_HAND+LOCATION_GRAVE)
+	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCode(EVENT_DAMAGE)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCost(s.cst2)
@@ -45,8 +45,9 @@ function s.con1(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.cst1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToDeckAsCost() end
-	Duel.SendtoDeck(e:GetHandler(),nil,SEQ_DECKSHUFFLE,REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsDiscardable(REASON_COST) end
+	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
 end
 
 function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
