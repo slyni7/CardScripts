@@ -32,23 +32,41 @@ function s.regcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	--Register the results of coin tosses
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_TOSS_COIN)
 	e1:SetRange(LOCATION_SZONE)
-	e1:SetCondition(s.effcon)
-	e1:SetOperation(s.effop)
-	e1:SetLabelObject(re)
-	e1:SetReset(RESET_EVENT|RESETS_STANDARD&~RESET_TURN_SET|RESET_CHAIN)
+	e1:SetOperation(s.coinregop)
 	c:RegisterEffect(e1)
+	--Apply effects based on the number of heads
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_CHAIN_SOLVED)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetCountLimit(1)
+	e2:SetCondition(s.effcond)
+	e2:SetOperation(s.effop)
+	e2:SetLabelObject(re)
+	c:RegisterEffect(e2)
 end
-function s.effcon(e,tp,eg,ep,ev,re,r,rp)
+function s.coinregop(e,tp,eg,ep,ev,re,r,rp)
+	local ct=aux.GetCoinHeadsFromEv(ev)
+	for i=1,ct do
+		--Register a flag for every head
+		e:GetHandler():RegisterFlagEffect(id,RESETS_STANDARD_PHASE_END,0,1)
+	end
+end
+function s.effcond(e,tp,eg,ep,ev,re,r,rp)
 	return re==e:GetLabelObject()
 end
 function s.effop(e,tp,eg,ep,ev,re,r,rp)
+	--Card hint (the effect always applies, even with no heads in the results)
 	Duel.Hint(HINT_CARD,0,id)
-	local ct=aux.GetCoinHeadsFromEv(ev)
+	local ct=e:GetHandler():GetFlagEffect(id)
+	if ct<=0 then return end
 	if ct>0 then
 		Duel.Damage(1-tp,500,REASON_EFFECT)
 	end
