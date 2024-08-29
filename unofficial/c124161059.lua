@@ -71,9 +71,13 @@ function s.unendalf(c)
 	return c:IsCode(124161058) and c:IsFaceup()
 end
 
+function s.unfilter(c)
+	return (c:IsFaceup() or c:IsLocation(LOCATION_HAND+LOCATION_DECK)) and c:IsCode(124161058)
+end
+
 function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	local un=Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,nil,124161058)
+	local un=Duel.GetMatchingGroup(s.unfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
 	local g=Duel.GetMatchingGroup(s.tg2filter,tp,LOCATION_MZONE,0,nil,e)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) end
 	if chk==0 then return c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and #g>0 and #un>0 and not Duel.IsExistingMatchingCard(s.unendalf,tp,LOCATION_ONFIELD,0,1,nil) end
@@ -100,13 +104,13 @@ function s.con3(e,tp,eg)
 	return eg:IsExists(s.con3filter,1,nil,tp)
 end
 
-function s.tg3filter(c,e,tp)
-	return c:IsCanBeEffectTarget(e)
+function s.tg3filter(c,e)
+	return c:IsCanBeEffectTarget(e) and c:IsAbleToRemove()
 end
 
 function s.tg3(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) end
-	local g=Duel.GetMatchingGroup(s.tg3filter,tp,0,LOCATION_GRAVE,nil,e,tp)
+	local g=Duel.GetMatchingGroup(s.tg3filter,tp,0,LOCATION_GRAVE,nil,e)
 	local eq=Duel.GetFlagEffect(tp,124161058)
 	if chk==0 then return #g>0 and eq>0 end
 	local sg=aux.SelectUnselectGroup(g,e,tp,1,eq,aux.TRUE,1,tp,HINTMSG_REMOVE)
