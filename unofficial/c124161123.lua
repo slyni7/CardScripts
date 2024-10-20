@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCountLimit(1,id)
+	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(s.con2)
 	e2:SetTarget(s.tg2)
 	e2:SetOperation(s.op2)
@@ -27,7 +27,7 @@ end
 
 --effect 1
 function s.con1filter(c,tp)
-	return c:IsFaceup() and (c:IsTrapMonster() or c:IsSetCard(0xf28)) and c:IsLocation(LOCATION_MZONE) and c:IsControler(tp)
+	return c:IsFaceup() and ((c:IsTrapMonster() and c:IsContinuousTrap()) or c:IsSetCard(0xf28)) and c:IsLocation(LOCATION_MZONE) and c:IsControler(tp)
 end
 function s.con1(e,tp,eg,ep,ev,re,r,rp)
 	if rp==tp then return false end
@@ -75,7 +75,7 @@ function s.op2(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-		e1:SetValue(LOCATION_REMOVED)
+		e1:SetValue(LOCATION_DECKBOT)
 		e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
 		c:RegisterEffect(e1)
 	end

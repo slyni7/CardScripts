@@ -42,7 +42,6 @@ function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
-	c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(s.tg1filter,tp,LOCATION_DECK,0,nil)
 	if #g==0 then return end
 	local sg=aux.SelectUnselectGroup(g,e,tp,1,2,aux.dncheck,1,tp,HINTMSG_ATOHAND)
@@ -65,7 +64,7 @@ function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local xg=Duel.GetMatchingGroup(s.tg2xfilter,tp,LOCATION_GRAVE,0,nil)
 	local eq=Duel.GetFlagEffect(tp,124161058)
 	if chk==0 then return #g>0 and #xg>0 and eq>0 end
-	local sg=aux.SelectUnselectGroup(g,e,tp,1,1,aux.TRUE,1,tp,HINTMSG_SELECT)
+	local sg=aux.SelectUnselectGroup(g,e,tp,1,1,aux.TRUE,1,tp,HINTMSG_TARGET)
 	Duel.SetTargetCard(sg)
 end
 

@@ -18,21 +18,21 @@ function s.initial_effect(c)
 	--effect 2
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(LOCATION_ONFIELD,0)
 	e2:SetCondition(function(e) return e:GetHandler():GetLinkedGroupCount()>0 end)
 	e2:SetTarget(s.tg2)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	c:RegisterEffect(e3)
 end
 
 --link
+function s.linkffilter(c)
+	return c:IsTrapMonster() and c:IsContinuousTrap()
+end
 function s.linkfilter(g,lc,sumtype,tp)
-	return g:IsExists(Card.IsTrapMonster,1,nil,lc,sumtype,tp)
+	return g:IsExists(s.linkffilter,1,nil,lc,sumtype,tp)
 end
 
 --effect 1
@@ -54,12 +54,6 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.GetFirstTarget()
 	if sg:IsRelateToEffect(e) then
 		Duel.SSet(tp,sg)
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-		e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		sg:RegisterEffect(e1)
 	end
 end
 
