@@ -30,14 +30,14 @@ function s.initial_effect(c)
 	e3:SetCondition(s.con3)
 	e3:SetValue(TYPE_TUNER)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetCode(EFFECT_SYNCHRO_MAT_FROM_HAND)
-	e4:SetRange(LOCATION_HAND)
-	e4:SetCondition(s.con3)
-	e4:SetValue(s.val3)
-	c:RegisterEffect(e4)
+	local e3a=Effect.CreateEffect(c)
+	e3a:SetType(EFFECT_TYPE_SINGLE)
+	e3a:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3a:SetCode(EFFECT_SYNCHRO_MAT_FROM_HAND)
+	e3a:SetRange(LOCATION_HAND)
+	e3a:SetCondition(s.con3)
+	e3a:SetValue(s.val3)
+	c:RegisterEffect(e3a)
 end
 
 --effect 1
@@ -53,16 +53,16 @@ function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local sg=aux.SelectUnselectGroup(g,e,tp,1,1,aux.TRUE,1,tp,HINTMSG_RTOHAND)
 	Duel.SetTargetCard(sg)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,sg,1,0,LOCATION_MZONE)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,sg,1,0,LOCATION_HAND)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,LOCATION_HAND)
 end
 
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local sg=Duel.GetFirstTarget()
-	if sg:IsRelateToEffect(e) and Duel.SendtoHand(sg,nil,REASON_EFFECT)>0 and sg:IsLocation(LOCATION_HAND) and c:IsRelateToEffect(e) then
+	local tg=Duel.GetFirstTarget()
+	if tg:IsRelateToEffect(e) and Duel.SendtoHand(tg,nil,REASON_EFFECT)>0 and tg:IsLocation(LOCATION_HAND) and c:IsRelateToEffect(e) then
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 		Duel.BreakEffect()
-		Duel.ConfirmCards(1-tp,sg)
+		Duel.ConfirmCards(1-tp,tg)
 	end
 end
 

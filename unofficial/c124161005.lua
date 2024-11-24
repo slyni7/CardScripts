@@ -31,14 +31,14 @@ function s.initial_effect(c)
 	e3:SetCondition(s.con3)
 	e3:SetValue(TYPE_TUNER)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetCode(EFFECT_SYNCHRO_MAT_FROM_HAND)
-	e4:SetRange(LOCATION_HAND)
-	e4:SetCondition(s.con3)
-	e4:SetValue(s.val3)
-	c:RegisterEffect(e4)
+	local e3a=Effect.CreateEffect(c)
+	e3a:SetType(EFFECT_TYPE_SINGLE)
+	e3a:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3a:SetCode(EFFECT_SYNCHRO_MAT_FROM_HAND)
+	e3a:SetRange(LOCATION_HAND)
+	e3a:SetCondition(s.con3)
+	e3a:SetValue(s.val3)
+	c:RegisterEffect(e3a)
 end
 
 --effect 1
@@ -71,9 +71,9 @@ end
 
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
-		local sg=Duel.GetFirstTarget()
-		if sg:IsRelateToEffect(e) then
-			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
+		local tg=Duel.GetFirstTarget()
+		if tg:IsRelateToEffect(e) then
+			Duel.SpecialSummon(tg,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end

@@ -15,33 +15,33 @@ function s.initial_effect(c)
 	e1:SetTarget(function(_,c) return c:IsSetCard(0xf25) end)
 	e1:SetValue(s.val1)
 	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_UPDATE_DEFENSE)
-	c:RegisterEffect(e2)
+	local e1a=e1:Clone()
+	e1a:SetCode(EFFECT_UPDATE_DEFENSE)
+	c:RegisterEffect(e1a)
 	--effect 2
-	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_DESTROY)
-	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetRange(LOCATION_FZONE)
-	e3:SetCountLimit(1,id)
-	e3:SetCost(s.cst2)
-	e3:SetTarget(s.tg2)
-	e3:SetOperation(s.op2)
-	c:RegisterEffect(e3)
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_TOGRAVE)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_FZONE)
+	e2:SetCountLimit(1,id)
+	e2:SetCost(s.cst2)
+	e2:SetTarget(s.tg2)
+	e2:SetOperation(s.op2)
+	c:RegisterEffect(e2)
 	--effect 3
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_FIELD)
-	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e4:SetRange(LOCATION_FZONE)
-	e4:SetCode(EFFECT_CANNOT_ACTIVATE)
-	e4:SetCondition(s.con3u)
-	e4:SetTargetRange(0,1)
-	e4:SetValue(s.val3)
-	c:RegisterEffect(e4)
-	local e5=e4:Clone()
-	e5:SetCode(EFFECT_CANNOT_SSET)
-	e5:SetCondition(s.con3d)
-	c:RegisterEffect(e5)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetRange(LOCATION_FZONE)
+	e3:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e3:SetCondition(s.con3u)
+	e3:SetTargetRange(0,1)
+	e3:SetValue(s.val3)
+	c:RegisterEffect(e3)
+	local e3a=e3:Clone()
+	e3a:SetCode(EFFECT_CANNOT_SSET)
+	e3a:SetCondition(s.con3d)
+	c:RegisterEffect(e3a)
 end
 
 --effect 1
@@ -52,7 +52,7 @@ function s.val1(e,c)
 	if ug>dg then
 		dg=ug
 	end
-	return dg*200
+	return dg*100
 end
 
 --effect 2
@@ -73,7 +73,7 @@ function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ug=Duel.GetMatchingGroupCount(Card.IsFaceup,tp,0,LOCATION_ONFIELD,nil)
 	local dg=Duel.GetMatchingGroupCount(Card.IsFacedown,tp,0,LOCATION_ONFIELD,nil)
 	if chk==0 then return #g>2 and ug~=dg end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
 end
 
 function s.op2(e,tp,eg,ep,ev,re,r,rp)
@@ -82,12 +82,12 @@ function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	local sg
 	if #ug+#dg>0 and #ug~=#dg then
 		if #dg>#ug and #ug>0 then
-			sg=aux.SelectUnselectGroup(ug,e,tp,1,1,aux.TRUE,1,tp,HINTMSG_DESTROY)
+			sg=aux.SelectUnselectGroup(ug,e,tp,1,1,aux.TRUE,1,tp,HINTMSG_TOGRAVE)
 		end
 		if #ug>#dg and #dg>0 then
-			sg=aux.SelectUnselectGroup(dg,e,tp,1,1,aux.TRUE,1,tp,HINTMSG_DESTROY)
+			sg=aux.SelectUnselectGroup(dg,e,tp,1,1,aux.TRUE,1,tp,HINTMSG_TOGRAVE)
 		end
-		Duel.Destroy(sg,REASON_EFFECT)
+		Duel.SendtoGrave(sg,REASON_EFFECT)
 	end
 end
 

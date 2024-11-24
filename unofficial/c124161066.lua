@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--effect 1
-	local params = {function(c) return c:IsRace(RACE_FIEND) end}
+	local params={function(c) return c:IsRace(RACE_FIEND) end}
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
@@ -45,13 +45,14 @@ function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not (c:IsLocation(LOCATION_GRAVE) and eg:IsContains(c)) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,LOCATION_HAND) 
+	Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,nil,1,0,0)
 end
 
 function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-			local g=Duel.GetFieldGroup(tp,0,LOCATION_SZONE)
+			local g=Duel.GetMatchingGroup(Card.IsSpellTrap,tp,0,LOCATION_ONFIELD,nil,e,tp)
 			if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 				Duel.BreakEffect()
 				local sg=aux.SelectUnselectGroup(g,e,tp,1,1,aux.TRUE,1,tp,HINTMSG_DESTROY)

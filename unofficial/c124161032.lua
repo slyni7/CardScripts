@@ -12,6 +12,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.tg1)
 	e1:SetOperation(s.op1)
 	c:RegisterEffect(e1)
+	--effect 2
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
@@ -42,12 +43,12 @@ function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
-	local sg=Duel.GetFirstTarget()
-	if sg:IsRelateToEffect(e) then
-		Duel.ConfirmCards(tp,sg)
-		local eff=sg:GetActivateEffect()
-		local tg=eff:GetTarget()
-		if sg:IsSetCard(0xf22) and sg:GetOwner()==tp and tg(e,1-tp,eg,ep,ev,re,r,rp,0) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+	local tg=Duel.GetFirstTarget()
+	if tg:IsRelateToEffect(e) then
+		Duel.ConfirmCards(tp,tg)
+		local eff=tg:GetActivateEffect()
+		local ta=eff:GetTarget()
+		if tg:IsSetCard(0xf22) and tg:GetOwner()==tp and ta(e,1-tp,eg,ep,ev,re,r,rp,0) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 			local op=eff:GetOperation()
 			if op then op(e,1-tp,eg,ep,ev,re,r,rp,2) end
 		end
