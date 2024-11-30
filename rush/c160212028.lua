@@ -29,10 +29,15 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	--Effect	
 	local announceFilter={}
 	for _,name in pairs(tc.material) do
-		table.insert(announceFilter,name)
-		table.insert(announceFilter,OPCODE_ISCODE)
+		if #announceFilter==0 then
+			table.insert(announceFilter,name)
+			table.insert(announceFilter,OPCODE_ISCODE)
+		else
+			table.insert(announceFilter,name)
+			table.insert(announceFilter,OPCODE_ISCODE)
+			table.insert(announceFilter,OPCODE_OR)
+		end
 	end
-	table.insert(announceFilter,OPCODE_OR)
 	local code=Duel.AnnounceCard(tp,announceFilter)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
