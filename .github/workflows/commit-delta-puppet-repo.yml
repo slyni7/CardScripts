@@ -5,7 +5,7 @@ on:
       - master
 jobs:
   commit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       REMOTE: ProjectIgnis/DeltaPuppetOfStrings.git
       REPO_NAME: DeltaPuppetOfStrings
