@@ -3693,7 +3693,7 @@ function Card.RegisterEffect(c,e,...)
 				end
 			end
 			local sg=g:Select(1-tp,0,1,nil)
-			if #sg>0 then
+			if sg and #sg>0 then
 				Duel.RaiseSingleEvent(sg:GetFirst(),EVENT_IDOL,e,REASON_EFFECT,tp,tp,0)
 			else
 				local g=Group.CreateGroup()
@@ -3705,7 +3705,7 @@ function Card.RegisterEffect(c,e,...)
 					end
 				end
 				local sg=g:Select(tp,0,1,nil)
-				if #sg>0 then
+				if sg and #sg>0 then
 					Duel.RaiseSingleEvent(sg:GetFirst(),EVENT_IDOL,e,REASON_EFFECT,tp,tp,0)
 				end
 			end
@@ -3744,7 +3744,7 @@ function Duel.RegisterEffect(e,...)
 				end
 			end
 			local sg=g:Select(1-tp,0,1,nil)
-			if #sg>0 then
+			if sg and #sg>0 then
 				Duel.RaiseSingleEvent(sg:GetFirst(),EVENT_IDOL,e,REASON_EFFECT,tp,tp,0)
 			else
 				local g=Group.CreateGroup()
@@ -3756,7 +3756,7 @@ function Duel.RegisterEffect(e,...)
 					end
 				end
 				local sg=g:Select(tp,0,1,nil)
-				if #sg>0 then
+				if sg and #sg>0 then
 					Duel.RaiseSingleEvent(sg:GetFirst(),EVENT_IDOL,e,REASON_EFFECT,tp,tp,0)
 				end
 			end
