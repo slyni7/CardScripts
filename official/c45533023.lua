@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	e2:SetCondition(s.descon)
 	e2:SetTarget(s.destg1)
 	e2:SetOperation(s.desop1)
-	c:RegisterEffect(e2,false,REGISTER_FLAG_DETACH_XMAT)
+	c:RegisterEffect(e2)
 	--destroy
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e3:SetCost(s.descost)
 	e3:SetTarget(s.destg2)
 	e3:SetOperation(s.desop2)
-	c:RegisterEffect(e3)
+	c:RegisterEffect(e3,false,REGISTER_FLAG_DETACH_XMAT)
 end
 function s.dacon(e)
 	return e:GetHandler():GetOverlayCount()>0
