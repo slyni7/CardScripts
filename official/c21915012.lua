@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetLabelObject(e0)
-	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO) end)
+	e1:SetCondition(function(e) return e:GetHandler():IsSynchroSummoned() end)
 	e1:SetOperation(s.lvop)
 	c:RegisterEffect(e1)
 	--Gains ATK equal to its Level x 400
@@ -48,7 +48,7 @@ function s.puretuner(c,sc,tp)
 	return not c:IsHasEffect(EFFECT_NONTUNER) and c:IsType(TYPE_TUNER,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp)
 end
 function s.othertuner(c,sc,tp)
-	return (c:IsHasEffect(EFFECT_NONTUNER) and c:IsType(TYPE_TUNER,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp)) or c:IsHasEffect(30765615)
+	return (c:IsHasEffect(EFFECT_NONTUNER) and c:IsType(TYPE_TUNER,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp)) or c:IsHasEffect(EFFECT_CAN_BE_TUNER)
 end
 function s.valcheck(e,c)
 	local mg=c:GetMaterial()
@@ -98,7 +98,7 @@ function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsSummonType(SUMMON_TYPE_SYNCHRO) and c:IsLocation(LOCATION_GRAVE)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsSynchroSummoned() and c:IsLocation(LOCATION_GRAVE)
 		and r&REASON_SYNCHRO>0
 end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)

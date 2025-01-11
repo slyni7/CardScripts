@@ -1,14 +1,14 @@
 --ゴーティス・フューリー
--- Ghoti Fury
--- Scripted by Hatter
+--Ghoti Fury
+--Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	-- Banish monsters
+	--Banish monsters
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_REMOVE)
@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.rmtg)
 	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
-	-- Increase ATK of Fish monsters
+	--Increase ATK of Fish monsters
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_ATKCHANGE)
@@ -54,7 +54,7 @@ end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetTargetCards(e)
 	if #tg~=2 then return end
-	local reset_count=(Duel.IsTurnPlayer(tp) and Duel.GetCurrentPhase()==PHASE_STANDBY) and 2 or 1
+	local reset_count=(Duel.IsTurnPlayer(tp) and Duel.IsPhase(PHASE_STANDBY)) and 2 or 1
 	local turn_chk=Duel.GetTurnCount()
 	aux.RemoveUntil(tg,nil,REASON_EFFECT,PHASE_STANDBY,id,e,tp,
 		aux.DefaultFieldReturnOp,
@@ -83,12 +83,12 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local atk=ct*100
 	local c=e:GetHandler()
 	for tc in g:Iter() do
-		-- Gain ATK
+		--Gain ATK
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(atk)
-		e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+		e1:SetReset(RESETS_STANDARD_PHASE_END)
 		tc:RegisterEffect(e1)
 	end
 end

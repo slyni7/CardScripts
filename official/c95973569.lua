@@ -66,10 +66,10 @@ function s.valcheck(e,c)
 end
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsSummonType(SUMMON_TYPE_SYNCHRO) and not c:HasFlagEffect(id,e:GetLabel())
+	return c:IsSynchroSummoned() and not c:HasFlagEffect(id,e:GetLabel())
 end
 function s.rmfilter(c)
-	return c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:IsSummonLocation(LOCATION_EXTRA) and c:IsAbleToRemove()
+	return c:IsSpecialSummoned() and c:IsSummonLocation(LOCATION_EXTRA) and c:IsAbleToRemove()
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.rmfilter(chkc) end
@@ -78,7 +78,7 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,s.rmfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 	--Register each time that the effect is used
-	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,0,1)
+	e:GetHandler():RegisterFlagEffect(id,RESETS_STANDARD_PHASE_END,0,1)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

@@ -1,4 +1,4 @@
---JP Name
+--水雷魔神－ゲート・ガーディアン
 --Gate Guardian of Water and Thunder
 --Scripted by The Razgriz
 local s,id=GetID()
@@ -60,13 +60,13 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e1:SetValue(0)
-		e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+		e1:SetReset(RESETS_STANDARD_PHASE_END)
 		tc:RegisterEffect(e1)
 	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousPosition(POS_FACEUP) and c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:IsPreviousLocation(LOCATION_MZONE)
+	return c:IsPreviousPosition(POS_FACEUP) and c:IsSpecialSummoned() and c:IsPreviousLocation(LOCATION_MZONE)
 		and c:IsPreviousControler(tp) and rp==1-tp
 end
 function s.spfilter(c,e,tp)

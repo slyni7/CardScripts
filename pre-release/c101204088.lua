@@ -1,4 +1,4 @@
---
+--狂愛の竜娘アイザ
 --Aiza the Dragoness of Deranged Devotion
 --Scripted by Hatter
 local s,id=GetID()

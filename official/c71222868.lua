@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ) end)
+	e1:SetCondition(function(e) return e:GetHandler():IsXyzSummoned() end)
 	e1:SetTarget(s.destg)
 	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
@@ -78,6 +78,6 @@ function s.copyop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) then
 		local code=tc:GetOriginalCodeRule()
-		c:CopyEffect(code,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,1)
+		c:CopyEffect(code,RESETS_STANDARD_PHASE_END,1)
 	end
 end
