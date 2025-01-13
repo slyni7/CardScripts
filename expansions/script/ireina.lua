@@ -3910,6 +3910,8 @@ function Card.RegisterEffect(c,e,...)
 	end
 end
 
+EFFECT_JANUARY=18454200
+
 Duel.LoadScript("yukitokisaki.lua")
 
 Duel.LoadScript("proc_braveex.lua")
