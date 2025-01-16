@@ -1854,7 +1854,7 @@ function Duel.IsPlayerCanSpecialSummonMonster(...)
 	local p=t[1]
 	local eset={Duel.GetPlayerEffect(p,EFFECT_HATOTAURUS_TOKEN)}
 	local code=t[2]
-	if #eset>0 and Duel.ReadCard(code,CARDDATA_TYPE)&TYPE_TOKEN>0 then
+	if #eset>0 and Duel.GetCardTypeFromCode(code)&TYPE_TOKEN>0 then --Duel.ReadCard(code,CARDDATA_TYPE)&TYPE_TOKEN>0 then
 		t[2]=99970687
 		t[3]=0x0
 		t[4]=0x4011
@@ -1875,7 +1875,7 @@ function Duel.CreateToken(...)
 	local p=t[1]
 	local eset={Duel.GetPlayerEffect(p,EFFECT_HATOTAURUS_TOKEN)}
 	local code=t[2]
-	if #eset>0 and Duel.ReadCard(code,CARDDATA_TYPE)&TYPE_TOKEN>0 then
+	if #eset>0 and Duel.GetCardTypeFromCode(code)&TYPE_TOKEN>0 then --Duel.ReadCard(code,CARDDATA_TYPE)&TYPE_TOKEN>0 then
 		t[2]=99970687
 		local tc=dcretok(table.unpack(t))
 		for _,te in pairs(eset) do
