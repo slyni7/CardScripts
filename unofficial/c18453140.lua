@@ -53,6 +53,11 @@ function cm.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local m=_G["c"..tc:GetCode()]
 	local te=m.todeck_effect
 	local tg=te:GetTarget()
+	if te:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then
+		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	else
+		e:SetProperty(0)
+	end
 	if tg then
 		tg(e,tp,eg,ep,ev,re,r,rp,1)
 	end
