@@ -141,7 +141,7 @@ function c67452357.tar5(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return Duel.IsExistingMatchingCard(c67452357.tfil5,tp,LOCATION_DECK,0,1,nil)
 	end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRVE,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function c67452357.op5(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
