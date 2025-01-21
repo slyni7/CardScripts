@@ -63,7 +63,7 @@ function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 		end
 	else
 		local ct=#Duel.GMGroup(cm.tfil11,tp,"M",0,c)
-		local g=Duel.GMGroup(cm.tfil13,tp,"M","M",nil)
+		local g=Duel.GMGroup(cm.tfil13,tp,"O","O",nil)
 		if ct>0 and #g>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 			local dg=g:Select(tp,1,ct,nil)
