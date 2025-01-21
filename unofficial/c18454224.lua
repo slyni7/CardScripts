@@ -54,6 +54,7 @@ function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local sg=g:SelectSubGroup(tp,s.tfun1,false,2,2)
+	Duel.SetTargetCard(g)
 	Duel.SOI(0,CATEGORY_TOHAND,sg,2,0,0)
 end
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
