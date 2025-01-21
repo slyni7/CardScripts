@@ -38,10 +38,10 @@ function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_REMOVED)
 end
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
-	local ft=Duel.GetLocationCount(tp,"M")
+	local ft=Duel.GetLocCount(tp,"M")
 	if ft>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,s.tfil1,tp,LOCATION_REMOVED,0,ft,ft,nil,e,tp)
+		local g=Duel.SMCard(tp,s.tfil1,tp,"R",0,ft,ft,nil,e,tp)
 		if #g>0 then
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end
