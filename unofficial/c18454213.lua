@@ -152,7 +152,7 @@ function s.cost5(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ghost=Duel.GetPlayerEffect(tp,EFFECT_GHOSTELLAR)
 	local ft=Duel.GetLocCount(tp,"M")
 	if chk==0 then
-		return ghost or (ft>-1 and Duel.CheckReleaseGroupCost(tp,s.cfil5,1,false,nil,nil,ft,tp))
+		return (ghost and ft>0) or (not ghost and ft>-1 and Duel.CheckReleaseGroupCost(tp,s.cfil5,1,false,nil,nil,ft,tp))
 	end
 	if ghost then
 		Duel.Hint(HINT_CARD,0,ghost:GetHandler():GetCode())
