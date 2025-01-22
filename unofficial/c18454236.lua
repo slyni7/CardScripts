@@ -27,6 +27,7 @@ function s.initial_effect(c)
 	local e5=MakeEff(c,"STo")
 	e5:SetCode(id)
 	e5:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e5:SetD(id,4)
 	WriteEff(e5,5,"CTO")
 	c:RegisterEffect(e5)
 end
