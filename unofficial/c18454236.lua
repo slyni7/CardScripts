@@ -124,6 +124,7 @@ function s.tar5(e,tp,eg,ep,ev,re,r,rp,chk)
 	local op=0
 	if sel==2 then
 		Duel.Hint(HINT_OPSELECTED,1-tp,aux.Stringid(id,2))
+		op=3
 		e:SetLabel(3)
 	elseif sel==1 then
 		op=Duel.SelectEffect(tp,{b1,aux.Stringid(id,0)},{b2,aux.Stringid(id,1)})
