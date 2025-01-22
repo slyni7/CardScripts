@@ -46,6 +46,7 @@ function c67452357.initial_effect(c)
 	e5:SetOperation(c67452357.op5)
 	c:RegisterEffect(e5)
 end
+c67452357.listed_names={86445415}
 function c67452357.tfil1(c)
 	return c:IsSetCard(0x51) and c:IsType(TYPE_TRAP)
 end
