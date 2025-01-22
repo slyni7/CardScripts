@@ -24,7 +24,7 @@ function cm.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function cm.nfil1(c)
-	return c:IsFaceup() and c:IsType(TYPE_EQUIP)
+	return (c:IsFaceup() and c:IsType(TYPE_EQUIP)) or c:GetEquipTarget()
 end
 function cm.con1(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IEMCard(cm.nfil1,tp,"S",0,1,nil)
