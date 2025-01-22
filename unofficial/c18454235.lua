@@ -48,7 +48,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_ADJUST)
 	e1:SetReset(RESET_PHASE+phase)
 	e1:SetLabel(zone)
-	e1:SetOperation(s.oop31)
+	e1:SetOperation(s.oop11)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.oop11(e,tp,eg,ep,ev,re,r,rp)
