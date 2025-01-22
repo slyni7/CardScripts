@@ -164,7 +164,7 @@ function s.op5(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetReset(RESET_PHASE+phase)
 		e2:SetLabel(zone)
 		e2:SetOperation(s.oop52)
-		Duel.RegisterEffect(e1,tp)
+		Duel.RegisterEffect(e2,tp)
 	end
 end
 function s.oop52(e,tp,eg,ep,ev,re,r,rp)
