@@ -524,8 +524,8 @@ function s.tfil4(c,e,tp)
 end
 function s.tar4(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local b1=Duel.IEMCard(s.tfil4,tp,"D",0,1,nil,e,tp) and Duel.GetLocCount(tp,"M")>0
-	local b2=not c:IsAttribute(ATTRIBUTE_WATER) or not c:IsRace(RACE_CYBERSE)
+	local b1=Duel.IEMCard(s.tfil4,tp,"D",0,1,nil,e,tp) and Duel.GetLocCount(tp,"M")>0 and Duel.GetFlagEffect(tp,id-10000)==0
+	local b2=not c:IsAttribute(ATTRIBUTE_WATER) or not c:IsRace(RACE_CYBERSE) and Duel.GetFlagEffect(tp,id-20000)==0
 	if chk==0 then
 		if e:GetLabel()~=10000 then
 			return false
@@ -550,10 +550,12 @@ function s.tar4(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	e:SetCategory(0)
 	if op&1~=0 then
+		Duel.RegisterFlagEffect(tp,id-10000,RESET_PHASE+PHASE_END,0,1)
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		Duel.SOI(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,"D")
 	end
 	if op&2~=0 then
+		Duel.RegisterFlagEffect(tp,id-20000,RESET_PHASE+PHASE_END,0,1)
 	end
 end
 function s.op4(e,tp,eg,ep,ev,re,r,rp)

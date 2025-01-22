@@ -106,8 +106,8 @@ function s.tfil5(c)
 end
 function s.tar5(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local b1=Duel.IEMCard(s.tfil5,tp,"D",0,1,nil)
-	local b2=true
+	local b1=Duel.IEMCard(s.tfil5,tp,"D",0,1,nil) and Duel.GetFlagEffect(tp,id-10000)==0
+	local b2=Duel.GetFlagEffect(tp,id-20000)==0
 	if chk==0 then
 		if e:GetLabel()~=10000 then
 			return false
@@ -132,8 +132,10 @@ function s.tar5(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	e:SetCategory(0)
 	if op&1~=0 then
+		Duel.RegisterFlagEffect(tp,id-10000,RESET_PHASE+PHASE_END,0,1)
 	end
 	if op&2~=0 then
+		Duel.RegisterFlagEffect(tp,id-20000,RESET_PHASE+PHASE_END,0,1)
 		Duel.Hint(HINT_SELECTMSG,tp,0)
 		local zone=Duel.SelectFieldZone(tp,1,LSTN("O"),LSTN("O"),0xe000e000)
 		Duel.Hint(HINT_ZONE,1-tp,((zone&0xffff)<<16)|(zone>>16))
