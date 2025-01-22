@@ -519,6 +519,9 @@ function s.cost4(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(10000)
 	return true
 end
+function s.tfil4(c,e,tp)
+	return c:IsSetCard("ÀºÇÏ¸°") and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function s.tar4(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local b1=Duel.IEMCard(s.tfil4,tp,"D",0,1,nil,e,tp) and Duel.GetLocCount(tp,"M")>0
