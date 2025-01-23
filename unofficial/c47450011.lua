@@ -6,7 +6,7 @@ function cm.initial_effect(c)
 	
 	--module summon
 	c:EnableReviveLimit()
-	aux.AddModuleProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_MODULE),nil,2,10,nil)
+	aux.AddModuleProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_MODULE),nil,1,10,nil)
 
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
