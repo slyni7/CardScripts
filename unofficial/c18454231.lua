@@ -21,8 +21,10 @@ function s.initial_effect(c)
 	local e4=MakeEff(c,"FC")
 	e4:SetCode(EVENT_ADJUST)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	WriteEff(e4,4,"O")
+	WriteEff(e4,4,"NO")
 	Duel.RegisterEffect(e4,0)
+	local e6=e4:Clone()
+	Duel.RegisterEffect(e6,1)
 	local e5=MakeEff(c,"STo")
 	e5:SetCode(id)
 	e5:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
@@ -524,6 +526,9 @@ function s.op3(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.op4(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsControler(tp) then
+		return
+	end
 	if c:GetFlagEffect(id-10000)==0 then
 		e:SetLabelObject({c:GetAttribute(),c:GetRace()})
 		c:RegisterFlagEffect(id-10000,RESET_EVENT+RESETS_STANDARD,0,0)
