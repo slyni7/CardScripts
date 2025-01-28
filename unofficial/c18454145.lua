@@ -84,7 +84,7 @@ function s.oop21(e,tp,eg,ep,ev,re,r,rp)
 		Duel.DiscardDeck(tp,2,REASON_EFFECT)
 	elseif op==2 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-		local tc=Duel.SMCard(tp,s.tfil22,tp,"D",0,1,1,nil):GetFirst()
+		local tc=Duel.SMCard(tp,s.onfil21,tp,"D",0,1,1,nil):GetFirst()
 		if tc then
 			Duel.SSet(tp,tc)
 			local fid=c:GetFieldID()
