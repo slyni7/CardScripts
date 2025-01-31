@@ -117,13 +117,13 @@ end
 function Xyz.SubFilterChk(c,f,xyz,tp)
 	return (not f or f(c,xyz,SUMMON_TYPE_XYZ|MATERIAL_XYZ,tp))
 end
-function Xyz.CheckValidMultiXyzMaterial(c,xyz)
+function Xyz.CheckValidMultiXyzMaterial(c,xyz,matg)
 	if not c:IsHasEffect(511001225) then return false end
 	local eff={c:GetCardEffect(511001225)}
 	for i=1,#eff do
 		local te=eff[i]
 		local tgf=te:GetOperation()
-		if not tgf or tgf(te,xyz) then return true end
+		if not tgf or tgf(te,xyz,matg) then return true end
 	end
 	return false
 end
@@ -485,7 +485,7 @@ function Xyz.Target(f,lv,minc,maxc,mustbemat,exchk)
 								elseif sc:IsHasEffect(511001225) then
 									matg:AddCard(sc)
 									ct=ct+1
-									if not Xyz.CheckValidMultiXyzMaterial(sc,c) or (min>=ct and minc>=matct+1) then
+									if not Xyz.CheckValidMultiXyzMaterial(sc,c,matg) or (min>=ct and minc>=matct+1) then
 										matct=matct+1
 									else
 										local multi={}
@@ -605,7 +605,7 @@ function Xyz.Target(f,lv,minc,maxc,mustbemat,exchk)
 									matg:AddCard(sc)
 								end
 								ct=ct+1
-								if Xyz.CheckValidMultiXyzMaterial(sc,c) and ct<minc then
+								if Xyz.CheckValidMultiXyzMaterial(sc,c,matg) and ct<minc then
 									local multi={}
 									if mg:IsExists(Xyz.RecursionChk2,1,sg,mg,c,tp,minc,maxc,sg,matg,ct,mustbemat,exchk,f,mustg,lv) then
 										table.insert(multi,1)
