@@ -195,7 +195,7 @@ function Xyz.RecursionChk1(c,mg,xyz,tp,min,max,minc,maxc,sg,matg,ct,matct,mustbe
 			for _,v in ipairs(retchknum) do
 				if v==val then redun=true break end
 			end 
-			if not redun and val>0 and (not tgf or tgf(te,xyz)) then
+			if not redun and val>0 and (not tgf or tgf(te,xyz,matg)) then
 				if xct>=min and xmatct+val>=minc and xct<=max and xmatct+val<=maxc then
 					local ok=true
 					if matg:IsExists(Card.IsHasEffect,1,nil,91110378) then
@@ -301,7 +301,7 @@ function Xyz.RecursionChk2(c,mg,xyz,tp,minc,maxc,sg,matg,ct,mustbemat,exchk,f,mu
 			for _,v in ipairs(retchknum) do
 				if v==val then redun=true break end
 			end
-			if val>0 and (not tgf or tgf(te,xyz)) and not redun then
+			if val>0 and (not tgf or tgf(te,xyz,matg)) and not redun then
 				if xct+val>=minc and xct+val<=maxc then
 					local ok=true
 					if matg:IsExists(Card.IsHasEffect,1,nil,91110378) then
@@ -497,7 +497,7 @@ function Xyz.Target(f,lv,minc,maxc,mustbemat,exchk)
 											local te=eff[i]
 											local tgf=te:GetOperation()
 											local val=te:GetValue()
-											if val>0 and (not tgf or tgf(te,c)) then
+											if val>0 and (not tgf or tgf(te,c,matg)) then
 												if (min>=ct and minc>=matct+1+val) 
 													or mg:IsExists(Xyz.RecursionChk1,1,sg,mg,c,tp,min,max,minc,maxc,sg,matg,ct,matct+1+val,mustbemat,exchk,f,mustg,lv) then
 													table.insert(multi,1+val)
@@ -615,7 +615,7 @@ function Xyz.Target(f,lv,minc,maxc,mustbemat,exchk)
 										local te=eff[i]
 										local tgf=te:GetOperation()
 										local val=te:GetValue()
-										if val>0 and (not tgf or tgf(te,c)) then
+										if val>0 and (not tgf or tgf(te,c,matg)) then
 											if minc<=ct+val and ct+val<=maxc
 												or mg:IsExists(Xyz.RecursionChk2,1,sg,mg,c,tp,minc,maxc,sg,matg,ct+val,mustbemat,exchk,f,mustg,lv) then
 												table.insert(multi,1+val)
