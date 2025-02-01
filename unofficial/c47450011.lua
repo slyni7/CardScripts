@@ -98,14 +98,14 @@ function cm.eqlimit(e,c)
   return e:GetOwner()==c
 end
 
-function cm.tgfilter(c,e)
+function cm.tgfilter(c)
 	local atk=e:GetHandler():GetAttack()
 	return c:IsType(TYPE_MONSTER) and c:IsAttackBelow(atk)
 end
 
 function cm.eqtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(cm.tgfilter,tp,0,LOCATION_MZONE,1,nil,e) end
+		and Duel.IsExistingMatchingCard(cm.tgfilter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_MZONE)
 end
 
@@ -115,7 +115,7 @@ function cm.eqop2(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 
-	local g=Duel.SelectMatchingCard(tp,cm.tgfilter,tp,0,LOCATION_MZONE,1,1,nil,e)
+	local g=Duel.SelectMatchingCard(tp,cm.tgfilter,tp,0,LOCATION_MZONE,1,1,nil)
 	local tc=g:GetFirst()
 
 	if not Duel.Equip(tp,tc,c) then return end
