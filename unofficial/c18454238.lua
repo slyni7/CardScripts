@@ -61,6 +61,7 @@ function s.tar3(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,0)
 	local zone=Duel.SelectFieldZone(tp,1,LSTN("O"),LSTN("O"),0xe000e000)
+	Duel.Hint(HINT_ZONE,tp,zone)
 	Duel.Hint(HINT_ZONE,1-tp,((zone&0xffff)<<16)|(zone>>16))
 	e:SetLabel(zone)
 	Duel.RaiseEvent(Group.FromCards(c),18454238,e,REASON_COST,tp,tp,1)
