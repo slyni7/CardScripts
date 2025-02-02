@@ -1,65 +1,52 @@
---[Insomnia]
-local m=99970490
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ Insomnia ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--명계반전
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMING_END_PHASE)
+	YuL.Activate(c)
+	
+	local e1=MakeEff(c,"Qo","S")
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCountLimit(1,m+EFFECT_COUNT_CODE_OATH)
-	e1:SetTarget(cm.sptg)
-	e1:SetOperation(cm.spop)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCL(1,id)
+	WriteEff(e1,1,"TO")
 	c:RegisterEffect(e1)
+
+	local e2=MakeEff(c,"F","S")
+	e2:SetCode(EFFECT_CANNOT_REMOVE)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetTargetRange(0,1)
+	e2:SetTarget(s.rmlimit)
+	c:RegisterEffect(e2)
 	
 end
 
---명계반전
-function cm.filter(c,e,tp,id)
-	return c:IsSetCard(0xe0a) and c:GetTurnID()==id and not c:IsReason(REASON_RETURN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
+function s.tar1fil(c,e,tp)
+	return c:IsSetCard(0xe0a) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cm.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cm.filter(chkc,e,tp,Duel.GetTurnCount()) end
+function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.tar1fil(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(cm.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp,Duel.GetTurnCount()) end
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if Duel.IsPlayerAffectedByEffect(tp,59822133) then ft=1 end
+		and Duel.IsExistingTarget(s.tar1fil,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,cm.filter,tp,LOCATION_GRAVE,0,1,ft,nil,e,tp,Duel.GetTurnCount())
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
+	local g=Duel.SelectTarget(tp,s.tar1fil,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,tp,0)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,g,1,tp,0)
 end
-function cm.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft<=0 then return end
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
-	local tc=sg:GetFirst()
-	if sg:GetCount()>1 and Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
-	if sg:GetCount()>ft then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		tc=sg:Select(tp,ft,ft,nil)
+function s.op1(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_CHANGE_RACE)
+		e1:SetValue(RACE_ZOMBIE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e1)
+		aux.DelayedOperation(tc,PHASE_END,id,e,tp,function(dg) Duel.Destroy(dg,REASON_EFFECT) end,nil,0,1,aux.Stringid(id,1))
 	end
-	while tc do
-		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_DEFENSE) then
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_SET_BASE_ATTACK)
-			e1:SetValue(1500)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-			tc:RegisterEffect(e1)
-			local e2=e1:Clone()
-			e2:SetCode(EFFECT_SET_BASE_DEFENSE)
-			tc:RegisterEffect(e2)
-			local e3=e1:Clone()
-			e3:SetCode(EFFECT_CHANGE_RACE)
-			e3:SetValue(RACE_ZOMBIE)
-			tc:RegisterEffect(e3)
-		end
-		tc=sg:GetNext()
-	end
-	Duel.SpecialSummonComplete()
+end
+
+function s.rmlimit(e,c,p)
+	return c:IsLocation(LOCATION_GRAVE) and c:IsSetCard(0xe0a) and c:IsMonster()
 end

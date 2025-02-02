@@ -1,100 +1,98 @@
---[Insomnia]
-local m=99970489
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ Insomnia ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--공격 무효
+    -- Activate from hand
+    local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+    e0:SetCondition(s.handcon)
+    c:RegisterEffect(e0)
+	
 	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMING_ATTACK)
-	WriteEff(e1,1,"NCO")
+	e1:SetTarget(s.destg)
+	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
 	
-	--공수 증가
-	local e2=MakeEff(c,"Qo","G")
-	e2:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetHintTiming(TIMING_DAMAGE_STEP)
-	e2:SetCost(aux.bfgcost)
-	WriteEff(e2,2,"NTO")
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetHintTiming(TIMING_END_PHASE)
+	e2:SetCountLimit(1,id)
+	e2:SetCost(s.setcost)
+	e2:SetTarget(s.settg)
+	e2:SetOperation(s.setop)
 	c:RegisterEffect(e2)
 	
 end
 
---공격 무효
-function cm.cfilter(c)
-	return c:IsSetCard(0xe0a) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToGraveAsCost()
+function s.filter(c)
+	return c:IsRace(RACE_ZOMBIE) and c:IsSetCard(0xe0a) and c:IsFaceup()
 end
-function cm.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cm.cfilter,tp,LOCATION_DECK,0,1,nil,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local tc=Duel.SelectMatchingCard(tp,cm.cfilter,tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
-	Duel.SendtoGrave(tc,REASON_COST)
-	e:SetLabel(tc:GetAttack())
-end
-function cm.con1(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp and (Duel.IsAbleToEnterBP() or (Duel.GetCurrentPhase()>=PHASE_BATTLE_START and Duel.GetCurrentPhase()<=PHASE_BATTLE))
-end
-function cm.op1(e,tp,eg,ep,ev,re,r,rp)
-	local atk=e:GetLabel()
-	local ac=Duel.GetAttacker()
-	if ac and ac:IsAttackBelow(atk) then
-		Duel.NegateAttack()
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-		e1:SetReset(RESET_PHASE+PHASE_END)
-		e1:SetCountLimit(1)
-		e1:SetLabel(atk)
-		e1:SetCondition(cm.discon)
-		e1:SetOperation(cm.disop)
-		Duel.RegisterEffect(e1,tp)
-	else
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-		e1:SetReset(RESET_PHASE+PHASE_END)
-		e1:SetCountLimit(2)
-		e1:SetLabel(atk)
-		e1:SetCondition(cm.discon)
-		e1:SetOperation(cm.disop)
-		Duel.RegisterEffect(e1,tp)
-	end
-end
-function cm.discon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:GetFirst():IsAttackBelow(e:GetLabel())
-end
-function cm.disop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,m)
-	Duel.NegateAttack()
+function s.handcon(e)
+    return Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 
---공수 증가
-function cm.con2(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
+function s.desfilter(c,e,tp)
+	return c:IsCanBeEffectTarget(e) and (c:IsControler(1-tp) or (c:IsMonster() and c:IsFaceup() and c:IsSetCard(0xe0a)))
 end
-function cm.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0xe0a)
+function s.rescon(sg,e,tp,mg)
+	return sg:FilterCount(Card.IsControler,nil,tp)==1
 end
-function cm.tar2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cm.filter,tp,LOCATION_MZONE,0,1,nil) end
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return false end
+	local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,e,tp)
+	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,3,3,s.rescon,0) end
+	local tg=aux.SelectUnselectGroup(g,e,tp,3,3,s.rescon,1,tp,HINTMSG_DESTROY)
+	Duel.SetTargetCard(tg)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tg,#tg,tp,0)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,1500)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,1500)
 end
-function cm.op2(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(cm.filter,tp,LOCATION_MZONE,0,nil)
-	local tc=g:GetFirst()
-	while tc do
-		local e1=Effect.CreateEffect(e:GetHandler())
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	local tg=Duel.GetTargetCards(e)
+	if #tg>0 then
+		if Duel.Destroy(tg,REASON_EFFECT)>0 then
+			local og=Duel.GetOperatedGroup():Filter(Card.IsPreviousRaceOnField,nil,RACE_ZOMBIE)
+			if #og>0 then
+				Duel.Damage(1-tp,1500,REASON_EFFECT)
+				Duel.Recover(tp,1500,REASON_EFFECT)
+			end
+		end
+	end
+end
+
+function s.cfilter(c)
+	return c:IsSetCard(0xe0a) and c:IsMonster() and c:IsAbleToRemoveAsCost()
+end
+function s.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
+end
+function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsSSetable() end
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,0,0)
+end
+function s.setop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and c:IsSSetable() and Duel.SSet(tp,c)>0 then
+		--Banish it if it leaves the field
+		local e1=Effect.CreateEffect(c)
+		e1:SetDescription(3300)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(500)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e1)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_UPDATE_DEFENSE)
-		tc:RegisterEffect(e2)
-		tc=g:GetNext()
+		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+		e1:SetReset(RESET_EVENT|RESETS_REDIRECT)
+		e1:SetValue(LOCATION_REMOVED)
+		c:RegisterEffect(e1)
 	end
 end
