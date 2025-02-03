@@ -1,6 +1,8 @@
-spinel=spinel or {}
+spinel={}
+Spinel=spinel
 
---스펠 스피드 조정
+--■■■■■■■■■■■■■■■■■■■■■■■■
+--■스펠 스피드 조정
 
 GlobalSpellSpeed=false
 GlobalSpellSpeedTable={}
@@ -71,8 +73,196 @@ function RegisterSpellSpeedCheck()
 	Duel.RegisterEffect(e1,0)
 end
 
---소멸
+--■■■■■■■■■■■■■■■■■■■■■■■■
+--■■ 이하 효과 엎는거 / 난 이런걸 짠 기억이 없는데 ㅋㅋ
+local cregeff = {}
 
+--트라미드 마스터
+cregeff[32912040] = {
+	[0] = function(e,c)
+		local cost=e:GetCost()
+		e:SetCountLimit(999)
+		e:SetCost(function(e,tp,eg,ep,ev,re,r,rp,chk)
+			local c=e:GetHandler()
+			if chk==0 then return c:GetFlagEffect(32912040+1)<1 end
+			c:RegisterFlagEffect(32912040+1,RESET_PHASE+PHASE_END+RESET_EVENT+RESETS_STANDARD,0,1)
+			return cost(e,tp,eg,ep,ev,re,r,rp,chk)
+		end)
+		e:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			return not Duel.IsPlayerAffectedByEffect(tp,99000347)
+		end)
+		local e1=e:Clone()
+		e1:SetType(EFFECT_TYPE_QUICK_O)
+		e1:SetCode(EVENT_FREE_CHAIN)
+		e1:SetHintTiming(0,TIMING_END_PHASE)
+		e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			return Duel.IsPlayerAffectedByEffect(tp,99000347)
+		end)
+		return {e,e1}
+	end,
+	[1] = function(e,c)
+		e:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			return Duel.IsPlayerAffectedByEffect(tp,99000347) or Duel.GetTurnPlayer()~=tp
+		end)
+	end}
+--트라미드 헌터
+cregeff[95923441] = {
+	[1] = function(e,c)
+		e:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			return Duel.IsPlayerAffectedByEffect(tp,99000347) or Duel.GetTurnPlayer()~=tp
+		end)
+	end}
+--트라미드 댄서
+cregeff[69529337] = {
+	[0] = function(e,c)
+		e:SetCountLimit(999)
+		e:SetCost(function(e,tp,eg,ep,ev,re,r,rp,chk)
+			local c=e:GetHandler()
+			if chk==0 then return c:GetFlagEffect(69529337+1)<1 end
+			c:RegisterFlagEffect(69529337+1,RESET_PHASE+PHASE_END+RESET_EVENT+RESETS_STANDARD,0,1)
+		end)
+		e:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			return not Duel.IsPlayerAffectedByEffect(tp,99000347)
+		end)
+		local e1=e:Clone()
+		e1:SetType(EFFECT_TYPE_QUICK_O)
+		e1:SetCode(EVENT_FREE_CHAIN)
+		e1:SetHintTiming(0,TIMING_END_PHASE)
+		e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			return Duel.IsPlayerAffectedByEffect(tp,99000347)
+		end)
+		return {e,e1}
+	end,
+	[1] = function(e,c)
+		e:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			return Duel.IsPlayerAffectedByEffect(tp,99000347) or Duel.GetTurnPlayer()~=tp
+		end)
+	end}
+--각성의 빛
+function spinel.lightfilter(c,tp)
+	return c:IsFaceup()
+		and (c:IsAttribute(ATTRIBUTE_EARTH)
+			or (Duel.GetFlagEffect(tp,99000192)~=0 and c:IsSetCard(0xc21))
+			or (Duel.GetFlagEffect(tp,99000364)~=0 and c:IsCode(99000355)))
+end
+cregeff[98374133] = {
+	[0] = function(e,c)
+		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+			if chkc then return chkc:IsLocation(LOCATION_MZONE) and spinel.lightfilter(chkc) end
+			if chk==0 then return Duel.IsExistingTarget(spinel.lightfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp) end
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+			Duel.SelectTarget(tp,spinel.lightfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp)
+			Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
+		end)
+	end,
+	[1] = function(e,c)
+		e:SetValue(function(e,c)
+			return spinel.lightfilter(c,e:GetHandlerPlayer())
+		end)
+	end}
+--개별 카드 효과 다 엎고 나서 이중for문
+for code,t in ipairs(cregeff) do
+	for ct,f in ipairs(t) do
+		RegEff.scref(code,ct,f)
+	end
+end
+
+--■■■■■■■■■■■■■■■■■■■■■■■■
+--■■	안쓰는데 혹시나 싶어서
+
+--■EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP
+spinel.delay=0x14000
+
+--■엑시즈 소재 제거 (ct=제거할 수)
+function spinel.rmovcost(ct)
+	return function(e,tp,eg,ep,ev,re,r,rp,chk)
+		if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,ct,REASON_COST) end
+		e:GetHandler():RemoveOverlayCard(tp,ct,ct,REASON_COST)
+	end
+end
+
+--■자기자신 코스트
+function spinel.relcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsReleasable() end
+	Duel.Release(e:GetHandler(),REASON_COST)
+end
+function spinel.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
+end
+function spinel.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToDeckOrExtraAsCost() end
+	Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_COST)
+end
+function spinel.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
+end
+function spinel.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToHandAsCost() end
+	Duel.SendtoHand(e:GetHandler(),nil,REASON_COST)
+end
+function spinel.discost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsDiscardable() end
+	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
+end
+
+--■드로우 (pl=플레이어[자신 0, 상대 1], ct=수)
+function spinel.drawtg(pl,ct)
+	return function(e,tp,eg,ep,ev,re,r,rp,chk)
+		if chk==0 then return Duel.IsPlayerCanDraw(math.abs(pl-tp),ct) end
+		Duel.SetTargetPlayer(math.abs(pl-tp))
+		Duel.SetTargetParam(ct)
+		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,math.abs(pl-tp),ct)
+	end
+end
+function spinel.drawop(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Draw(p,d,REASON_EFFECT)
+end
+
+--■엑시즈 소재수 체크
+function spinel.xmcon(ct,excon)
+	return function(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetOverlayCount()>=ct and (not excon or excon(e,tp,eg,ep,ev,re,r,rp))
+	end
+end
+
+--■스트링 출력
+function spinel.desccost(costf)
+	return function(e,tp,eg,ep,ev,re,r,rp,chk)
+		if chk==0 then return (not costf or costf(e,tp,eg,ep,ev,re,r,rp,0)) end
+		Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+		if costf then costf(e,tp,eg,ep,ev,re,r,rp,1) end		
+	end
+end
+
+--■소환타입 체크
+function spinel.stypecon(t,con)
+	return function(e,tp,eg,ep,ev,re,r,rp)
+		return bit.band(e:GetHandler():GetSummonType(),t)==t and (not con or con(e,tp,eg,ep,ev,re,r,rp))
+	end
+end
+
+--■■■■■■■■■■■■■■■■■■■■■■■■
+--■■	주석 라인 / 옛날 init 백업
+UnlimitChain={}
+
+local dschlim=Duel.SetChainLimit
+function Duel.SetChainLimit(f)
+	dschlim(function(e,ep,tp)
+		for _,te in pairs(UnlimitChain) do
+			if e==te then
+				return true
+			end
+		end
+		return f(e,ep,tp)
+	end)
+end
+
+--[[
+
+--■소멸
 function Duel.Delete(e,sg)	
 	local over=Group.CreateGroup()
 	if aux.GetValueType(sg)=="Group" then
@@ -126,7 +316,7 @@ function Duel.Delete(e,sg)
 	end
 end
 
---트라미드 아누비스
+--■트라미드 아누비스
 
 local cregeff=Card.RegisterEffect
 function Card.RegisterEffect(c,e,forced,...)
@@ -195,7 +385,7 @@ function Card.RegisterEffect(c,e,forced,...)
 	end
 end
 
---아스텔라 각성의 빛
+--■아스텔라 각성의 빛
 
 local cregeff=Card.RegisterEffect
 function Card.RegisterEffect(c,e,forced,...)
@@ -223,7 +413,7 @@ function spinel.lightfilter(c,tp)
 end
 
 
---제로니어 슈퍼특소
+--■제로니어 슈퍼특소
 
 --if not ZeronierTable then ZeronierTable={} end
 
@@ -260,7 +450,7 @@ function Duel.RegisterEffect(e,tp,forced,...)
 				--for i,eff in ipairs(ZeronierTable) do
 				--	if eff==se then return false end
 				--end
-			return Duel.GetFlagEffect(sump,c:GetOriginalCode()+99000351)==0
+			return Duel.GetFlagEffect(tp,c:GetOriginalCode()+99000351)==0
 			end)
 		else
 			e:SetTarget(function(e,c,sump,sumtype,sumpos,targetp,se)
@@ -268,14 +458,14 @@ function Duel.RegisterEffect(e,tp,forced,...)
 				--	if eff==re or not target(e,c,sump,sumtype,sumpos,targetp,se) then return false end
 				--end
 			return target(e,c,sump,sumtype,sumpos,targetp,se)
-				and Duel.GetFlagEffect(sump,c:GetOriginalCode()+99000351)==0
+				and Duel.GetFlagEffect(tp,c:GetOriginalCode()+99000351)==0
 			end)
 		end
 	end
 	dregeff(e,tp,forced,...)
 end
 
---스피넬 슈퍼발동
+--■스피넬 슈퍼발동
 
 if not SpinelTable then SpinelTable={} end
 
@@ -357,92 +547,6 @@ function Duel.RegisterEffect(e,tp,forced,...)
 	dregeff(e,tp,forced,...)
 end
 
-UnlimitChain={}
 
-local dschlim=Duel.SetChainLimit
-function Duel.SetChainLimit(f)
-	dschlim(function(e,ep,tp)
-		for _,te in pairs(UnlimitChain) do
-			if e==te then
-				return true
-			end
-		end
-		return f(e,ep,tp)
-	end)
-end
-
---이하 안쓰는거
-
---EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP
-spinel.delay=0x14000
-
---엑시즈 소재 제거 (ct=제거할 수)
-function spinel.rmovcost(ct)
-	return function(e,tp,eg,ep,ev,re,r,rp,chk)
-		if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,ct,REASON_COST) end
-		e:GetHandler():RemoveOverlayCard(tp,ct,ct,REASON_COST)
-	end
-end
-
---자기자신 코스트
-function spinel.relcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleasable() end
-	Duel.Release(e:GetHandler(),REASON_COST)
-end
-function spinel.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
-	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-end
-function spinel.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToDeckOrExtraAsCost() end
-	Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_COST)
-end
-function spinel.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
-	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
-end
-function spinel.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToHandAsCost() end
-	Duel.SendtoHand(e:GetHandler(),nil,REASON_COST)
-end
-function spinel.discost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsDiscardable() end
-	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
-end
-
---드로우 (pl=플레이어[자신 0, 상대 1], ct=수)
-function spinel.drawtg(pl,ct)
-	return function(e,tp,eg,ep,ev,re,r,rp,chk)
-		if chk==0 then return Duel.IsPlayerCanDraw(math.abs(pl-tp),ct) end
-		Duel.SetTargetPlayer(math.abs(pl-tp))
-		Duel.SetTargetParam(ct)
-		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,math.abs(pl-tp),ct)
-	end
-end
-function spinel.drawop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Draw(p,d,REASON_EFFECT)
-end
-
---엑시즈 소재수 체크
-function spinel.xmcon(ct,excon)
-	return function(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetOverlayCount()>=ct and (not excon or excon(e,tp,eg,ep,ev,re,r,rp))
-	end
-end
-
---스트링 출력
-function spinel.desccost(costf)
-	return function(e,tp,eg,ep,ev,re,r,rp,chk)
-		if chk==0 then return (not costf or costf(e,tp,eg,ep,ev,re,r,rp,0)) end
-		Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-		if costf then costf(e,tp,eg,ep,ev,re,r,rp,1) end		
-	end
-end
-
---소환타입 체크
-function spinel.stypecon(t,con)
-	return function(e,tp,eg,ep,ev,re,r,rp)
-		return bit.band(e:GetHandler():GetSummonType(),t)==t and (not con or con(e,tp,eg,ep,ev,re,r,rp))
-	end
-end
+--]]
+--■■■■■■■■■■■■■■■■■■■■■■■■

@@ -1,50 +1,46 @@
 --네트워크 익스플로러
-local m=99000235
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	--link summon
-	aux.AddLinkProcedure(c,nil,2,99,cm.lcheck)
+	Link.AddProcedure(c,nil,2,3,s.lcheck)
 	c:EnableReviveLimit()
-	--summon
+	--그 몬스터를 1번 더 컨트롤러의 필드에 일반 소환한다.
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(m,0))
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SUMMON)
-	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_NO_TURN_RESET)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCondition(cm.thcon)
-	e1:SetTarget(cm.thtg)
-	e1:SetOperation(cm.thop)
+	e1:SetCondition(function(e) return e:GetHandler():IsLinked() end)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--search
+	--그 몬스터와 같은 종족의 몬스터 1장을 덱에서 패에 넣는다.
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(m,1))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,m)
-	e2:SetTarget(cm.thtg2)
-	e2:SetOperation(cm.thop2)
+	e2:SetCountLimit(1,id)
+	e2:SetTarget(s.thtg)
+	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
-function cm.lcheck(g,lc)
-	return g:IsExists(Card.IsLinkRace,1,nil,RACE_CYBERSE)
+function s.lcheck(g,lc,sumtype,tp)
+	return g:IsExists(Card.IsRace,1,nil,RACE_CYBERSE,lc,sumtype,tp)
 end
-function cm.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLinkState()
-end
-function cm.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
 	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_SUMMON,g,1,0,0)
-	e:GetHandler():RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(99111753,1))
+	e:GetHandler():RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,2))
 end
-function cm.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.RaiseEvent(tc,EVENT_SUMMON_SUCCESS,e,REASON_EFFECT,tp,tc:GetControler(),ev)
@@ -52,29 +48,27 @@ function cm.thop(e,tp,eg,ep,ev,re,r,rp)
 		tc:SetStatus(STATUS_SUMMON_TURN,true)
 	end
 end
-function cm.tgfilter(c,tp,lg)
-	return c:IsFaceup() and lg:IsContains(c) and Duel.IsExistingMatchingCard(cm.thfilter,tp,LOCATION_DECK,0,1,nil,c)
+function s.cfilter(c,e,tp)
+	return e:GetHandler():GetLinkedGroup():IsContains(c) and c:IsFaceup()
+		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,c:GetRace())
 end
-function cm.thfilter(c,tc)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and c:IsRace(tc:GetRace())
+function s.thfilter(c,rc)
+	return c:IsRace(rc) and c:IsAbleToHand()
 end
-function cm.thtg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local c=e:GetHandler()
-	local lg=c:GetLinkedGroup()
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and cm.tgfilter(chkc,tp,lg) end
-	if chk==0 then return Duel.IsExistingTarget(cm.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp,lg) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,cm.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp,lg)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.cfilter(chkc,e,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function cm.thop2(e,tp,eg,ep,ev,re,r,rp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local g=Duel.SelectMatchingCard(tp,cm.thfilter,tp,LOCATION_DECK,0,1,1,nil,tc)
-		if g:GetCount()>0 then
-			Duel.SendtoHand(g,tp,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,g)
-		end
+	if not tc:IsRelateToEffect(e) or tc:IsFacedown() then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,tc:GetRace())
+	if #g>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
 end
