@@ -30,11 +30,12 @@ function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local lo=e:GetLabelObject()
 	if chk==0 then
-		lo:SetLabel(10000)
+		e:SetLabel(10000)
+		lo:SetLabel(0)
 		return true
 	end
 	if lo:GetLabel()~=0 then
-		lo:SetLabel(10000)
+		lo:SetLabel(0)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local g=Duel.SMCard(tp,s.cfil1,tp,"HO",0,1,1,c,e,tp)
 		local tc=g:GetFirst()
@@ -111,7 +112,7 @@ function s.oop12(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.val2(e,c)
-	e:SetLabel(1)
+	e:SetLabel(10001)
 end
 function s.con2(e)
 	local c=e:GetHandler()
