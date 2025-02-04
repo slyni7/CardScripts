@@ -52,12 +52,14 @@ end
 function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	Debug.RainbowFishPause()
 	for tc in aux.Next(g) do
 		local token=Duel.CreateToken(tp,CARD_RAINBOW_FISH)
-		Duel.DisableShuffleCheck()
-		Duel.SendtoDeck(token,nil,1,REASON_RULE)
+		--Duel.DisableShuffleCheck()
+		--Duel.SendtoDeck(token,nil,1,REASON_RULE)
 		Duel.Overlay(tc,token)
 	end
+	Debug.RainbowFishPeplay()
 end
 
 --서치 / 샐비지

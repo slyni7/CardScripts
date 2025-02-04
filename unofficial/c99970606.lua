@@ -55,9 +55,11 @@ function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 		local token=Duel.CreateToken(tp,CARD_RAINBOW_FISH)
 		g:AddCard(token)
 	end
-	Duel.DisableShuffleCheck()
-	Duel.SendtoDeck(g,nil,1,REASON_RULE)
+	Debug.RainbowFishPause()
+	--Duel.DisableShuffleCheck()
+	--Duel.SendtoDeck(g,nil,1,REASON_RULE)
 	Duel.Overlay(c,g)
+	Debug.RainbowFishPeplay()
 end
 
 --무효화
