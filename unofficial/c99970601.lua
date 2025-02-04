@@ -48,7 +48,7 @@ function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 	--Duel.DisableShuffleCheck()
 	--Duel.SendtoDeck(g,nil,1,REASON_RULE)
 	Duel.Overlay(c,g)
-	Debug.RainbowFishPeplay()
+	Debug.RainbowFishReplay()
 end
 
 --덤핑

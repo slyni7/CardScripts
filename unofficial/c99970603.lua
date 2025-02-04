@@ -59,7 +59,7 @@ function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 		--Duel.SendtoDeck(token,nil,1,REASON_RULE)
 		Duel.Overlay(tc,token)
 	end
-	Debug.RainbowFishPeplay()
+	Debug.RainbowFishReplay()
 end
 
 --서치 / 샐비지
