@@ -58,12 +58,8 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetOperation(s.op1op)
 	e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 	c:RegisterEffect(e1,true)
-	
-	local cc=Duel.GetCurrentChain()
-	local ct=Duel.SpecialSummonComplete()
-	Debug.Message(ct)
-	Debug.Message(cc)
-	if ct==1 and cc>1 then
+
+	if Duel.SpecialSummonComplete()==1 and cc>1 then
 		local cp=Duel.GetChainInfo(cc-1,CHAININFO_TRIGGERING_PLAYER)
 		if cp~=tp then
 			Duel.NegateActivation(cc-1)
