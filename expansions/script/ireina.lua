@@ -3910,6 +3910,10 @@ function Card.RegisterEffect(c,e,...)
 	end
 end
 
+
+
+
+
 EFFECT_JANUARY=18454200
 EFFECT_GHOSTELLAR=18454213
 
