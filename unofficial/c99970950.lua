@@ -59,6 +59,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 	c:RegisterEffect(e1,true)
 
+	local cc=Duel.CurrentChain()
 	if Duel.SpecialSummonComplete()==1 and cc>1 then
 		local cp=Duel.GetChainInfo(cc-1,CHAININFO_TRIGGERING_PLAYER)
 		if cp~=tp then
