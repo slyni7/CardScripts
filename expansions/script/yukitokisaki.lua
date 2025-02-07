@@ -32,7 +32,7 @@ end
 local dspsumcpl=Duel.SpecialSummonComplete
 function Duel.SpecialSummonComplete(...)
 	local res=dspsumcpl(...)
-	if res then
+	if res>0 then
 		local og=Duel.GetOperatedGroup()
 		local cp=Duel.GetChainInfo(0,CHAININFO_TRIGGERING_PLAYER)
 		if cp==nil then
@@ -57,7 +57,7 @@ EFFECT_KURIBOHEMIAN=18454157
 local dds=Duel.Destroy
 function Duel.Destroy(...)
 	local res=dds(...)
-	if res then
+	if res>0 then
 		local cp=Duel.GetChainInfo(0,CHAININFO_TRIGGERING_PLAYER)
 		if cp==nil then
 			return res
