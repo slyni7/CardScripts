@@ -2786,7 +2786,9 @@ function Duel.SpecialSummonComplete()
 		end
 		g:DeleteGroup()
 		aux.SpecialSummonByEffectWaitingGroup=nil
-		return dssc()
+		local res=dssc()
+		Debug.Message(res)
+		return res
 	end
 end
 
