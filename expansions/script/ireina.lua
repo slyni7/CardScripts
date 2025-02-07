@@ -3913,6 +3913,8 @@ end
 EFFECT_JANUARY=18454200
 EFFECT_GHOSTELLAR=18454213
 
+
+
 Duel.LoadScript("yukitokisaki.lua")
 
 Duel.LoadScript("proc_braveex.lua")
