@@ -2760,7 +2760,7 @@ function Duel.SpecialSummon(g,...)
 	end
 	if #g>0 then
 		Duel.SpecialSummonComplete()
-		return #g
+		return #g:Filter(Card.IsLocation,nil,LOCATION_MZONE)
 	end
 end
 
