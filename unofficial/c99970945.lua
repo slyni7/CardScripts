@@ -34,7 +34,7 @@ function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.tar1fil,tp,LOCATION_REMOVED,0,nil)
-	if #g>=2 then
+	if #g>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local sg=g:Select(tp,1,2,nil)
 		Duel.SendtoGrave(sg,REASON_EFFECT+REASON_RETURN)
