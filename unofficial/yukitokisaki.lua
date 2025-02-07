@@ -46,6 +46,7 @@ function Duel.SpecialSummonComplete(...)
 				YukitokisakiErrorCall(cp,OPCODE_AND,OPCODE_AND)
 			end
 		end
+		return res
 	else
 		return res
 	end
