@@ -167,3 +167,16 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(tp,1000,REASON_EFFECT)
 end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
