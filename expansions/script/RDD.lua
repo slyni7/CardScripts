@@ -69,8 +69,6 @@ e2:SetOperation(function()
 end)
 Duel.RegisterEffect(e2,0)--
 
-Duel.LoadScript("proto.lua")
-
 for j=1,50 do
 	local rand=Duel.GetRandomNumber(1,#RDDMain)
 	local code=RDDMain[rand]
@@ -91,5 +89,7 @@ for j=1,20 do
 	local code=RDDExtra[rand]
 	Debug.AddCard(code,1,1,LOCATION_EXTRA,0,POS_FACEDOWN)
 end
+
+Duel.LoadScript("proto.lua")
 
 end
