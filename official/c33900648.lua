@@ -166,3 +166,4 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Damage(tp,1000,REASON_EFFECT)
 end
+
