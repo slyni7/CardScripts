@@ -51,17 +51,3 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	Debug.RainbowFishReplay()	
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
