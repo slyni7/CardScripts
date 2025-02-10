@@ -1305,4 +1305,3 @@ function Synchro.DarkTarget(f1,f2,plv,nlv,...)
 				else return false end
 			end
 end
---server please update this
