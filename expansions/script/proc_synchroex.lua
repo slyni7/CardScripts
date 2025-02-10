@@ -61,14 +61,14 @@ function Synchro.CheckFilterChk(c,f1,f2,sub1,sub2,sc,tp)
 	if f(te,c) then
 		reset=true
 	end
-	local res=((c:IsType(TYPE_TUNER,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp) or c:IsCode(30765616)) and (not f1 or f1(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp))) or not f2 or f2(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp) or (sub1 and sub1(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp)) or (sub2 and sub2(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp))
+	local res=((c:IsType(TYPE_TUNER,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp)) and (not f1 or f1(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp))) or not f2 or f2(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp) or (sub1 and sub1(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp)) or (sub2 and sub2(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp))
 	if reset then
 		Duel.AssumeReset()
 	end
 	return res
 end
 function Synchro.TunerFilter(c,f1,sub1,sc,tp)
-	return ((c:IsType(TYPE_TUNER,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp) or c:IsCode(30765616)) and (not f1 or f1(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp))) or (sub1 and sub1(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp))
+	return ((c:IsType(TYPE_TUNER,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp)) and (not f1 or f1(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp))) or (sub1 and sub1(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp))
 end
 function Synchro.NonTunerFilter(c,f2,sub2,sc,tp)
 	return not f2 or f2(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp) or (sub2 and sub2(c,sc,SUMMON_TYPE_SYNCHRO|MATERIAL_SYNCHRO,tp))
