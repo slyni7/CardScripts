@@ -4009,6 +4009,8 @@ Duel.LoadScript("proc_braveex.lua")
 
 Duel.LoadScript("proc_skull.lua")
 
+Duel.LoadScript("ireina_full_list.lua")
+
 --
 
 --dofile("expansions/script/ireina_playing_cards.lua")
