@@ -24,25 +24,25 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.TRUE,0,0xff,0xff,nil)
 	Duel.SendtoDeck(g,nil,-2,REASON_RULE)
 	Duel.DisableShuffleCheck()
-	for j=1,50 do
+	while Duel.GetFieldGroupCount(0,LOCATION_DECK,0)<50 do
 		local rand=Duel.GetRandomNumber(1,#RDDMain)
 		local code=RDDMain[rand]
 		local token=Duel.CreateToken(0,code)
 		Duel.SendtoDeck(token,nil,2,REASON_RULE)
 	end
-	for j=1,20 do
+	while Duel.GetFieldGroupCount(0,LOCATION_EXTRA,0)<20 do
 		local rand=Duel.GetRandomNumber(1,#RDDExtra)
 		local code=RDDExtra[rand]
 		local token=Duel.CreateToken(0,code)
 		Duel.SendtoDeck(token,nil,2,REASON_RULE)
 	end
-	for j=1,50 do
+	while Duel.GetFieldGroupCount(1,LOCATION_EXTRA,0)<50 do
 		local rand=Duel.GetRandomNumber(1,#RDDMain)
 		local code=RDDMain[rand]
 		local token=Duel.CreateToken(1,code)
 		Duel.SendtoDeck(token,nil,2,REASON_RULE)
 	end
-	for j=1,20 do
+	while Duel.GetFieldGroupCount(1,LOCATION_EXTRA,0)<20 do
 		local rand=Duel.GetRandomNumber(1,#RDDExtra)
 		local code=RDDExtra[rand]
 		local token=Duel.CreateToken(1,code)
