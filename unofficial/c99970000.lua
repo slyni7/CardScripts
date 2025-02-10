@@ -98,3 +98,4 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Readjust()
 	Debug.RainbowFishReplay()
 end
+
