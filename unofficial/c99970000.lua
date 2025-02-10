@@ -32,7 +32,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	end
 	for j=1,20 do
 		local rand=Duel.GetRandomNumber(1,#RDDMain)
-		local code=RDDEXtra[rand]
+		local code=RDDExtra[rand]
 		local token=Duel.CreateToken(0,code)
 		Duel.SendtoDeck(token,nil,2,REASON_RULE)
 	end
@@ -44,7 +44,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	end
 	for j=1,20 do
 		local rand=Duel.GetRandomNumber(1,#RDDMain)
-		local code=RDDEXtra[rand]
+		local code=RDDExtra[rand]
 		local token=Duel.CreateToken(1,code)
 		Duel.SendtoDeck(token,nil,2,REASON_RULE)
 	end
