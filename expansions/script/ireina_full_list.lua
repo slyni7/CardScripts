@@ -14,4 +14,11 @@ function Auxiliary.GlobalFullList()
 	end
 end
 
-aux.GlobalFullList()
+local e1=Effect.GlobalEffect()
+e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+e1:SetCode(EVENT_STARTUP)
+e1:SetCountLimit(1)
+e1:SetOperation(function()
+	aux.GlobalFullList()
+end)
+Duel.RegisterEffect(e1,0)
