@@ -36,6 +36,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 		local token=Duel.CreateToken(0,code)
 		Duel.SendtoDeck(token,nil,2,REASON_RULE)
 	end
+	Duel.DisableShuffleCheck()
 	while Duel.GetFieldGroupCount(1,LOCATION_DECK,0)<50 do
 		local rand=Duel.GetRandomNumber(1,#RDDMain)
 		local code=RDDMain[rand]
@@ -48,5 +49,52 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 		local token=Duel.CreateToken(1,code)
 		Duel.SendtoDeck(token,nil,2,REASON_RULE)
 	end
+	local p0=Duel.GetPlayersCount(0)
+	for i=1,p0 do
+		if i>1 then
+			local g=Duel.GetMatchingGroup(aux.TRUE,0,0xff,0,nil)
+			Duel.SendtoDeck(g,nil,-2,REASON_RULE)
+			Duel.DisableShuffleCheck()
+			while Duel.GetFieldGroupCount(0,LOCATION_DECK,0)<50 do
+				local rand=Duel.GetRandomNumber(1,#RDDMain)
+				local code=RDDMain[rand]
+				local token=Duel.CreateToken(0,code)
+				Duel.SendtoDeck(token,nil,2,REASON_RULE)
+			end
+			while Duel.GetFieldGroupCount(0,LOCATION_EXTRA,0)<20 do
+				local rand=Duel.GetRandomNumber(1,#RDDExtra)
+				local code=RDDExtra[rand]
+				local token=Duel.CreateToken(0,code)
+				Duel.SendtoDeck(token,nil,2,REASON_RULE)
+			end
+		end
+		if p0>1 then
+			Duel.TagSwap(0)
+		end
+	end
+	local p1=Duel.GetPlayersCount(1)
+	for i=1,p1 do
+		if i>1 then
+			local g=Duel.GetMatchingGroup(aux.TRUE,0,0,0xff,nil)
+			Duel.SendtoDeck(g,nil,-2,REASON_RULE)
+			Duel.DisableShuffleCheck()
+			while Duel.GetFieldGroupCount(1,LOCATION_DECK,0)<50 do
+				local rand=Duel.GetRandomNumber(1,#RDDMain)
+				local code=RDDMain[rand]
+				local token=Duel.CreateToken(1,code)
+				Duel.SendtoDeck(token,nil,2,REASON_RULE)
+			end
+			while Duel.GetFieldGroupCount(1,LOCATION_EXTRA,0)<20 do
+				local rand=Duel.GetRandomNumber(1,#RDDExtra)
+				local code=RDDExtra[rand]
+				local token=Duel.CreateToken(1,code)
+				Duel.SendtoDeck(token,nil,2,REASON_RULE)
+			end
+		end
+		if p1>1 then
+			Duel.TagSwap(1)
+		end
+	end
+	Duel.Readjust()
 	Debug.RainbowFishReplay()
 end
