@@ -60,14 +60,14 @@ e1:SetOperation(function()
 	end
 	Duel.Readjust()
 end)
-Duel.RegisterEffect(e1,0)
+Duel.RegisterEffect(e1,0)--
 local e2=Effect.GlobalEffect()
 e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 e2:SetCode(EVENT_ADJUST)
 e2:SetCountLimit(1)
 e2:SetOperation(function()
 end)
-Duel.RegisterEffect(e2,0)
+Duel.RegisterEffect(e2,0)--
 
 Duel.LoadScript("proto.lua")
 
