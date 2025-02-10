@@ -3913,6 +3913,96 @@ end
 EFFECT_JANUARY=18454200
 EFFECT_GHOSTELLAR=18454213
 
+local cregeff=Card.RegisterEffect
+function Card.RegisterEffect(c,e,forced,...)
+	local code=c:GetOriginalCode()
+	local mt=_G["c"..code]
+	cregeff(c,e,forced,...)
+	if code==80921533 and mt.eff_ct[c][1]==e then
+		local filter=function(c,se,ct,tp)
+			if ct==3 then
+				if not c:IsHasEffect(18454249) then
+					return false
+				end
+				Duel.RegisterFlagEffect(tp,80921533,0,0,0)
+				local res=c:IsSummonable(false,se)
+				Duel.ResetFlagEffect(tp,80921533)
+				return res
+			end
+			if not (c:IsSummonableCard() and c:CanSummonOrSet(false,se)) then
+				return false
+			end
+			local mi,ma=c:GetTributeRequirement()
+			return mi==ct or ma==ct
+		end
+		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk)
+			local se=e:GetLabelObject()
+			local b1=Duel.CheckLPCost(tp,1000) and Duel.IsExistingMatchingCard(filter,tp,LOCATION_HAND,0,1,nil,se,1,tp)
+			local b2=Duel.CheckLPCost(tp,2000) and Duel.IsExistingMatchingCard(filter,tp,LOCATION_HAND,0,1,nil,se,2,tp)
+			local b3=Duel.CheckLPCost(tp,3000) and Duel.IsExistingMatchingCard(filter,tp,LOCATION_HAND,0,1,nil,se,3,tp)
+			if chk==0 then
+				return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and (b1 or b2 or b3)
+			end
+			local op=Duel.SelectEffect(tp,
+				{b1,aux.Stringid(80921533,1)},
+				{b2,aux.Stringid(80921533,2)},
+				{b3,aux.Stringid(18454249,0)}
+				)
+			Duel.PayLPCost(tp,op*1000)
+			e:SetLabel(op)
+			Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,tp,LOCATION_HAND)
+		end)
+		e:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+			local c=e:GetHandler()
+			local op=e:GetLabel()
+			local se=e:GetLabelObject()
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
+			local sc=Duel.SelectMatchingCard(tp,filter,tp,LOCATION_HAND,0,1,1,nil,se,op,tp):GetFirst()
+			if sc then
+				if op==3 then
+					Duel.RegisterFlagEffect(tp,80921533,0,0,0)
+					local e1=Effect.CreateEffect(c)
+					e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+					e1:SetCode(EVENT_MOVE)
+					e1:SetLabelObject(sc)
+					e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+						local sc=e:GetLabelObject()
+						if eg:IsContains(sc) then
+							Duel.ResetFlagEffect(tp,80921533)
+							e:Reset()
+						end
+					end)
+					Duel.RegisterEffect(e1,tp)
+					Duel.Summon(tp,sc,false,se)
+				else
+					Duel.SummonOrSet(tp,sc,false,se)
+				end
+			end
+		end)
+	elseif code==80921533 and mt.eff_ct[c][2]==e then
+		local te=mt.eff_ct[c][1]
+		local ge=Effect.CreateEffect(c)
+		ge:SetType(EFFECT_TYPE_IGNITION)
+		ge:SetRange(LOCATION_GRAVE+LOCATION_REMOVED)
+		ge:SetProperty(EFFECT_FLAG_BOTH_SIDE)
+		ge:SetCategory(CATEGORY_SUMMON)
+		ge:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			return Duel.GetPlayerEffect(tp,18454250)
+		end)
+		ge:SetTarget(te:GetTarget())
+		ge:SetOperation(te:GetOperation())
+		cregeff(c,ge)
+		local re=Effect.CreateEffect(c)
+		re:SetType(EFFECT_TYPE_SINGLE)
+		re:SetValue(SUMMON_TYPE_NORMAL)
+		cregeff(c,re)
+		ge:SetLabelObject(re)
+	end
+end
+
+FLAG_EFFECT_SHIELD=18454274
+EFFECT_SHIELD=18454274
+
 Duel.LoadScript("yukitokisaki.lua")
 
 Duel.LoadScript("proc_braveex.lua")
