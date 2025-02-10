@@ -36,7 +36,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 		local token=Duel.CreateToken(0,code)
 		Duel.SendtoDeck(token,nil,2,REASON_RULE)
 	end
-	while Duel.GetFieldGroupCount(1,LOCATION_EXTRA,0)<50 do
+	while Duel.GetFieldGroupCount(1,LOCATION_DECK,0)<50 do
 		local rand=Duel.GetRandomNumber(1,#RDDMain)
 		local code=RDDMain[rand]
 		local token=Duel.CreateToken(1,code)
@@ -48,6 +48,5 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 		local token=Duel.CreateToken(1,code)
 		Duel.SendtoDeck(token,nil,2,REASON_RULE)
 	end
-	Debug.RainbowFishReplay()	
+	Debug.RainbowFishReplay()
 end
-
