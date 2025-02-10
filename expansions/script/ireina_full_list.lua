@@ -7,7 +7,7 @@ function Auxiliary.GlobalFullList()
 		for i=1,#Auxiliary.GlobalOCGList do
 			local code=Auxiliary.GlobalOCGList[i]
 			for p=0,1 do
-				local token=Duel.CreateToken(tp,code)
+				local token=Duel.CreateToken(p,code)
 				table.insert(Auxiliary.GlobalOCGTokens[p],token)
 			end
 		end
