@@ -48,7 +48,7 @@ end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=0
 	if e:GetHandler():IsLocation(LOCATION_HAND) then ft=1 end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)<=ft and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_DECK,0,1,nil,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>ft and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_DECK,0,1,nil,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_DECK)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
