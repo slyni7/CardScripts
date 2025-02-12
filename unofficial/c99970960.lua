@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e0:SetCondition(function(e) return Duel.IsTurnPlayer(e:GetHandlerPlayer()) and Duel.IsBattlePhase() end)
+	e0:SetCondition(function() return Duel.IsBattlePhase() end)
 	c:RegisterEffect(e0)
 
 	local e2=Effect.CreateEffect(c)
