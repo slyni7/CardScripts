@@ -1,86 +1,81 @@
---성흔사도 <종말론>
-local m=99970206
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ S��igma ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--엑시즈 소환
-	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xe00),1,3)
-	c:EnableReviveLimit()
-	
-	--전투 내성
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCondition(cm.indcon)
-	e1:SetValue(1)
+	local e1=MakeEff(c,"I","HG")
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCL(1,id)
+	e1:SetCondition(aux.NOT(s.xyzcon))
+	WriteEff(e1,1,"CTO")
 	c:RegisterEffect(e1)
-	
-	--바운스
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(m,0))
-	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
-	e2:SetCost(cm.thcost)
-	e2:SetTarget(cm.thtg)
-	e2:SetOperation(cm.thop)
+	local e2=e1:Clone()
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetCondition(s.xyzcon)
 	c:RegisterEffect(e2)
 	
-	--제외
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_REMOVE)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetTarget(cm.target)
-	e3:SetOperation(cm.operation)
+	e3:SetType(EFFECT_TYPE_XMATERIAL)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e3:SetCondition(s.con3)
+	e3:SetValue(aux.tgoval)
 	c:RegisterEffect(e3)
 
+	local e4=MakeEff(c,"I","M")
+	e4:SetCategory(CATEGORY_CONTROL)
+	e4:SetCL(1,{id,1})
+	WriteEff(e4,4,"CTO")
+	c:RegisterEffect(e4)
+	
 end
 
---전투 내성
-function cm.indcon(e)
-	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_LIGHT)
+
+function s.cost1fil(c)
+	return c:IsSetCard(0x6d70) and c:IsAttribute(ATT_D) and (c:IsFaceup() or c:IsLocation(LOCATION_DECK)) and c:IsAbleToGraveAsCost()
+end
+function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cost1fil,tp,LOCATION_DECK,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,s.cost1fil,tp,LOCATION_DECK,0,1,1,nil)
+	Duel.SendtoGrave(g,REASON_COST)
+end
+function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,0)
+end
+function s.op1(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
 end
 
---바운스
-function cm.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) and e:GetHandler():GetAttackAnnouncedCount()==0 end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetCode(EFFECT_CANNOT_ATTACK)
-	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-	e:GetHandler():RegisterEffect(e1,true)
+function s.xyzcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsType,TYPE_XYZ),tp,LOCATION_MZONE,0,1,nil)
 end
 
-function cm.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
-	local g=Duel.GetMatchingGroup(Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
-end
-function cm.thop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
-	Duel.SendtoHand(g,nil,REASON_EFFECT)
+function s.con3(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsSetCard(0x6d70) and c:IsType(TYPE_XYZ)
 end
 
---제외
-function cm.rmfilter(c)
-	return c:IsAbleToRemove()
+function s.cost4(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckRemoveOverlayCard(tp,1,0,1,REASON_COST) end
+	Duel.RemoveOverlayCard(tp,1,0,1,1,REASON_COST)
 end
-function cm.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_GRAVE) and cm.rmfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(cm.rmfilter,tp,0,LOCATION_GRAVE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectTarget(tp,cm.rmfilter,tp,0,LOCATION_GRAVE,1,4,nil)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
+function s.tar4(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_CONTROL,nil,1,tp,0)
 end
-function cm.operation(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if tg:GetCount()<=0 then return end
-	Duel.Remove(tg,POS_FACEUP,REASON_EFFECT)
+function s.op4(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.SelectMatchingCard(tp,Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,1,1,nil)
+	if #g>0 then
+		Duel.HintSelection(g)
+		Duel.GetControl(g,tp)
+	end
 end

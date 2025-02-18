@@ -1,64 +1,59 @@
---성흔사도 <향락의 철과 피>
-local m=99970203
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ S��igma ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--세트
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(m,0))
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	local e1=MakeEff(c,"STo")
 	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCountLimit(1,m)
-	e1:SetTarget(cm.settg)
-	e1:SetOperation(cm.setop)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetCL(1,id)
+	WriteEff(e1,1,"TO")
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
 	c:RegisterEffect(e2)
-	local e3=e1:Clone()
+	local e3=e2:Clone()
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-
-	--향락
-	local e4=Effect.CreateEffect(c)
-	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_DAMAGE)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetCountLimit(1,199970203)
-	e4:SetTarget(cm.thtg)
-	e4:SetOperation(cm.thop)
-	c:RegisterEffect(e4)
+	local e9=Effect.CreateEffect(c)
+	e9:SetType(EFFECT_TYPE_SINGLE)
+	e9:SetCode(99970204)
+	e9:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE,EFFECT_FLAG2_MAJESTIC_MUST_COPY)
+	e9:SetLabelObject(e1)
+	e9:SetLabel(id)
+	c:RegisterEffect(e9)
+	
+	local e0=MakeEff(c,"STo")
+	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_DAMAGE)
+	e0:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e0:SetCode(EVENT_TO_GRAVE)
+	e0:SetCL(1,{id,1})
+	WriteEff(e0,0,"TO")
+	c:RegisterEffect(e0)
 	
 end
 
---세트
-function cm.setfilter(c)
-	return c:IsSetCard(0xe00) and c:IsType(TYPE_SPELL) and c:IsSSetable()
+function s.tar1fil(c)
+	return c:IsSetCard(0x6d70) and c:IsSpellTrap() and c:IsSSetable()
 end
-function cm.settg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cm.setfilter,tp,LOCATION_DECK,0,1,nil) end
+function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tar1fil,tp,LOCATION_DECK,0,1,nil) end
 end
-function cm.setop(e,tp,eg,ep,ev,re,r,rp)
+function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,cm.setfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 then
+	local g=Duel.SelectMatchingCard(tp,s.tar1fil,tp,LOCATION_DECK,0,1,1,nil)
+	if #g>0 then
 		Duel.SSet(tp,g)
-		Duel.ConfirmCards(1-tp,g)
 	end
 end
 
---향락
-function cm.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tar0(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,1000)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,1,tp,700)
 end
-function cm.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.op0(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SendtoHand(c,nil,REASON_EFFECT)
-		Duel.BreakEffect()
-		Duel.Damage(tp,1000,REASON_EFFECT)
+	if c:IsRelateToEffect(e) and Duel.SendtoHand(c,nil,REASON_EFFECT)>0 then
+		Duel.Damage(tp,700,REASON_EFFECT)
 	end
 end

@@ -1,76 +1,60 @@
---성흔사도 <닫힌 하늘>
-local m=99970230
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ S��igma ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--엑시즈 소환
-	RevLim(c)
-	aux.AddXyzProcedure(c,aux.FBF(Card.IsSetCard,0xe00),1,2)
-
-	--엑시즈 레벨	
-	local e0=MakeEff(c,"S")
-	e0:SetCode(EFFECT_XYZ_LEVEL)
-	e0:SetCondition(cm.xlvcon)
-	e0:SetValue(1)
-	c:RegisterEffect(e0)
-	
-	--소재 추가
-	local e1=MakeEff(c,"I","M")
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCountLimit(1)
-	e1:SetCost(spinel.rmovcost(1))
-	e1:SetTarget(cm.target)
-	e1:SetOperation(cm.operation)
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_TOGRAVE)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	
-	--파괴 내성 부여
+
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EFFECT_DESTROY_REPLACE)
-	e2:SetProperty(EFFECT_TYPE_XMATERIAL+EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetTarget(cm.reptg)
-	e2:SetCondition(cm.repcon)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetCL(1,id)
+	e2:SetCost(s.co)
+	e2:SetTarget(s.tar)
+	e2:SetOperation(s.op)
+	e2:SetCountLimit(1,id)
 	c:RegisterEffect(e2)
 	
 end
 
---엑시즈 레벨	
-function cm.xlvcon(e)
-	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_LIGHT)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
-
---소재 추가
-function cm.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0xe00) and c:IsType(TYPE_XYZ)
+function s.tgfilter(c)
+	return c:IsMonster() and c:IsSetCard(0x6d70) and c:IsAbleToGrave()
 end
-function cm.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and cm.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(cm.filter,tp,LOCATION_MZONE,0,1,nil) 
-		and Duel.GetMatchingGroupCount(Card.IsSetCard,tp,LOCATION_GRAVE,0,nil,0xe00)>0 end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,cm.filter,tp,LOCATION_MZONE,0,1,1,nil)
-end
-function cm.operation(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_GRAVE,0,nil,0xe00)
-	if tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) and #g>0 then
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local g=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_DECK,0,nil)
+	if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local sg=g:Select(tp,1,1,nil)
-		Duel.Overlay(tc,sg)
+		Duel.SendtoGrave(sg,REASON_EFFECT)
 	end
 end
 
---파괴 내성 부여
-function cm.repcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSetCard(0xe00) and c:IsType(TYPE_XYZ)
+function s.co(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckLPCost(tp,700) end
+	Duel.PayLPCost(tp,700)
 end
-function cm.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_BATTLE+REASON_EFFECT)
-		and c:CheckRemoveOverlayCard(tp,1,REASON_EFFECT) end
-	if Duel.SelectEffectYesNo(tp,c,96) then
-		c:RemoveOverlayCard(tp,1,1,REASON_EFFECT)
-		return true
-	else return false end
+function s.filter(c,e,tp)
+	return c:IsSetCard(0x6d70) and c:IsAttribute(ATT_D) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function s.tar(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
+end
+function s.op(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
+	if #g>0 then Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) end
 end

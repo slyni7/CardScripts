@@ -1,99 +1,87 @@
---성흔사도 <첫 번째 계시>
-local m=99970207
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ S��igma ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--서치 & 덤핑
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(cm.target)
-	e1:SetOperation(cm.activate)
+	c:EnableReviveLimit()
+	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x6d70),1,2)
+	
+	local e1=MakeEff(c,"I","M")
+	e1:SetD(id,0)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCost(aux.dxmcostgen(1,1,nil))
+	e1:SetCL(1,id)
+	WriteEff(e1,1,"TO")
 	c:RegisterEffect(e1)
-
-	--공 / 수 증가
-	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
-	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCost(aux.bfgcost)
-	e2:SetCondition(cm.condition)
-	e2:SetOperation(cm.activate1)
+	
+	local e2=MakeEff(c,"Qo","M")
+	e2:SetD(id,1)
+	e2:SetCategory(CATEGORY_DISABLE)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetCL(1,{id,1})
+	WriteEff(e2,2,"NCTO")
 	c:RegisterEffect(e2)
+	
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_XMATERIAL)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCode(EFFECT_IMMUNE_EFFECT)
+	e3:SetCondition(s.con3)
+	e3:SetValue(s.imfilter)
+	c:RegisterEffect(e3)
 	
 end
 
---서치 & 덤핑
-function cm.filter(c)
-	return c:IsSetCard(0xe00) and c:IsAttribute(ATTRIBUTE_DARK) and (c:IsAbleToHand() or c:IsAbleToGrave())
+function s.tar1fil(c,e,tp)
+	return c:IsAttribute(ATT_L) and c:IsSetCard(0x6d70) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cm.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cm.filter,tp,LOCATION_DECK,0,1,nil) end
+function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.tar1fil,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
-function cm.activate(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,cm.filter,tp,LOCATION_DECK,0,1,1,nil)
-	local tc=g:GetFirst()
-	if tc and tc:IsAbleToHand() and (not tc:IsAbleToGrave() or Duel.SelectYesNo(tp,aux.Stringid(m,0))) then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,tc)
-	else
-		Duel.SendtoGrave(tc,REASON_EFFECT)
-	end
+function s.op1(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.tar1fil),tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	if #g>0 then Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) end
 end
 
---공 / 수 증가
-function cm.condition(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetAttacker()
-	local at=Duel.GetAttackTarget()
-	if not at or tc:IsFacedown() or at:IsFacedown() then return false end
-	if tc:IsControler(1-tp) then tc=at end
-	e:SetLabelObject(tc)
-	return tc:IsControler(tp) and tc:IsLocation(LOCATION_MZONE) and tc:IsSetCard(0xe00)
-end
-function cm.activate1(e,tp,eg,ep,ev,re,r,rp)
+function s.con2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=e:GetLabelObject()
-	if tc:IsRelateToBattle() and not tc:IsImmuneToEffect(e) then
+	return c:GetOverlayGroup():GetClassCount(Card.GetAttribute)==1 and c:GetOverlayGroup():IsExists(Card.IsAttribute,1,nil,ATT_L)
+end
+function s.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsReleasable() end
+	Duel.Release(e:GetHandler(),REASON_COST)
+end
+function s.tar2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsNegatable,tp,0,LOCATION_ONFIELD,1,nil) end
+end
+function s.op2(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local g=Duel.GetMatchingGroup(Card.IsNegatable,tp,0,LOCATION_ONFIELD,nil)
+	if #g==0 then return end
+	for tc in aux.Next(g) do
+		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(1400)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetCode(EFFECT_DISABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_UPDATE_DEFENSE)
-		e2:SetValue(1400)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
+		e2:SetCode(EFFECT_DISABLE_EFFECT)
+		e2:SetValue(RESET_TURN_SET)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e2)
-		local fid=c:GetFieldID()
-		tc:RegisterFlagEffect(m,RESET_EVENT+0x1fe0000,0,1,fid)
-		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-		e3:SetCode(EVENT_PHASE+PHASE_END)
-		e3:SetReset(RESET_PHASE+PHASE_END)
-		e3:SetCountLimit(1)
-		e3:SetLabel(fid)
-		e3:SetLabelObject(tc)
-		e3:SetCondition(cm.descon)
-		e3:SetOperation(cm.desop)
-		Duel.RegisterEffect(e3,tp)
 	end
 end
-function cm.descon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	if tc:GetFlagEffectLabel(m)==e:GetLabel() then
-		return true
-	else
-		e:Reset()
-		return false
-	end
+
+function s.con3(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsSetCard(0x6d70) and c:IsType(TYPE_XYZ)
 end
-function cm.desop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	Duel.Destroy(tc,REASON_EFFECT)
+function s.imfilter(e,re)
+	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP) and re:GetHandlerPlayer()~=e:GetHandlerPlayer()
 end

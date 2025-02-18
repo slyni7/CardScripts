@@ -1,75 +1,75 @@
---성흔사도 <잃지 않은 믿음>
-local m=99970229
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ S��igma ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--특수 소환 + 묘지
-	local e1=MakeEff(c,"Qo","HG")
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOGRAVE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCL(1,m)
-	WriteEff(e1,1,"TO")
+	e1:SetCL(1,id)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	
-	--컨트롤
-	local e2=MakeEff(c,"Qo","M")
-	e2:SetCategory(CATEGORY_CONTROL)
-	e2:SetProperty(EFFECT_TYPE_XMATERIAL)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCondition(Duel.IsMainPhase)
-	e2:SetCL(1)
-	WriteEff(e2,2,"CTO")
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCL(1,{id,1})
+	e2:SetCost(aux.SelfBanishCost)
+	WriteEff(e2,2,"NO")
 	c:RegisterEffect(e2)
-	
 end
 
---특수 소환 + 묘지
-function cm.tar1fil(c)
-	return c:IsFaceup() and c:IsSetCard(0xe00) and c:IsAttribute(ATT_D)
+function s.filter(c)
+	return c:IsSetCard(0x6d70) and c:IsAttribute(ATT_D) and c:IsAbleToHand()
 end
-function cm.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and cm.tar1fil(chkc) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingTarget(cm.tar1fil,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectTarget(tp,cm.tar1fil,tp,LOCATION_MZONE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
+function s.filter2(c)
+	return c:IsSetCard(0x6d70) and c:IsAttribute(ATT_L) and c:IsAbleToHand()
 end
-function cm.op1(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0
-		and tc and tc:IsRelateToEffect(e) then
-		Duel.BreakEffect()
-		Duel.SendtoGrave(tc,REASON_EFFECT)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
+	if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0
+		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsType,TYPE_XYZ),tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK,0,1,nil)
+		and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		Duel.ConfirmCards(1-tp,g)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		local sg=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_DECK,0,1,1,nil)
+		if #sg>0 then
+			Duel.BreakEffect()
+			Duel.SendtoHand(sg,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,sg)
+		end
 	end
 end
 
---컨트롤
-function cm.cfil2(c)
-	return c:IsAbleToDeckAsCost() and c:IsSetCard(0xe00) and c:IsAttribute(ATT_L)
+
+function s.con2fil(c)
+	return c:IsFaceup() and c:IsSetCard(0x6d70) and c:IsRelateToBattle()
 end
-function cm.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	local mg=Duel.GetMatchingGroup(cm.cfil2,tp,LSTN("G"),0,nil)
-	mg:Merge(e:GetHandler():GetOverlayGroup():Filter(cm.cfil2,nil))
-	if chk==0 then return #mg>0 end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=mg:Select(tp,1,1,nil)
-	Duel.SendtoDeck(g,nil,2,REASON_COST)
+function s.con2(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetAttacker()
+	local tc2=Duel.GetAttackTarget()
+	if not tc then return false end
+	return s.con2fil(tc) or (tc2 and s.con2fil(tc2))
 end
-function cm.tar2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(Card.IsAbleToChangeControler,tp,0,LOCATION_MZONE,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_CONTROL,nil,1,0,0)
+function s.op2(e,tp,eg,ep,ev,re,r,rp,chk)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x6d70))
+	e1:SetValue(1400)
+	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_UPDATE_DEFENSE)
+	Duel.RegisterEffect(e2,tp)
 end
-function cm.op2(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToChangeControler,tp,0,LOCATION_MZONE,1,1,nil)
-	if #g>0 then
-		Duel.GetControl(g,tp)
-	end
-end
+

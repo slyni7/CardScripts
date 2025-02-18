@@ -1,68 +1,94 @@
---S†igma
-local m=99970381
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ S��igma ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--특수 소환 + 회수
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TODECK)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(spinel.delay)
-	e1:SetCountLimit(1,m)
+	local e1=MakeEff(c,"A")
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DRAW+CATEGORY_DESTROY)
 	WriteEff(e1,1,"TO")
 	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e2:SetCondition(s.actcon)
+	e2:SetDescription(aux.Stringid(id,2))
 	c:RegisterEffect(e2)
-	local e3=e1:Clone()
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	
+	local e3=Effect.CreateEffect(c)
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetRange(LOCATION_GRAVE)
+	e3:SetCost(aux.SelfBanishCost)
+	e3:SetTarget(s.xyztg)
+	e3:SetOperation(s.xyzop)
 	c:RegisterEffect(e3)
 	
-	--회수 + 드로우
-	local e4=Effect.CreateEffect(c)
-	e4:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetCountLimit(1,199970381)
-	WriteEff(e4,4,"TO")
-	c:RegisterEffect(e4)
-
 end
 
---특수 소환 + 회수
-function cm.spfilter(c,e,tp)
-	return c:IsSetCard(0xe00) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.tfil1(c,e,tp)
+	return c:IsSetCard(0x6d70) and c:IsAttribute(ATT_L) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
 end
-function cm.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cm.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		return Duel.IsExistingMatchingCard(s.tfil1,tp,LOCATION_DECK,0,1,nil,e,tp) and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
 end
-function cm.op1(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+function s.op1(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(1-tp,LOCATION_MZONE)<=0 then
+		return
+	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,cm.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	if g:GetCount()>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)~=0
-		and c:IsRelateToEffect(e) and c:IsFaceup() and c:IsAbleToDeck() then
-		Duel.BreakEffect()
-		Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_EFFECT)
+	local g=Duel.SelectMatchingCard(tp,s.tfil1,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+	if #g>0 and Duel.SpecialSummon(g,0,tp,1-tp,false,false,POS_FACEUP)>0 then
+	
+		local b1=Duel.IsPlayerCanDraw(tp,2) 
+		local b2=Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())
+		if not ((b1 or b2) and Duel.SelectYesNo(tp,aux.Stringid(id,3))) then return end
+		
+		local op=Duel.SelectEffect(tp,
+			{b1,aux.Stringid(id,0)},
+			{b2,aux.Stringid(id,1)})
+
+		if op==1 then
+			Duel.BreakEffect()
+			Duel.Draw(tp,2,REASON_EFFECT)
+		elseif op==2 then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+			local sg=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,2,e:GetHandler())
+			if #sg>0 then
+				Duel.BreakEffect()
+				Duel.Destroy(sg,REASON_EFFECT)
+			end
+		end
 	end
 end
 
---회수 + 드로우
-function cm.tar4(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToDeck() and Duel.IsPlayerCanDraw(tp,1) end
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+function s.confil(c)
+	return c:IsAttribute(ATT_D) and c:IsFaceup() and c:IsSetCard(0x6d70)
 end
-function cm.op4(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SendtoDeck(c,nil,0,REASON_EFFECT)~=0 and c:IsLocation(LOCATION_DECK) then
-		Duel.ShuffleDeck(tp)
-		Duel.BreakEffect()
-		Duel.Draw(tp,1,REASON_EFFECT)
+function s.actcon(e)
+	return Duel.IsExistingMatchingCard(s.confil,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+end
+
+function s.matfil(c,tp)
+	return c:IsSetCard(0x6d70) and c:IsFaceup() and Duel.IsExistingMatchingCard(Card.IsXyzSummonable,tp,LOCATION_EXTRA,0,1,nil,c)
+end
+function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.matfil,tp,LOCATION_MZONE,0,1,nil,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,3))
+	local g=Duel.SelectMatchingCard(tp,s.matfil,tp,LOCATION_MZONE,0,1,1,nil,tp)
+	if #g==0 then return end
+	Duel.HintSelection(g)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local xyzc=Duel.SelectMatchingCard(tp,Card.IsXyzSummonable,tp,LOCATION_EXTRA,0,1,1,nil,g):GetFirst()
+	if xyzc then
+		Duel.XyzSummon(tp,xyzc,g)
 	end
 end

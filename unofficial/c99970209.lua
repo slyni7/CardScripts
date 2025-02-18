@@ -1,62 +1,56 @@
---성흔사도 <죄>
-local m=99970209
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ S��igma ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--발동
-	YuL.Activate(c)
+	c:EnableReviveLimit()
+	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x6d70),1,3)
 
-	--특수 소환
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(m,0))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetCountLimit(1,m)
-	e2:SetTarget(cm.sptg)
-	e2:SetOperation(cm.spop)
-	c:RegisterEffect(e2)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e0:SetCode(EFFECT_XYZ_LEVEL)
+	e0:SetRange(LOCATION_EXTRA)
+	e0:SetTargetRange(LOCATION_MZONE,0)
+	e0:SetTarget(function(e,c) return c:IsRank(1) end)
+	e0:SetValue(function(e,_,rc) return rc==e:GetHandler() and 1 or 0 end)
+	c:RegisterEffect(e0)
 	
-	--데미지
-	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_DAMAGE)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e3:SetCode(EVENT_DESTROYED)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetCondition(cm.damcon)
-	e3:SetTarget(YuL.damtg(1,500))
-	e3:SetOperation(YuL.damop)
+	local e1=MakeEff(c,"Qo","M")
+	e1:SetD(id,0)
+	e1:SetCategory(CATEGORY_TOHAND)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCL(1,id)
+	WriteEff(e1,1,"TO")
+	e1:SetCost(aux.dxmcostgen(1,1,nil))
+	c:RegisterEffect(e1)
+	
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetTargetRange(LOCATION_MZONE,0)
+	e2:SetTarget(function(e,c) return c:IsSetCard(0x6d70) and c:IsAttribute(ATT_L) end)
+	e2:SetValue(function(e,c) return e:GetHandler():GetOverlayCount()*700 end)
+	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e3)
 	
 end
 
---특수 소환
-function cm.spfilter(c,e,tp)
-	return c:IsSetCard(0xe00) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function cm.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and cm.spfilter(chkc,e,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(cm.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,cm.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
-end
-function cm.spop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c) end
+	local sg=Duel.GetMatchingGroup(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,c)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,sg,#sg,0,0)
+	if c:GetOverlayGroup():GetClassCount(Card.GetAttribute)==1 and c:GetOverlayGroup():IsExists(Card.IsAttribute,1,nil,ATT_L) then
+		Duel.SetChainLimit(s.chlimit)
 	end
 end
-
---데미지
-function cm.cfilter(c,tp)
-	return c:IsSetCard(0xe00) and c:IsType(TYPE_MONSTER) and c:IsReason(REASON_BATTLE+REASON_EFFECT)
-		and c:IsPreviousLocation(LOCATION_MZONE+LOCATION_HAND) and c:GetPreviousControler()==tp
+function s.chlimit(e,ep,tp)
+	return tp==ep
 end
-function cm.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(cm.cfilter,1,nil,tp)
+function s.op1(e,tp,eg,ep,ev,re,r,rp)
+	local sg=Duel.GetMatchingGroup(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
+	Duel.SendtoHand(sg,nil,REASON_EFFECT)
 end

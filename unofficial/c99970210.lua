@@ -1,91 +1,69 @@
---성흔사도 <회개의 기도>
-local m=99970210
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ S��igma ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--파괴
+	c:EnableReviveLimit()
+	Xyz.AddProcedure(c,s.matfilter,1,2,s.ovfilter,aux.Stringid(id,0),2,s.xyzop)
+
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DESTROY)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCost(cm.cost)
-	e1:SetTarget(cm.target)
-	e1:SetOperation(cm.activate)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_SET_BASE_ATTACK)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetValue(s.atkval)
 	c:RegisterEffect(e1)
-
-	--특수 소환
-	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCountLimit(1,m)
-	e2:SetCost(aux.bfgcost)
-	e2:SetTarget(cm.target1)
-	e2:SetOperation(cm.activate1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_SET_BASE_DEFENSE)
 	c:RegisterEffect(e2)
-
+	
+	local e3=MakeEff(c,"I","M")
+	e3:SetD(id,0)
+	e3:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCL(1,id)
+	e3:SetCost(aux.dxmcostgen(1,1,nil))
+	WriteEff(e3,3,"TO")
+	c:RegisterEffect(e3)
+	
 end
 
---파괴
-function cm.costfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xe00) and c:IsAbleToRemoveAsCost()
+function s.matfilter(c,xyz,sumtype,tp)
+	return c:IsSetCard(0x6d70,xyz,sumtype,tp) and c:IsAttribute(ATT_D,xyz,sumtype,tp)
 end
-function cm.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cm.costfilter,tp,LOCATION_GRAVE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,cm.costfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-	e:SetLabel(g:GetFirst():GetAttribute())
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
-	if e:GetLabel()==ATTRIBUTE_LIGHT then
-		e:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW)
-	end
+function s.ovfilter(c,tp,xyzc)
+	return c:IsFaceup() and c:IsSetCard(0x6d70,xyzc,SUMMON_TYPE_XYZ,tp)
+	   and c:IsAttribute(ATT_L,xyzc,SUMMON_TYPE_XYZ,tp)
 end
-function cm.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
-	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_MZONE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_MZONE,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+function s.xyzop(e,tp,chk)
+	if chk==0 then return not Duel.HasFlagEffect(tp,id) end
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE|PHASE_END,EFFECT_FLAG_OATH,1)
+	return true
 end
-function cm.activate(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	local att=e:GetLabel()
-	if tc and tc:IsRelateToEffect(e) then
-		Duel.Destroy(tc,REASON_EFFECT)
-	end
-	if att==ATTRIBUTE_LIGHT then
+
+function s.atkval(e,c)
+	return math.abs(Duel.GetLP(1)-Duel.GetLP(0))
+end
+
+function s.tar3fil(c)
+	return c:IsSetCard(0x6d70) and c:IsAbleToDeck() and c:IsFaceup()
+end
+function s.tar3(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsControler(tp) and s.tar3fil(chkc) end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.IsExistingTarget(s.tar3fil,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectTarget(tp,s.tar3fil,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,5,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
+function s.op3(e,tp,eg,ep,ev,re,r,rp)
+	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	if not tg or tg:FilterCount(Card.IsRelateToEffect,nil,e)==0 then return end
+	Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
+	local g=Duel.GetOperatedGroup()
+	if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end
+	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)
+	if ct>0 then
+		Duel.BreakEffect()
 		Duel.Draw(tp,1,REASON_EFFECT)
-	end
-end
-
---특수 소환
-function cm.filter(c,e,tp)
-	return c:IsSetCard(0xe00) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
-end
-function cm.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and cm.filter(chkc,e,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(cm.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,cm.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
-end
-function cm.activate1(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_DEFENSE) then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e2)
-		Duel.SpecialSummonComplete()
 	end
 end

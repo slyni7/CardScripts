@@ -1,74 +1,125 @@
---성흔사도 <구제의 예언>
-local m=99970204
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ S��igma ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--특수 소환
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(cm.spcon)
+	local e1=MakeEff(c,"STo")
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetCL(1,id)
+	WriteEff(e1,1,"CTO")
 	c:RegisterEffect(e1)
-	
-	--바운스
-	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1)
-	e2:SetHintTiming(0,0x1e0)
-	e2:SetTarget(cm.target)
-	e2:SetOperation(cm.activate)
+	local e2=e1:Clone()
+	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
 	c:RegisterEffect(e2)
-	
-	--내성 부여
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_XMATERIAL)
-	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetCondition(YuL.phase(2,PHASE_MAIN1+PHASE_MAIN2))
-	e3:SetValue(aux.tgoval)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
 	
+	local e0=MakeEff(c,"STo")
+	e0:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
+	e0:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e0:SetCode(EVENT_TO_GRAVE)
+	e0:SetCL(1,{id,1})
+	WriteEff(e0,0,"TO")
+	c:RegisterEffect(e0)
+	
 end
 
---특수 소환
-function cm.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x0ee) and c:IsAttribute(ATTRIBUTE_DARK)
+function s.cost1(e,tg,ep,ev,re,r,rp,chk)
+	e:SetLabel(10000)
+	return true
 end
-function cm.spcon(e,c)
-	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and
-		Duel.IsExistingMatchingCard(cm.filter,c:GetControler(),LOCATION_MZONE,0,1,nil)
-end
-
---바운스
-function cm.filter(c)
-	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_DARK) and c:IsSetCard(0xe00)
-end
-function cm.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
-	local c=e:GetHandler()
-	if chk==0 then return Duel.IsExistingTarget(cm.filter,tp,LOCATION_MZONE,0,1,c)
-		and Duel.IsExistingTarget(nil,tp,0,LOCATION_ONFIELD,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g1=Duel.SelectTarget(tp,cm.filter,tp,LOCATION_MZONE,0,1,1,c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g2=Duel.SelectTarget(tp,nil,tp,0,LOCATION_ONFIELD,1,1,nil)
-	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g1,2,0,0)
-end
-function cm.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if g:GetCount()>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
+function s.cost1fil(c,e,tp)
+	if not (c:IsHasEffect(id) and not c:IsCode(id) and c:IsAbleToGraveAsCost() and c:IsSetCard(0x6d70) and c:IsAttribute(ATT_D)) then 
+		return false
 	end
+	local eff={c:GetCardEffect(id)}
+	for _,teh in ipairs(eff) do
+		local te=teh:GetLabelObject()
+		local con=te:GetCondition()
+		local tg=te:GetTarget()
+		if (not con or con(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) 
+			and (not tg or tg(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
+			return true
+		end
+	end
+	return false
+end
+function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then
+		return false
+	end
+	if chk==0 then
+		if e:GetLabel()~=10000 then
+			return false
+		end
+		e:SetLabel(0)
+		return Duel.IsExistingMatchingCard(s.cost1fil,tp,LOCATION_DECK,0,1,nil,e,tp)
+	end
+	e:SetLabel(0)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,s.cost1fil,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+	Duel.SendtoGrave(g,REASON_COST)
+	local tc=g:GetFirst()
+	local eff={tc:GetCardEffect(id)}
+	local te=nil
+	local acd={}
+	local ac={}
+	for _,teh in ipairs(eff) do
+		local temp=teh:GetLabelObject()
+		local con=temp:GetCondition()
+		local tg=temp:GetTarget()
+		if (not con or con(temp,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) 
+			and (not tg or tg(temp,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
+			table.insert(ac,teh)
+			table.insert(acd,temp:GetDescription())
+		end
+	end
+	if #ac==1 then
+		te=ac[1]
+	elseif #ac>1 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EFFECT)
+		op=Duel.SelectOption(tp,table.unpack(acd))
+		op=op+1
+		te=ac[op]
+	end
+	if not te then
+		return
+	end
+	local teh=te
+	te=teh:GetLabelObject()
+	e:SetProperty(te:GetProperty())
+	e:SetLabel(te:GetLabel())
+	e:SetLabelObject(te:GetLabelObject())
+	local tg=te:GetTarget()
+	if tg then
+		tg(e,tp,eg,ep,ev,re,r,rp,1)
+	end
+	te:SetLabel(e:GetLabel())
+	te:SetLabelObject(e:GetLabelObject())
+	e:SetLabelObject(te)
+	Duel.ClearOperationInfo(0)
+end
+function s.op1(e,tp,eg,ep,ev,re,r,rp)
+	local te=e:GetLabelObject()
+	e:SetLabel(te:GetLabel())
+	e:SetLabelObject(te:GetLabelObject())
+	local op=te:GetOperation()
+	if op then
+		op(e,tp,eg,ep,ev,re,r,rp)
+	end
+	te:SetLabel(e:GetLabel())
+	te:SetLabelObject(e:GetLabelObject())
 end
 
---내성 부여
-function cm.condition(e)
-	return e:GetHandler():IsSetCard(0xe00)
+function s.tar0(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToDeck() and Duel.IsPlayerCanDraw(tp,1) end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
+function s.op0(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and Duel.SendtoDeck(c,nil,1,REASON_EFFECT)~=0 and c:IsLocation(LOCATION_DECK) then
+		Duel.Draw(tp,1,REASON_EFFECT)
+	end
 end
