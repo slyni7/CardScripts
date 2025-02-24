@@ -8,6 +8,7 @@ CUSTOMREASON_DELIGHT=0x1
 EFFECT_DELAY_TURN=18452705
 EVENT_DELAY_TURN=18452706
 ELABEL_IS_DELIGHT_SUMMONING=0x1
+ELABEL_IS_DELAYED_SUMMON=0x2
 
 Auxiliary.DelayZone={}
 Auxiliary.DelayGroup={}
@@ -23,23 +24,23 @@ function Auxiliary.DelayByTurn(c,tp,ct,lab)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CANNOT_ATTACK)
-	e1:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_SET_AVAILABLE)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_IGNORE_BATTLE_TARGET)
-	e2:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_SET_AVAILABLE)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
-	e3:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	e3:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_SET_AVAILABLE)
 	c:RegisterEffect(e3)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_UNRELEASABLE_SUM)
-	e0:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	e0:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_SET_AVAILABLE)
 	e0:SetValue(1)
 	c:RegisterEffect(e0)
 	local e5=Effect.CreateEffect(c)
@@ -64,7 +65,7 @@ function Auxiliary.DelayByTurn(c,tp,ct,lab)
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_SINGLE)
 	e6:SetCode(EFFECT_DELAY_TURN)
-	e6:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	e6:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_SET_AVAILABLE)
 	if lab then
 		e6:SetLabel(lab)
 	end
@@ -98,26 +99,26 @@ function Auxiliary.DelayTillPhase(c,tp,phase,ct)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CANNOT_ATTACK)
-	e1:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_SET_AVAILABLE)
 	e1:SetReset(RESET_PHASE+phase,ct)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_IGNORE_BATTLE_TARGET)
-	e2:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_SET_AVAILABLE)
 	e2:SetReset(RESET_PHASE+phase,ct)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
-	e3:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	e3:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_SET_AVAILABLE)
 	e3:SetReset(RESET_PHASE+phase,ct)
 	c:RegisterEffect(e3)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_UNRELEASABLE_SUM)
-	e0:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	e0:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_SET_AVAILABLE)
 	e0:SetReset(RESET_PHASE+phase,ct)
 	e0:SetValue(1)
 	c:RegisterEffect(e0)
@@ -358,7 +359,7 @@ function Auxiliary.DelOpOp4(e1,e2,e3,e5)
 			if c:GetTurnCounter()>0 then
 				return
 			end
-			if te:GetLabel()&ELABEL_IS_DELIGHT_SUMMONING~=0 then
+			if te:GetLabel()&(ELABEL_IS_DELIGHT_SUMMONING|ELABEL_IS_DELAYED_SUMMON)~=0 then
 				if Duel.HintSpSummon then
 					Duel.HintSpSummon(c)
 				else
