@@ -1712,20 +1712,31 @@ function Card.RegisterEffect(c,e,forced,...)
 			return con(e,tp,eg,ep,ev,re,r,rp)
 		end)
 	elseif code==52038441 and mt.eff_ct[c][0]==e then
-		local filter1=function(c,p,eg)
-			return (c:IsSummonPlayer(p) and eg:IsContains(c) and (c:HasNonZeroAttack() or c:IsNegatableMonster()))
+		local filter1=function(c,e,tp)
+			return (c:IsSummonPlayer(1-tp) and c:IsCanBeEffectTarget(e) and c:IsLocation(LOCATION_MZONE) and (c:HasNonZeroAttack() or c:IsNegatableMonster()))
 				or c.delightsworn
-				
+		end
+		local filter2=function(c)
+			return c.delightsworn
 		end
 		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+			local g=e:GetLabelObject():Filter(filter1,nil,e,tp)
+			local sg=Duel.GetMatchingGroup(filter2,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+			g:Merge(sg)
 			if chkc then
-				return chkc:IsLocation(LOCATION_ONFIELD) and filter1(chkc,1-tp,eg)
+				return g:IsContains(chkc) and filter1(chkc,e,tp)
 			end
 			if chk==0 then
-				return Duel.IsExistingTarget(filter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,1-tp,eg)
+				return #g>0
 			end
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
-			local g=Duel.SelectTarget(tp,filter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,1-tp,eg)
+			local tg=nil
+			if #g>1 then
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
+				tg=g:Select(tp,1,1,nil)
+			else
+				tg=g
+			end
+			Duel.SetTargetCard(tg)
 			Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,1,0,0)
 		end)
 		Auxiliary.MetatableEffectCount=false
