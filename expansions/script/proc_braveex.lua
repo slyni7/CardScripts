@@ -76,10 +76,67 @@ function Auxiliary.AddBraveProcedure(c,f,min,max,gf)
 	return e1
 end
 
+if not Auxiliary.BraveRewrite then
+	Auxiliary.BraveRewrite=true
+
 local cregeff=Card.RegisterEffect
 
 function Card.RegisterEffect(c,e,...)
-	if e:IsHasType(EFFECT_TYPE_SINGLE) then
+	if e:IsHasType(EFFECT_TYPE_EQUIP) then
+		if e:GetCode()==EFFECT_SET_BASE_ATTACK then
+			local cond=e:GetCondition()
+			e:SetCondition(function(e)
+				local c=e:GetHandler():GetEquipTarget()
+				return (not cond or cond(e)) and not c:IsHasEffect(EFFECT_BRAVE)
+			end)
+		elseif e:GetCode()==EFFECT_UPDATE_ATTACK then
+			local cond=e:GetCondition()
+			e:SetCondition(function(e)
+				local c=e:GetHandler():GetEquipTarget()
+				return (not cond or cond(e)) and not c:IsHasEffect(EFFECT_BRAVE)
+			end)
+		elseif e:GetCode()==EFFECT_SET_ATTACK then
+			local cond=e:GetCondition()
+			e:SetCondition(function(e)
+				local c=e:GetHandler():GetEquipTarget()
+				return (not cond or cond(e)) and not c:IsHasEffect(EFFECT_BRAVE)
+			end)
+		elseif e:GetCode()==EFFECT_SET_ATTACK_FINAL then
+			local cond=e:GetCondition()
+			e:SetCondition(function(e)
+				local c=e:GetHandler():GetEquipTarget()
+				return (not cond or cond(e)) and not c:IsHasEffect(EFFECT_BRAVE)
+			end)
+		elseif e:GetCode()==EFFECT_SET_BASE_BRAVE then
+			local cond=e:GetCondition()
+			e:SetCondition(function(e)
+				local c=e:GetHandler():GetEquipTarget()
+				return (not cond or cond(e)) and c:IsHasEffect(EFFECT_BRAVE)
+			end)
+			e:SetCode(EFFECT_SET_BASE_ATTACK)
+		elseif e:GetCode()==EFFECT_UPDATE_BRAVE then
+			local cond=e:GetCondition()
+			e:SetCondition(function(e)
+				local c=e:GetHandler():GetEquipTarget()
+				return (not cond or cond(e)) and c:IsHasEffect(EFFECT_BRAVE)
+			end)
+			e:SetCode(EFFECT_UPDATE_ATTACK)
+		elseif e:GetCode()==EFFECT_SET_BRAVE then
+			local cond=e:GetCondition()
+			e:SetCondition(function(e)
+				local c=e:GetHandler():GetEquipTarget()
+				return (not cond or cond(e)) and c:IsHasEffect(EFFECT_BRAVE)
+			end)
+			e:SetCode(EFFECT_SET_ATTACK)
+		elseif e:GetCode()==EFFECT_SET_BRAVE_FINAL then
+			local cond=e:GetCondition()
+			e:SetCondition(function(e)
+				local c=e:GetHandler():GetEquipTarget()
+				return (not cond or cond(e)) and c:IsHasEffect(EFFECT_BRAVE)
+			end)
+			e:SetCode(EFFECT_SET_ATTACK_FINAL)
+		end
+	elseif e:IsHasType(EFFECT_TYPE_SINGLE) then
 		if e:GetCode()==EFFECT_SET_BASE_ATTACK then
 			local cond=e:GetCondition()
 			e:SetCondition(function(e)
@@ -339,6 +396,8 @@ function Card.GetBraveAttack(c,bc)
 	return c:GetAttack()
 end
 
+end
+
 function Auxiliary.BraveConditionFilter(c,bc,f)
 	return c:IsFaceup() and (not f or f(c)) and c:GetBraveAttack(bc)>0
 		--and c:IsCanBeBraveMaterial(bc)
@@ -408,11 +467,12 @@ function Auxiliary.BraveOperation(f,min,max,gf)
 				tc:RegisterFlagEffect(FLAGEFFECT_BURNING_ZONE,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD-RESET_LEAVE,0,0)
 				tc=g:GetNext()
 			end
-			Duel.SendtoDeck(g,nil,-2,REASON_DESTROY+REASON_MATERIAL)
+			--Duel.SendtoDeck(g,nil,-2,REASON_DESTROY+REASON_MATERIAL)
+			Duel.SendtoDeck(g,nil,-2,REASON_MATERIAL)
 			c:SetMaterial(g)
 			local tc=g:GetFirst()
 			while tc do
-				table.insert(Auxiliary.BurningZone[tc:GetControler()],tc)
+				table.insert(Auxiliary.BurningZone[tc:GetOwner()],tc)
 				Auxiliary.BurningZoneTopCardOperation(e,tp,eg,ep,ev,re,r,rp)
 				tc=g:GetNext()
 			end
@@ -478,14 +538,14 @@ end
 end
 --
 	local itype=Card.IsType
-	Card.IsType=function(c,t)
+	Card.IsType=function(c,t,...)
 	if c.CardType_Brave then
 		if t==TYPE_LINK then
 			return false
 		end
 		return itype(c,bit.bor(t,TYPE_LINK)-TYPE_LINK)
 	end
-	return itype(c,t)
+	return itype(c,t,...)
 end
 --
 	local iftype=Card.IsFusionType
