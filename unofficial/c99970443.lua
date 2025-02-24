@@ -1,114 +1,84 @@
---운명의 좌 「암전」
-local m=99970443
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--[ The Throne of Destiny ]
+local s,id=GetID()
+function s.initial_effect(c)
 
-	--특수 소환 장착
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	WriteEff(e1,1,"TO")
+	e1:SetCode(EVENT_CHAINING)
+	WriteEff(e1,1,"NCTO")
 	c:RegisterEffect(e1)
-
-	--가챠는 나쁜 문명!
+	
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_ADJUST)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetCondition(cm.con2)
-	e2:SetOperation(cm.op2)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e2:SetCondition(s.actcon)
+	e2:SetDescription(aux.Stringid(id,0))
 	c:RegisterEffect(e2)
-	--레벨 감소
+	
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_EQUIP)
-	e3:SetCode(EFFECT_CHANGE_LEVEL)
-	e3:SetValue(-4)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetRange(LOCATION_GRAVE)
+	e3:SetHintTiming(TIMING_END_PHASE)
+	e3:SetCost(s.setcost)
+	e3:SetTarget(s.settg)
+	e3:SetOperation(s.setop)
 	c:RegisterEffect(e3)
 	
-	--모듈 소재 불가
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e4:SetCode(EFFECT_CANNOT_BE_MODULE_MATERIAL)
-	e4:SetValue(1)
-	e4:SetCondition(cm.con4)
-	c:RegisterEffect(e4)
-	
-	--전투 내성 부여
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_EQUIP)
-	e5:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e5:SetValue(1)
-	e5:SetCondition(cm.con5)
-	c:RegisterEffect(e5)
-	
 end
 
---특수 소환 장착
-function cm.filter(c,e,tp)
-	return c:IsSetCard(0xd3b) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsSummonableCard()
+function s.con1(e,tp,eg,ep,ev,re,r,rp)
+	return (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(ev)
 end
-function cm.tar1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cm.filter(chkc,e,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(cm.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,cm.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
+function s.cost1fil(c)
+	return c:IsSetCard(0x9d70) and c:IsM()
 end
-function cm.op1(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
-		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)==0 then return end
-		Duel.Equip(tp,c,tc)
-		local e1=Effect.CreateEffect(tc)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetCode(EFFECT_EQUIP_LIMIT)
-		e1:SetValue(cm.eqlimit)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		c:RegisterEffect(e1)
+function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
+	local dg=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_ONFIELD,nil,e)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.cost1fil,1,true,aux.ReleaseCheckTarget,nil,dg) end
+	local g=Duel.SelectReleaseGroupCost(tp,s.cost1fil,1,1,true,aux.ReleaseCheckTarget,nil,dg)
+	Duel.Release(g,REASON_COST)
+end
+function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
-function cm.eqlimit(e,c)
-	return e:GetOwner()==c
+function s.op1(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.NegateActivation(ev) then return end
+	if re:GetHandler():IsRelateToEffect(re) then
+		Duel.Destroy(eg,REASON_EFFECT)
+	end
 end
 
---가챠는 좋은 문명!
-function cm.con2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=c:GetEquipTarget()
-	return c:GetFlagEffect(m)==0 and tc~=nil
+function s.confil(c)
+	return c:IsLevelAbove(3) and c:IsFaceup() and c:IsSetCard(0x9d70)
 end
-function cm.op2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	c:RegisterFlagEffect(m,RESET_EVENT+0x1fe0000,0,1)
-	Duel.Hint(HINT_CARD,0,m)
-	local atk=YuL.random(-2000,2000)
-	Duel.Hint(HINT_NUMBER,tp,atk)
-	Duel.Hint(HINT_NUMBER,1-tp,atk)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_EQUIP)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetReset(RESET_EVENT+0x1fe0000)
-	e1:SetValue(atk)
-	c:RegisterEffect(e1)
+function s.actcon(e)
+	return Duel.IsExistingMatchingCard(s.confil,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 
---모듈 소재 불가
-function cm.con4(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=c:GetEquipTarget()
-	return tc~=nil and tc:GetAttack()<=0
+function s.cfil(c)
+	return c:IsSetCard(0x9d70) and (c:IsAbleToDeckAsCost() or c:IsAbleToExtraAsCost()) and c:IsFaceup()
 end
-
---전투 내성 부여
-function cm.con5(e,tp,eg,ep,ev,re,r,rp)
+function s.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfil,tp,LOCATION_REMOVED,0,2,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectMatchingCard(tp,s.cfil,tp,LOCATION_REMOVED,0,2,2,nil)
+	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)
+end
+function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local tc=c:GetEquipTarget()
-	return tc~=nil and tc:GetAttack()>0
+	if chk==0 then return c:IsSSetable() end
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,0,0)
+end
+function s.setop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and c:IsSSetable() then
+		Duel.SSet(tp,c)
+	end
 end
