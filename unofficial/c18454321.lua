@@ -31,7 +31,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function s.con1(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()&(PHASE_MAIN1|PHASE_MAIN2)~=0
+	local ph=Duel.GetCurrentPhase()
+	return (Duel.GetTurnPlayer()==tp and ph&(PHASE_MAIN1|PHASE_MAIN2)~=0)
+		or (Duel.GetTurnPlayer()~=tp and ph>PHASE_MAIN1 and ph<PHASE_MAIN2)
 end
 function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
