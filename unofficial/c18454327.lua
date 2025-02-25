@@ -11,6 +11,4 @@ function s.initial_effect(c)
 end
 function s.gop1(e,tp,eg,ep,ev,re,r,rp)
 	Auxiliary.GlobalFullList()
-	Debug.Message(#Auxiliary.GlobalOCGTokens[0])
-	Debug.Message(#Auxiliary.GlobalOCGTokens[1])
 end
