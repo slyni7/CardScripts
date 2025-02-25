@@ -34,7 +34,7 @@ function s.gop2(e,tp,eg,ep,ev,re,r,rp)
 			if aux.GlobalOCGTokens[p]:IsContains(tc) then
 				local tcode=tc:GetOriginalCode()
 				aux.GlobalOCGTokens[p]:RemoveCard(tc)
-				local token=Duel.CreateToken(p,token)
+				local token=Duel.CreateToken(p,tcode)
 				aux.GlobalOCGTokens[p]:AddCard(token)
 			end
 			tc=eg:GetNext()
