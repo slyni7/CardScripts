@@ -10,5 +10,5 @@ function s.initial_effect(c)
 	end
 end
 function s.gop1(e,tp,eg,ep,ev,re,r,rp)
-	Auxiliary.GlobalFullList()
+	aux.GlobalFullList()
 end
