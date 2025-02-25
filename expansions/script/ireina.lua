@@ -3205,7 +3205,7 @@ function Auxiliary.NewHeavenAndEarth()
 				e1:SetValue(math.max(tatk,0))
 				trc:RegisterEffect(e1)
 			end
-			if trc then
+			if trc and not tc:IsReason(REASON_BATTLE+REASON_EFFECT) then
 				Duel.RaiseEvent(trc,18453882,e,0,0,0,0)
 			end
 			tc=eg:GetNext()
