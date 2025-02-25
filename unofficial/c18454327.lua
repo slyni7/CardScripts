@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	end
 end
 function s.gop1(e,tp,eg,ep,ev,re,r,rp)
-	Debug.RainbowFishPause()
 	Auxiliary.GlobalFullList()
-	Debug.RainbowFishReplay()
+	Debug.Message(#Auxiliary.GlobalOCGTokens[0])
+	Debug.Message(#Auxiliary.GlobalOCGTokens[1])
 end
