@@ -11,18 +11,17 @@ function s.initial_effect(c)
 end
 
 function s.tfil1(c)
-	local g=c:GetAdjacentGroup():Filter(Card.IsLocation,nil,LOCATION_MZONE)
-	return #g==0
+	return c:GetColumnGroupCount()==0
 end
 function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(s.tfil1,tp,LOCATION_MZONE,LOCATION_MZONE,nil):Filter(Card.IsAbleToHand,nil)
+	local g=Duel.GetMatchingGroup(s.tfil1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler()):Filter(Card.IsAbleToHand,nil)
 	if chk==0 then
 		return #g>0
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,#g,0,0)
 end
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.tfil1,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(s.tfil1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 	end
