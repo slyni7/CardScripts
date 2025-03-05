@@ -1,4 +1,4 @@
---휴프알테 엘리시온
+--휴프알로 엘리시온
 local s,id=GetID()
 function s.initial_effect(c)
 	--activate
@@ -61,7 +61,7 @@ end
 
 --effect 1
 function s.val1(e,c)
-	return Duel.GetFlagEffect(0,id)*200
+	return Duel.GetFlagEffect(0,id)*300
 end
 
 --effect 2
