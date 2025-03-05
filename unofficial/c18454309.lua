@@ -32,7 +32,7 @@ function s.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function s.cop21(rg,e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetHandler()
+	local tc=rg:GetFirst()
 	Duel.SendtoHand(tc,nil,REASON_EFFECT)
 end
 function s.cop22(rg,e,tp,eg,ep,ev,re,r,rp)
@@ -41,11 +41,11 @@ function s.cop22(rg,e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(fc,REASON_RULE)
 		Duel.BreakEffect()
 	end
-	local tc=e:GetHandler()
+	local tc=rg:GetFirst()
 	Duel.MoveToField(tc,tp,tp,LSTN("F"),POS_FACEUP,true)
 end
 function s.cop23(rg,e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetHandler()
+	local tc=rg:GetFirst()
 	Duel.ReturnToField(tc)
 end
 function s.tfil2(c,bool)
