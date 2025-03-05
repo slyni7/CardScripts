@@ -1,62 +1,49 @@
 --EMコン
+--Performapal Corn
 local s,id=GetID()
 function s.initial_effect(c)
-	--to hand
+	--Change both this card and 1 other "Perfomapal" monster you control to Defense Position, and if you do, add 1 "Odd-Eyes" monster from your Deck to your hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCategory(CATEGORY_POSITION+CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
-	e1:SetCondition(s.thcon)
+	e1:SetCondition(function(e) return (e:GetHandler():IsStatus(STATUS_SUMMON_TURN) or e:GetHandler():IsStatus(STATUS_SPSUMMON_TURN)) end)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-	--lp recover
+	--Gain 500 LP
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_RECOVER)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCondition(s.lpcon)
-	e2:SetCost(s.lpcost)
-	e2:SetTarget(s.lptg)
-	e2:SetOperation(s.lpop)
+	e2:SetCondition(function(e,tp) return Duel.IsTurnPlayer(1-tp) end)
+	e2:SetCost(s.reccost)
+	e2:SetTarget(s.rectg)
+	e2:SetOperation(s.recop)
 	c:RegisterEffect(e2)
-	aux.GlobalCheck(s,function()
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SUMMON_SUCCESS)
-		ge1:SetLabel(id)
-		ge1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		ge1:SetOperation(aux.sumreg)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=ge1:Clone()
-		ge2:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge2:SetLabel(id)
-		Duel.RegisterEffect(ge2,0)
-	end)
 end
-s.listed_series={0x9f,0x99}
+s.listed_series={SET_PERFORMAPAL,SET_ODD_EYES}
 s.listed_names={id}
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(id)~=0
-end
-function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9f) and c:IsAttackBelow(1000)
+function s.posfilter(c)
+	return c:IsFaceup() and c:IsSetCard(SET_PERFORMAPAL) and c:IsAttackBelow(1000)
 		and c:IsPosition(POS_FACEUP_ATTACK) and c:IsCanChangePosition()
 end
 function s.thfilter(c)
-	return c:IsSetCard(0x99) and c:IsMonster() and c:IsAbleToHand()
+	return c:IsSetCard(SET_ODD_EYES) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc) and chkc~=e:GetHandler() end
+	local c=e:GetHandler()
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.posfilter(chkc) and chkc~=c end
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)
-		and e:GetHandler():IsPosition(POS_FACEUP_ATTACK)
-		and Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
-	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,1,e:GetHandler())
+		and c:IsPosition(POS_FACEUP_ATTACK) and c:IsCanChangePosition() 
+		and Duel.IsExistingTarget(s.posfilter,tp,LOCATION_MZONE,0,1,c) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
+	local g=Duel.SelectTarget(tp,s.posfilter,tp,LOCATION_MZONE,0,1,1,c)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,g+Group.FromCards(c),2,tp,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
@@ -74,26 +61,23 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.cfilter(c)
-	return c:IsSetCard(0x9f) and c:IsMonster() and c:IsAbleToRemoveAsCost() and not c:IsCode(id)
+	return c:IsSetCard(SET_PERFORMAPAL) and c:IsMonster() and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true) and not c:IsCode(id)
 end
-function s.lpcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp
-end
-function s.lpcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return aux.bfgcost(e,tp,eg,ep,ev,re,r,rp,0)
-		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
+function s.reccost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToRemoveAsCost() and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE|LOCATION_GRAVE,0,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
-	g:AddCard(e:GetHandler())
+	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_MZONE|LOCATION_GRAVE,0,1,1,c)
+	g:AddCard(c)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
-function s.lptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(500)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,500)
 end
-function s.lpop(e,tp,eg,ep,ev,re,r,rp)
+function s.recop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Recover(p,d,REASON_EFFECT)
 end
