@@ -1,4 +1,4 @@
---휴프알테 브리클
+--휴프알로 브리클
 local s,id=GetID()
 function s.initial_effect(c)
 	--effect 1
@@ -35,6 +35,7 @@ function s.tg1con(sg,e,tp)
 end
 
 function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return false end
 	local g=Duel.GetMatchingGroup(s.tg1filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,e)
 	if chk==0 then return #g>0 end
 	local sg=aux.SelectUnselectGroup(g,e,tp,1,2,s.tg1con,1,tp,HINTMSG_RTOHAND)
