@@ -1593,7 +1593,7 @@ function Card.RegisterEffect(c,e,forced,...)
 	elseif code==84211599 and mt.eff_ct[c][0]==e then
 		e:SetCost(function(e,tp,eg,ep,ev,re,r,rp,chk)
 			if chk==0 then
-				return Duel.GetFlagEffect(tp,id)==0 or Duel.GetPlayerEffect(tp,EFFECT_GREED_SWALLOW)
+				return Duel.GetFlagEffect(tp,code)==0 or Duel.GetPlayerEffect(tp,EFFECT_GREED_SWALLOW)
 			end
 			if not e:IsHasType(EFFECT_TYPE_ACTIVATE) or Duel.GetPlayerEffect(tp,EFFECT_GREED_SWALLOW) then
 				return
