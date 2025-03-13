@@ -104,7 +104,11 @@ function s.op2(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e3)
 		if tc:IsAttack(0) and tc:IsDefense(0) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-			local mg=Duel.SelectMatchingCard(tp,s.ofil21,tp,LOCATION_HAND+LOCATION_MZONE,0,0,1,nil,e,tp,att)
+			local loc=LOCATION_HAND+LOCATION_MZONE
+			if e:GetLabel()==1 then
+				loc=LOCATION_HAND+LOCATION_DECK+LOCATION_MZONE
+			end
+			local mg=Duel.SelectMatchingCard(tp,s.ofil21,tp,loc,0,0,1,nil,e,tp,att)
 			if #mg>0 then
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 				local mc=mg:GetFirst()
