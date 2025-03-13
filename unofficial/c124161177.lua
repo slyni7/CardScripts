@@ -11,6 +11,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetRange(LOCATION_FZONE)
+	e1:SetLabelObject(e1)
 	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetTarget(function(_,c) return c:IsSetCard(0xf2b) end)
 	e1:SetValue(s.val1)
@@ -18,12 +19,24 @@ function s.initial_effect(c)
 	local e1a=e1:Clone()
 	e1a:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e1a)
+	local e1b=Effect.CreateEffect(c)
+	e1b:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1b:SetCode(EVENT_PAY_LPCOST)
+	e1b:SetRange(LOCATION_FZONE)
+	e1b:SetLabelObject(e1)
+	e1b:SetOperation(s.regop)
+	c:RegisterEffect(e1b)
+	local e1c=e1b:Clone()
+	e1c:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e1c:SetCode(EVENT_LEAVE_FIELD_P)
+	e1c:SetOperation(function(e) e:GetLabelObject():SetLabel(0) end)
+	c:RegisterEffect(e1c)
 	--effect 2
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetRange(LOCATION_FZONE)
-	e2:SetCode(EVENT_PAY_LPCOST)
+	e2:SetCode(EVENT_CHAINING)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.con2)
@@ -45,12 +58,20 @@ end
 
 --effect 1
 function s.val1(e,c)
-	return Duel.GetFlagEffect(e:GetHandlerPlayer(),124161180)*300
+	return e:GetLabelObject():GetLabel()*100
+end
+
+function s.regop(e,tp,eg,ep,ev,re,r,rp)
+	if ep==tp then
+		local val=e:GetLabelObject():GetLabel()
+		e:GetLabelObject():SetLabel(val+1)
+	end
 end
 
 --effect 2
 function s.con2(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and re and re:IsActivated() and re:GetHandler():IsSetCard(0xf2b) and not re:GetHandler():IsType(TYPE_FIELD)
+	local rc=re:GetHandler()
+	return rc:IsSetCard(0xf2b) and not rc:IsType(TYPE_FIELD) and rp==tp
 end
  
 function s.cst2(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -58,26 +79,20 @@ function s.cst2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,100)
 end
 
-function s.tg2filter(c,e,tp)
-	return (c:IsRace(RACE_PLANT) or c:IsAttribute(ATTRIBUTE_FIRE)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-
 function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(s.tg2filter,tp,LOCATION_HAND,0,nil,e,tp)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #g>0 end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,tp,LOCATION_HAND)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,100)
+	if chk==0 then return true end
 end
 
 function s.op2(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.tg2filter,tp,LOCATION_HAND,0,nil,e,tp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #g>0 then
-		local sg=aux.SelectUnselectGroup(g,e,tp,1,1,aux.TRUE,1,tp,HINTMSG_SPSUMMON):GetFirst()
-		if Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)>0 then
-			Duel.Damage(tp,sg:GetLevel()*100,REASON_EFFECT)
-			Duel.Damage(1-tp,sg:GetLevel()*100,REASON_EFFECT)
-		end
-	end
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
+	e1:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xf2b))
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
 end
 
 --effect 3
