@@ -1,4 +1,4 @@
---스피나스피 시아
+--란샤르드 시아
 local s,id=GetID()
 function s.initial_effect(c)
 	--effect 1
@@ -51,7 +51,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		local dg=Duel.GetMatchingGroup(s.op1filter,tp,0,LOCATION_HAND,nil,tp)
-		if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) and #dg>0 then
+		if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 and Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) and #dg>0 then
 			Duel.BreakEffect()
 			local dsg=aux.SelectUnselectGroup(dg,e,tp,1,1,aux.TRUE,1,1-tp,HINTMSG_TOGRAVE)
 			Duel.SendtoGrave(dsg,REASON_EFFECT)
