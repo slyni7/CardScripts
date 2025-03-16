@@ -1,4 +1,4 @@
---스피나스피 위즈 아딘
+--란샤르드 위즈 아딘
 local s,id=GetID()
 function s.initial_effect(c)
 	--fusion
@@ -27,7 +27,7 @@ end
 
 --effect 1
 function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 and Duel.IsPlayerCanDraw(tp,1) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CODE)
 	local ac=Duel.AnnounceCard(tp)
 	e:SetLabel(ac)
