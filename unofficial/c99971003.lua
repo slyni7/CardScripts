@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	
 	local e1=MakeEff(c,"STo")
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
 	e1:SetCondition(function(e) return e:GetHandler():IsXyzSummoned() end)
 	WriteEff(e1,1,"TO")
 	c:RegisterEffect(e1)
