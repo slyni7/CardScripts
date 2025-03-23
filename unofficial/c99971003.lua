@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	
 	local e1=MakeEff(c,"STo")
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCondition(function(e) return e:GetHandler():IsXyzSummoned() end)
 	WriteEff(e1,1,"TO")
 	c:RegisterEffect(e1)
@@ -49,7 +49,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsCanBeXyzMaterial(c,tp,REASON_EFFECT) then
-		Duel.Overlay(c,tc)
+		Duel.Overlay(c,tc,true)
 	end
 end
 
