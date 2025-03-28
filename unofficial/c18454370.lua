@@ -50,7 +50,7 @@ function s.tar2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		return chkc:IsOnField() and chkc:IsControler(tp) and chkc:IsAbleToGrave()
 	end
 	if chk==0 then
-		return Duel.IsExistingTarget(Card.IsAbleToGrave,tp,"O",0,1,nil)
+		return Duel.IETarget(Card.IsAbleToGrave,tp,"O",0,1,nil)
 			and Duel.IEMCard(s.tfil2,tp,"D",0,1,nil,e,tp) and Duel.GetLocCount(tp,"M")>0
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
