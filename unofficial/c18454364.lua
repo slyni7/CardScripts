@@ -125,7 +125,7 @@ function s.op4(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-		local g=Duel.SMCard(tp,s.tfil42,"DG",0,1,1,nil)
+		local g=Duel.SMCard(tp,s.tfil42,tp,"DG",0,1,1,nil)
 		if #g>0 then
 			Duel.Overlay(tc,g)
 		end
