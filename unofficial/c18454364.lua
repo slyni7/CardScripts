@@ -67,7 +67,7 @@ function s.tar3(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		return chkc:IsLoc("M") and chkc:IsAbleToRemove()
 	end
 	if chk==0 then
-		return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,"M","M",1,nil)
+		return Duel.IETarget(Card.IsAbleToRemove,tp,"M","M",1,nil)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.STarget(tp,Card.IsAbleToRemove,tp,"M","M",1,1,nil)
