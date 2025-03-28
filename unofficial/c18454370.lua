@@ -60,6 +60,7 @@ function s.tar2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
 	if Duel.GetLocCount(tp,"M")>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SMCard(tp,s.tfil2,tp,"D",0,1,1,nil,e,tp)
