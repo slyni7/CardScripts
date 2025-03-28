@@ -2417,7 +2417,7 @@ function Effect.SetTarget(e,tg)
 		local tgf=function(...)
 			local t={...}
 			Auxiliary.TriggeringEffect=t[1]
-			local res=tg(...)
+			local res=not tg or tg(...)
 			Auxiliary.TriggeringEffect=nil
 			return res
 		end
