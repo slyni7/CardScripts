@@ -1,4 +1,5 @@
 --FNo.0 未来皇ホープ
+--Number F0: Utopic Future
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
@@ -40,10 +41,10 @@ function s.initial_effect(c)
 end
 s.xyz_number=0
 function s.xyzfilter(c,xyz,sumtype,tp)
-	return c:IsType(TYPE_XYZ,xyz,sumtype,tp) and not c:IsSetCard(0x48,xyz,sumtype,tp)
+	return c:IsType(TYPE_XYZ,xyz,sumtype,tp) and not c:IsSetCard(SET_NUMBER,xyz,sumtype,tp)
 end
 function s.xyzcheck(g,tp,xyz)
-	local mg=g:Filter(function(c) return not c:IsHasEffect(511001175) end,nil)
+	local mg=g:Filter(function(c) return not c:IsHasEffect(EFFECT_EQUIP_SPELL_XYZ_MAT) end,nil)
 	return mg:GetClassCount(Card.GetRank)==1
 end
 function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -59,7 +60,7 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_EFFECT) 
+	if chk==0 then return not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_EFFECT)
 		and c:CheckRemoveOverlayCard(tp,1,REASON_EFFECT) end
 	if Duel.SelectEffectYesNo(tp,c,96) then
 		c:RemoveOverlayCard(tp,1,1,REASON_EFFECT)

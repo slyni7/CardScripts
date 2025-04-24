@@ -13,14 +13,14 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetCode(511000189)
+	e2:SetCode(EFFECT_SPELL_XYZ_MAT)
 	e2:SetCondition(s.con)
 	e2:SetValue(s.val)
 	e2:SetRange(LOCATION_SZONE)
 	c:RegisterEffect(e2)
 end
 function s.filter(c,e,tp)
-	return c:GetLevel()>0 and c:IsFaceup() and c:IsSetCard(0x54)
+	return c:GetLevel()>0 and c:IsFaceup() and c:IsSetCard(SET_GAGAGA)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc) end

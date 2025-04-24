@@ -3,7 +3,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	Xyz.AddProcedure(c,s.mfilter,5,2,s.ovfilter,aux.Stringid(id,2),99,s.xyzop)
+	Xyz.AddProcedure(c,s.mfilter,5,2,s.ovfilter,aux.Stringid(id,2),Xyz.InfiniteMats,s.xyzop)
 	--Back to Deck
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCost(s.tdcost)
+	e2:SetCost(Cost.Detach(1))
 	e2:SetTarget(s.tdtg)
 	e2:SetOperation(s.tdop)
 	c:RegisterEffect(e2,false,REGISTER_FLAG_DETACH_XMAT)
@@ -40,10 +40,6 @@ function s.xyzop(e,tp,chk,mc)
 	mc:RemoveOverlayCard(tp,2,2,REASON_COST)
 	return true
 end
-function s.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-end
 function s.tdfilter(c)
 	return c:IsPosition(POS_DEFENSE) and c:IsAbleToDeck()
 end
@@ -57,7 +53,7 @@ end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
-		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
+		Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	end
 end
 function s.cfilter(c)
@@ -69,7 +65,7 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsType(TYPE_XYZ) 
+	if chk==0 then return e:GetHandler():IsType(TYPE_XYZ)
 		and Duel.IsExistingMatchingCard(Card.IsRace,tp,LOCATION_GRAVE,0,1,nil,RACE_INSECT) end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)

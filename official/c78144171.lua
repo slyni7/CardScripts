@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
 	--Xyz Summon procedure
-	Xyz.AddProcedure(c,nil,7,2,s.ovfilter,aux.Stringid(id,0),99,s.xyzop)
+	Xyz.AddProcedure(c,nil,7,2,s.ovfilter,aux.Stringid(id,0),Xyz.InfiniteMats,s.xyzop)
 	--Destroy 1 opponent's card, then banish 1 card from your GY
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCost(aux.dxmcostgen(1,1,nil))
+	e1:SetCost(Cost.Detach(1,1,nil))
 	e1:SetTarget(s.destg)
 	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1,false,REGISTER_FLAG_DETACH_XMAT)

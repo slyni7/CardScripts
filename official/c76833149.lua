@@ -1,11 +1,11 @@
 --メルフィー・マミィ
---Melffy Mammy
+--Melffy Mommy
 --scripted by pyrQ
 local s,id=GetID()
 function s.initial_effect(c)
 	--Xyz Summon
 	c:EnableReviveLimit()
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_BEAST),2,2,nil,nil,99)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_BEAST),2,2,nil,nil,Xyz.InfiniteMats)
 	--Attach material
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -48,13 +48,13 @@ function s.mtfilter(c,e)
 end
 function s.mttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsType(TYPE_XYZ)
-		and Duel.IsExistingMatchingCard(s.mtfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,e:GetHandler(),e) end
+		and Duel.IsExistingMatchingCard(s.mtfilter,tp,LOCATION_HAND|LOCATION_MZONE,0,1,e:GetHandler(),e) end
 end
 function s.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-	local g=Duel.SelectMatchingCard(tp,s.mtfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,e:GetHandler(),e)
+	local g=Duel.SelectMatchingCard(tp,s.mtfilter,tp,LOCATION_HAND|LOCATION_MZONE,0,1,1,e:GetHandler(),e)
 	local tc=g:GetFirst()
 	if tc then
 		Duel.Overlay(c,tc,true)

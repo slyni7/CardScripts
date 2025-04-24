@@ -29,10 +29,13 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	--If your LP would become 0 from battle damage, make your LP 100
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e4:SetValue(s.indes)
-	c:RegisterEffect(e4)
+	e4:SetDescription(aux.Stringid(54366836,0))
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
+	e4:SetCondition(function(e,tp) return Duel.GetBattleDamage(tp)>=Duel.GetLP(tp) end)
+	e4:SetCost(Cost.Detach(1))
+	e4:SetOperation(s.damop)
+	c:RegisterEffect(e4,false,REGISTER_FLAG_DETACH_XMAT)
 end
 s.xyz_number=54
 function s.indcon(e)
@@ -59,10 +62,4 @@ function s.surop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	Duel.RegisterEffect(e1,tp)
 	Duel.SetLP(tp,100,REASON_EFFECT)
-end
-function s.damopx(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(tp,0)
-end
-function s.indes(e,c)
-	return not c:IsSetCard(0x48)
 end

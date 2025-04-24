@@ -7,16 +7,16 @@ jobs:
   commit:
     runs-on: ubuntu-22.04
     env:
-      REMOTE: ProjectIgnis/DeltaPuppetOfStrings.git
-      REPO_NAME: DeltaPuppetOfStrings
-      DESTINATION: DeltaPuppetOfStrings/script
-      BASE_SHA: 20220912
+      REMOTE: ProjectIgnis/DeltaBagooska.git
+      REPO_NAME: DeltaBagooska
+      DESTINATION: DeltaBagooska/script
+      BASE_SHA: 20250420
     steps:
     - uses: actions/checkout@v1
     - name: Clone destination repository
       run: |
         cd $HOME
-        git clone https://${{ secrets.DEPLOY_TOKEN }}@github.com/$REMOTE
+        git clone https://${{ secrets.DEPLOY_TOKEN_BAGOOSKA }}@github.com/$REMOTE
         mkdir -p $DESTINATION
     - name: Copy new or changed files
       id: copy

@@ -12,12 +12,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(511001225)
+	e2:SetCode(EFFECT_DOUBLE_XYZ_MATERIAL)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 end
 function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x55) and c:IsLevelAbove(1)
+	return c:IsFaceup() and c:IsSetCard(SET_PHOTON) and c:IsLevelAbove(1)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc) end

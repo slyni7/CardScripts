@@ -15,9 +15,3 @@ function s.initial_effect(c)
 	e2:SetOperation(s.dop)
 	c:RegisterEffect(e2)
 end
-function s.dcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetAttackTarget()~=nil
-end
-function s.dop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(1-tp,ev*2)
-end

@@ -57,7 +57,7 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local sg=Group.CreateGroup()
-	local mg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,LOCATION_GRAVE+LOCATION_ONFIELD,nil,e)
+	local mg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE|LOCATION_ONFIELD,LOCATION_GRAVE|LOCATION_ONFIELD,nil,e)
 	if chk==0 then return mg:IsExists(s.chkfilter,1,nil,mg,sg,e,tp) end
 	local reset={}
 	local tc
@@ -132,7 +132,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local xyz=xyzg:Select(tp,1,1,nil):GetFirst()
 		aux.RankUpComplete(xyz,aux.Stringid(id,1))
-		Duel.XyzSummon(tp,xyz,nil,g)
+		Duel.XyzSummon(tp,xyz,g,nil,#g,#g)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SPSUMMON_COST)

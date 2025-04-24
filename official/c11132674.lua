@@ -4,7 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	Xyz.AddProcedure(c,nil,8,2,s.ovfilter,aux.Stringid(id,0),99,s.xyzop)
+	Xyz.AddProcedure(c,nil,8,2,s.ovfilter,aux.Stringid(id,0),Xyz.InfiniteMats,s.xyzop)
 	--Search 1 "Springans" or "Therion" card
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
@@ -41,7 +41,7 @@ function s.xyzop(e,tp,chk)
 	return true
 end
 function s.thfilter(c)
-	return (c:IsSetCard(SET_SPRINGANS) or c:IsSetCard(SET_THERION)) and c:IsAbleToHand()
+	return c:IsSetCard({SET_SPRINGANS,SET_THERION}) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

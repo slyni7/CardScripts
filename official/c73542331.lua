@@ -4,14 +4,14 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--Xyz Summon
-	Xyz.AddProcedure(c,nil,7,2,nil,nil,99)
+	Xyz.AddProcedure(c,nil,7,2,nil,nil,Xyz.InfiniteMats)
 	c:EnableReviveLimit()
 	--Special Summon 1 "Kshatri-la" monster from the Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e1:SetCode(EVENT_PHASE|PHASE_STANDBY)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,{id,0})
 	e1:SetTarget(s.sptg)

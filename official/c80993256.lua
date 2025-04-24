@@ -1,11 +1,11 @@
 --亜種羅王
---Subspecies King Asura-Oh
+--Ashura King
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Xyz Summon procedure
-	Xyz.AddProcedure(c,nil,3,3,nil,nil,99)
+	Xyz.AddProcedure(c,nil,3,3,nil,nil,Xyz.InfiniteMats)
 	--Multiple attacks
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,id)
 	e3:SetCondition(s.negcond)
-	e3:SetCost(aux.dxmcostgen(1,1,nil))
+	e3:SetCost(Cost.Detach(1,1,nil))
 	e3:SetTarget(s.negtg)
 	e3:SetOperation(s.negop)
 	c:RegisterEffect(e3,false,REGISTER_FLAG_DETACH_XMAT)
@@ -47,14 +47,14 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(200)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE)
 		c:RegisterEffect(e1)
 	end
 end
 function s.negcond(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	return re:GetHandler()~=c and not c:IsStatus(STATUS_BATTLE_DESTROYED)
-		and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
+		and re:IsMonsterEffect() and Duel.IsChainNegatable(ev)
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
