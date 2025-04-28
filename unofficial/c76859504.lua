@@ -142,6 +142,7 @@ function cm.op4(e,tp,eg,ep,ev,re,r,rp)
 		end
 		local e1=MakeEff(c,"S")
 		e1:SetCode(EFFECT_IMMUNE_EFFECT)
+		e1:SetProperty(EFFECT_FLAG_IMMEDIATELY_APPLY)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+ph)
 		e1:SetValue(cm.oval41)
 		tc:RegisterEffect(e1)
