@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
-	e1:SetCost(s.cst1)
+	e1:SetCost(Cost.SelfReveal)
 	e1:SetTarget(s.tg1)
 	e1:SetOperation(s.op1(Fusion.SummonEffTG(params),Fusion.SummonEffOP(params)))
 	c:RegisterEffect(e1)
@@ -21,20 +21,13 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_GRAVE)  
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(s.con2)
-	e2:SetCost(s.cst2)
+	e2:SetCost(Cost.PayLP(700))
 	e2:SetTarget(s.tg2)
 	e2:SetOperation(s.op2)
 	c:RegisterEffect(e2)
 end
 
 --effect 1
-function s.cst1(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return not c:IsPublic() end
-	Duel.ConfirmCards(1-tp,c)
-	Duel.ShuffleHand(tp)
-end
-
 function s.tg1filter(c,e,tp)
 	return c:IsSetCard(0xf2b) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
@@ -67,11 +60,6 @@ end
 
 function s.con2(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.con2filter,1,nil,tp)
-end
-
-function s.cst2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLPCost(tp,700) end
-	Duel.PayLPCost(tp,700)
 end
 
 function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
