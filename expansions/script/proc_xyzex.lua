@@ -78,6 +78,7 @@ function Xyz.AddProcedure(c,f,lv,ct,alterf,desc,maxct,op,mustbemat,exchk)
 		e2:SetOperation(Xyz.Operation2(alterf,op))
 		c:RegisterEffect(e2)
 	end
+	return e1
 end
 --Xyz Summon(normal)
 function Xyz.MatFilter2(c,f,lv,xyz,tp)
