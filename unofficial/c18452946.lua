@@ -79,6 +79,9 @@ function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 	if ft<1 or #g<1 then
 		return
 	end
+	if ft>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then
+		ft=1
+	end
 	if #g>ft then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		g=g:Select(tp,ft,ft,nil)
