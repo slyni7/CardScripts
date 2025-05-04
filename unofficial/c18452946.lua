@@ -68,6 +68,9 @@ function cm.tar1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then
 		return ft>0 and #g>0
 	end
+	if ft>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then
+		ft=1
+	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=g:SelectSubGroup(tp,aux.dncheck,false,1,ft)
 	Duel.SetTargetCard(sg)
