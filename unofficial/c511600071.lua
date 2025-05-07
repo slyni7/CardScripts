@@ -14,16 +14,20 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_series={SET_NUMBER,SET_NUMBER_S}
-function s.filter(c,e)
+function s.matfilter(c,e)
 	return c:IsSetCard(SET_NUMBER) and c:IsCanBeEffectTarget(e)
 end
-function s.rescon(sg,e,tp,g)
-	return Duel.IsExistingMatchingCard(Card.IsXyzSummonable,tp,LOCATION_EXTRA,0,1,nil,nil,sg,#sg,#sg)
+function s.rescon(xyzg)
+	return function(sg,e,tp,g)
+		if xyzg:IsExists(Card.IsXyzSummonable,1,nil,nil,sg,#sg,#sg) then return true end
+		--If no xyz can be summoned using at least the currently seelcted cards as forced materials, stop
+		return false,not xyzg:IsExists(Card.IsXyzSummonable,1,nil,sg,g,#sg,#g)
+	end
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local c=e:GetHandler()
-	local mg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,nil,e)
+	local mg=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_GRAVE,0,nil,e)
 	local notSg=mg:Filter(aux.NOT(Card.IsSetCard),nil,SET_NUMBER_S)
 	for _c in notSg:Iter() do
 		local e1=Effect.CreateEffect(c)
@@ -33,13 +37,12 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		_c:RegisterEffect(e1,true)
 		_c:AssumeProperty(ASSUME_RANK,_c:GetRank()+1)
 	end
+	local xyzg=Duel.GetMatchingGroup(Card.IsXyzSummonable,tp,LOCATION_EXTRA,0,nil,nil,mg)
 	if chk==0 then
-		local res=Duel.IsExistingMatchingCard(Card.IsXyzSummonable,tp,LOCATION_EXTRA,0,1,nil,nil,mg)
 		notSg:ForEach(function(_c) _c:ResetEffect(id,RESET_CARD) end)
-		return res
+		return #xyzg>0
 	end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local tg=aux.SelectUnselectGroup(mg,e,tp,1,99,s.rescon,1,tp,HINTMSG_XMATERIAL,s.rescon)
+	local tg=aux.SelectUnselectGroup(mg,e,tp,1,#mg,s.rescon(xyzg),1,tp,HINTMSG_TARGET,s.rescon(xyzg))
 	Duel.SetTargetCard(tg)
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,tg,#tg,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
@@ -49,7 +52,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local mg=Duel.GetTargetCards(e)
 	local c=e:GetHandler()
 	local notSg=mg:Filter(aux.NOT(Card.IsSetCard),nil,SET_NUMBER_S)
-	for _c in aux.Next(notSg) do
+	for _c in notSg:Iter() do
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_ADD_SETCODE)
@@ -61,7 +64,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local xyz=Duel.SelectMatchingCard(tp,Card.IsXyzSummonable,tp,LOCATION_EXTRA,0,1,1,nil,nil,mg,#mg,#mg):GetFirst()
 	if xyz then
-		Duel.XyzSummon(tp,xyz,mg,nil,#mg,#mg)
+		Duel.XyzSummon(tp,xyz,mg,mg,#mg,#mg)
 		notSg:KeepAlive()
 		notSg:ForEach(function(_c) _c:Level((_c:Level()+1)) end)
 		local e1=Effect.CreateEffect(c)
