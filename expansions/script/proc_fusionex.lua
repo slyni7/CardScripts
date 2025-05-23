@@ -209,7 +209,7 @@ function Fusion.ConditionMix(insf,sub,...)
 				end
 				local sg=Group.CreateGroup()
 				mg:Merge(mustg)
-				GlobalMultipleFusionTalbe={}
+				GlobalMultipleFusionTable={}
 				local mfg=Group.CreateGroup()
 				for mc in aux.Next(mg) do
 					local mfm=aux.MultipleFusionMaterial(mc,c)
@@ -229,7 +229,7 @@ function Fusion.ConditionMix(insf,sub,...)
 				mg:Merge(mfg)
 				local res=mg:IsExists(Fusion.SelectMix,1,nil,tp,mg,sg,mustg,c,sub,sub,contact,sumtype,chkf,table.unpack(funs))
 				mg:Sub(mfg)
-				GlobalMultipleFusionTalbe={}
+				GlobalMultipleFusionTable={}
 				return res
 			end
 end
@@ -274,7 +274,7 @@ function Fusion.OperationMix(insf,sub,...)
 					p=1-tp Duel.ConfirmCards(1-tp,mg)
 					if mg:IsExists(Card.IsLocation,1,nil,LOCATION_HAND) then sfhchk=true end
 				end
-				GlobalMultipleFusionTalbe={}
+				GlobalMultipleFusionTable={}
 				local mfg=Group.CreateGroup()
 				for mc in aux.Next(mg) do
 					local mfm=aux.MultipleFusionMaterial(mc,c)
@@ -306,7 +306,7 @@ function Fusion.OperationMix(insf,sub,...)
 				end
 				mg:Sub(mfg)
 				sg:Sub(mfg)
-				GlobalMultipleFusionTalbe={}
+				GlobalMultipleFusionTable={}
 				if sfhchk then Duel.ShuffleHand(tp) end
 				Duel.SetFusionMaterial(sg)
 			end
