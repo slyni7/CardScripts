@@ -1786,6 +1786,88 @@ function Card.RegisterEffect(c,e,forced,...)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 			local g=Duel.SelectTarget(tp,filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,tp)
 		end)
+	elseif code==6637331 and mt.eff_ct[c][0]==e then
+		local filter=function(c,tp)
+			return c:IsAbleToRemove() and c:IsFaceup() and Duel.GetMZoneCount(tp,c)>0 and
+				((c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and aux.SpElimFilter(c,true))
+					or c.delightsworn)
+		end
+		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and s.spfilter(chkc,tp) end
+			local c=e:GetHandler()
+			if chk==0 then return Duel.IsExistingTarget(s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
+				and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+			local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
+			Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,tp,0)
+			Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,LOCATION_HAND)
+		end)
+	elseif code==33854624 and mt.eff_ct[c][0]==e then
+		local filter=function(c,tp)
+			return c:IsAbleToRemove() and c:IsFaceup() and Duel.GetMZoneCount(tp,c)>0 and
+				((c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and aux.SpElimFilter(c,true))
+					or c.delightsworn)
+		end
+		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and s.spfilter(chkc,tp) end
+			local c=e:GetHandler()
+			if chk==0 then return Duel.IsExistingTarget(s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
+				and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+			local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
+			Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,tp,0)
+			Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,LOCATION_HAND)
+		end)
+	elseif code==60242223 and mt.eff_ct[c][0]==e then
+		local filter=function(c,tp)
+			return c:IsAbleToRemove() and c:IsFaceup() and Duel.GetMZoneCount(tp,c)>0 and
+				((c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and aux.SpElimFilter(c,true))
+					or c.delightsworn)
+		end
+		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and s.spfilter(chkc,tp) end
+			local c=e:GetHandler()
+			if chk==0 then return Duel.IsExistingTarget(s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
+				and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+			local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
+			Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,tp,0)
+			Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,LOCATION_HAND)
+		end)
+	elseif code==72656408 and mt.eff_ct[c][0]==e then
+		local filter=function(c,tp)
+			return c:IsAbleToRemove() and c:IsFaceup() and Duel.GetMZoneCount(tp,c)>0 and
+				((c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and aux.SpElimFilter(c,true))
+					or c.delightsworn)
+		end
+		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and s.spfilter(chkc,tp) end
+			local c=e:GetHandler()
+			if chk==0 then return Duel.IsExistingTarget(s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
+				and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+			local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
+			Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,tp,0)
+			Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,LOCATION_HAND)
+		end)
+	elseif code==40366667 and mt.eff_ct[c][0]==e then
+		local con=e:GetCondition()
+		e:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			local rc=re:GetHandler()
+			if rc.delightsworn then
+				return true
+			end
+			return con(e,tp,eg,ep,ev,re,r,rp)
+		end)
+	elseif code==97045737 and mt.eff_ct[c][0]==e then
+		local con=e:GetCondition()
+		e:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			local rc=re:GetHandler()
+			if rc.delightsworn then
+				return true
+			end
+			return con(e,tp,eg,ep,ev,re,r,rp)
+		end)
 	elseif code==18452762 and mt.eff_ct[c][0]==e then
 		local filter=function(c,tp)
 			return c:IsFaceup()
