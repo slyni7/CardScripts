@@ -1793,12 +1793,12 @@ function Card.RegisterEffect(c,e,forced,...)
 					or c.delightsworn)
 		end
 		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and s.spfilter(chkc,tp) end
+			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and filter(chkc,tp) end
 			local c=e:GetHandler()
-			if chk==0 then return Duel.IsExistingTarget(s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
+			if chk==0 then return Duel.IsExistingTarget(filter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
 				and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-			local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
+			local g=Duel.SelectTarget(tp,filter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
 			Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,tp,0)
 			Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,LOCATION_HAND)
 		end)
@@ -1809,12 +1809,12 @@ function Card.RegisterEffect(c,e,forced,...)
 					or c.delightsworn)
 		end
 		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and s.spfilter(chkc,tp) end
+			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and filter(chkc,tp) end
 			local c=e:GetHandler()
-			if chk==0 then return Duel.IsExistingTarget(s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
+			if chk==0 then return Duel.IsExistingTarget(filter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
 				and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-			local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
+			local g=Duel.SelectTarget(tp,filter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
 			Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,tp,0)
 			Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,LOCATION_HAND)
 		end)
@@ -1825,12 +1825,12 @@ function Card.RegisterEffect(c,e,forced,...)
 					or c.delightsworn)
 		end
 		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and s.spfilter(chkc,tp) end
+			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and filter(chkc,tp) end
 			local c=e:GetHandler()
-			if chk==0 then return Duel.IsExistingTarget(s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
+			if chk==0 then return Duel.IsExistingTarget(filter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
 				and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-			local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
+			local g=Duel.SelectTarget(tp,filter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
 			Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,tp,0)
 			Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,LOCATION_HAND)
 		end)
@@ -1841,12 +1841,12 @@ function Card.RegisterEffect(c,e,forced,...)
 					or c.delightsworn)
 		end
 		e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and s.spfilter(chkc,tp) end
+			if chkc then return chkc:IsLocation(LOCATION_ONFIELD|LOCATION_GRAVE) and filter(chkc,tp) end
 			local c=e:GetHandler()
-			if chk==0 then return Duel.IsExistingTarget(s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
+			if chk==0 then return Duel.IsExistingTarget(filter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil,tp)
 				and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-			local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
+			local g=Duel.SelectTarget(tp,filter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil,tp)
 			Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,tp,0)
 			Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,LOCATION_HAND)
 		end)
