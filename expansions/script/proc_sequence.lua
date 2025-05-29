@@ -11,6 +11,8 @@ Auxiliary.GlobalSavedSequences={}
 Auxiliary.GlobalSavedSequences[0]={}
 Auxiliary.GlobalSavedSequences[1]={}
 
+if not aux.GlobalCurrentSequences then
+
 
 local e1=Effect.GlobalEffect()
 e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -140,8 +142,6 @@ e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
 	end
 end)
 Duel.RegisterEffect(e1,0)
-
-if not aux.GlobalCurrentSequences then
 
 Auxiliary.GlobalCurrentSequences={}
 Auxiliary.GlobalCurrentSequences[0]={}
