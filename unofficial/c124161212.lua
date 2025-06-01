@@ -41,7 +41,7 @@ end
 --activate
 function s.con0filter(c)
 	local mg=c:GetMaterial()
-	return c:IsType(TYPE_LINK) and #mg>0 and mg:FilterCount(Card.IsType,nil,TYPE_EFFECT)==0 and c:IsFaceup()
+	return c:IsSummonType(SUMMON_TYPE_LINK) and #mg>0 and mg:FilterCount(Card.IsType,nil,TYPE_EFFECT)==0 and c:IsFaceup()
 end
 
 function s.con0(e,tp,eg,ep,ev,re,r,rp)
@@ -58,7 +58,7 @@ function s.cst1(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 function s.tg1filter(c,e,tp)
-	return (c:IsSetCard(0xf2d) or not c:IsType(TYPE_EFFECT)) and c:IsType(TYPE_LINK) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return (c:IsSetCard(0xf2d) or not c:IsType(TYPE_EFFECT)) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 
 function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
