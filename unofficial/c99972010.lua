@@ -134,3 +134,4 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SSet(tp,c)
 	end
 end
+
