@@ -24,17 +24,17 @@ function s.initial_effect(c)
 end
 
 --effect 1
-function s.tg1filter(c,e)
-	return c:IsSetCard(0xf2c) and not c:IsCode(id) and c:IsCanBeEffectTarget(e) and c:IsFaceup()
+function s.tg1filter(c,e,tp)
+	return c:IsSetCard(0xf2c) and not c:IsCode(id) and c:IsControler(tp) and c:IsCanBeEffectTarget(e) and c:IsFaceup()
 end
 
 function s.tg1con(sg,e,tp,mg)
-	return sg:IsExists(s.tg1filter,1,nil,e)
+	return sg:IsExists(s.tg1filter,1,nil,e,tp)
 end
 
 function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return false end
-	local g=Duel.GetMatchingGroup(s.tg1filter,tp,LOCATION_REMOVED,0,nil,e)
+	local g=Duel.GetMatchingGroup(s.tg1filter,tp,LOCATION_REMOVED,0,nil,e,tp)
 	if chk==0 then return #g>0 end
 	local ag=Duel.GetMatchingGroup(Card.IsCanBeEffectTarget,tp,LOCATION_REMOVED,LOCATION_REMOVED,nil,e)
 	local sg=aux.SelectUnselectGroup(ag,e,tp,1,3,s.tg1con,1,tp,HINTMSG_TOGRAVE)
@@ -62,7 +62,7 @@ end
 
 function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 
