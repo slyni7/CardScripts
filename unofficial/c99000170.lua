@@ -1,9 +1,10 @@
 --Frozenorb Serihppas
 local m=99000170
 local cm=_G["c"..m]
+local s,id=GetID()
 function cm.initial_effect(c)
 	--link summon
-	aux.AddLinkProcedure(c,nil,2,2,cm.lcheck)
+	Link.AddProcedure(c,nil,2,2,s.matcheck)
 	c:EnableReviveLimit()
 	--attribute
 	local e1=Effect.CreateEffect(c)
@@ -36,8 +37,8 @@ function cm.initial_effect(c)
 	e5:SetOperation(cm.spop2)
 	c:RegisterEffect(e5)
 end
-function cm.lcheck(g,lc)
-	return g:IsExists(Card.IsLinkSetCard,1,nil,0xc23)
+function s.matcheck(g,lc,sumtype,tp)
+	return g:IsExists(Card.IsSetCard,1,nil,0xc23,lc,sumtype,tp)
 end
 function cm.ctfilter(c)
 	return c:GetCounter(0x1015)>0 and c:IsControlerCanBeChanged()

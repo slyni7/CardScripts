@@ -1,10 +1,10 @@
---³×Å©·Î¿öÄ¿ ·ç½Ã¾Æ
+--ë„¤í¬ë¡œì›Œì»¤ ë£¨ì‹œì•„
 local m=99000154
 local cm=_G["c"..m]
 function cm.initial_effect(c)
 	--link summon
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkRace,RACE_ZOMBIE),2)
+	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_ZOMBIE),2)
 	--negate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(m,0))

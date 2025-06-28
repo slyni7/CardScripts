@@ -1,19 +1,20 @@
 --Frozenorb Reyarp
 local m=99000169
 local cm=_G["c"..m]
+local s,id=GetID()
 function cm.initial_effect(c)
 	--
 	c:EnableReviveLimit()
-	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WATER),3,2)
+	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_WATER),3,2)
 	--lv change
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_XYZ_LEVEL)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAIABLE)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetRange(LOCATION_EXTRA)
 	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetTarget(cm.lvtg)
-	e1:SetValue(cm.lvval)
+	e1:SetTarget(function(e,c) return c:HasLevel() and c:GetOwner()~=e:GetHandlerPlayer() end)
+	e1:SetValue(s.lvval)
 	c:RegisterEffect(e1)
 	--Search
 	local e2=Effect.CreateEffect(c)
@@ -49,13 +50,13 @@ function cm.initial_effect(c)
 	e4:SetOperation(cm.spop)
 	c:RegisterEffect(e4)
 end
-function cm.lvtg(e,c)
-	return c:IsLevelAbove(1) and c:GetOwner()~=e:GetHandlerPlayer()
-end
-function cm.lvval(e,c,rc)
+function s.lvval(e,c,rc)
 	local lv=c:GetLevel()
-	if rc==e:GetHandler() then return 3
-	else return lv end
+	if rc:IsCode(id) then
+		return 3
+	else
+		return lv
+	end
 end
 function cm.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

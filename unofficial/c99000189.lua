@@ -1,11 +1,12 @@
---πŸ¥Âº” ¿€¿∫ ¿Ãæﬂ±‚
+--Î∞îÎã∑ÏÜç ÏûëÏùÄ Ïù¥ÏïºÍ∏∞
 local m=99000189
 local cm=_G["c"..m]
+local s,id=GetID()
 function cm.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsRace,RACE_AQUA+RACE_FISH+RACE_SEASERPENT),2,false)
-	aux.AddContactFusionProcedure(c,Card.IsAbleToGraveAsCost,LOCATION_MZONE,0,Duel.SendtoGrave,REASON_COST)
+	Fusion.AddProcMixN(c,true,true,aux.FilterBoolFunction(Card.IsRace,RACE_AQUA+RACE_FISH+RACE_SEASERPENT),2)
+	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit,nil,nil,nil,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -25,8 +26,14 @@ function cm.initial_effect(c)
 	e3:SetOperation(cm.operation)
 	c:RegisterEffect(e3)
 end
-function cm.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+function s.splimit(e,se,sp,st)
+	return (st&SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+end
+function s.contactfil(tp)
+	return Duel.GetMatchingGroup(Card.IsAbleToGraveAsCost,tp,LOCATION_MZONE,0,nil)
+end
+function s.contactop(g)
+	Duel.SendtoGrave(g,REASON_COST|REASON_MATERIAL)
 end
 function cm.cfilter(c,tp)
 	return c:IsRace(RACE_AQUA+RACE_FISH+RACE_SEASERPENT) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()

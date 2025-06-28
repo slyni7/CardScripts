@@ -1,11 +1,12 @@
---µµπÃ≥Õ∆Æ ø¿∫Í ≥◊≈©∑Œøˆƒø
+--ÎèÑÎØ∏ÎÑåÌä∏ Ïò§Î∏å ÎÑ§ÌÅ¨Î°úÏõåÏª§
 local m=99000397
 local cm=_G["c"..m]
+local s,id=GetID()
 function cm.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsFusionSetCard,0xc24),aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),true)
-	aux.AddContactFusionProcedure(c,Card.IsAbleToRemoveAsCost,LOCATION_ONFIELD+LOCATION_GRAVE,0,Duel.Remove,POS_FACEUP,REASON_COST)
+	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0xc24),aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_DARK))
+	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit)
 	--spsummon condition
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
@@ -35,8 +36,17 @@ function cm.initial_effect(c)
 	e2:SetOperation(cm.posop)
 	c:RegisterEffect(e2)
 end
-function cm.splimit(e,se,sp,st)
+function s.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
+end
+function s.matfil(c,tp)
+	return c:IsAbleToRemoveAsCost() and (c:IsLocation(LOCATION_SZONE) or aux.SpElimFilter(c,false,true))
+end
+function s.contactfil(tp)
+	return Duel.GetMatchingGroup(s.matfil,tp,LOCATION_ONFIELD|LOCATION_GRAVE,0,nil,tp)
+end
+function s.contactop(g)
+	Duel.Remove(g,POS_FACEUP,REASON_COST|REASON_MATERIAL)
 end
 function cm.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonLocation()==LOCATION_EXTRA

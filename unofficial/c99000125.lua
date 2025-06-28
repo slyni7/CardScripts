@@ -1,4 +1,4 @@
---·¹ְּ´ֿµ¥ְּ ְּ»ח÷§
+--כ ˆל´כ‹ˆכ°ל´ ל´ל‚¬כ²¨
 local m=99000125
 local cm=_G["c"..m]
 function cm.initial_effect(c)

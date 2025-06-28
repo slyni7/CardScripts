@@ -1,4 +1,4 @@
---���̴ϵ�� �ø����
+--레이니드롭 올리비아
 local m=99000122
 local cm=_G["c"..m]
 function cm.initial_effect(c)

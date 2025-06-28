@@ -1,10 +1,10 @@
---¹ìÆÄÀÌ¾î ÀÎÃ¦Æ®¸®½º
+--ë±€íŒŒì´ì–´ ì¸ì±ˆíŠ¸ë¦¬ìŠ¤
 local m=99000242
 local cm=_G["c"..m]
 function cm.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrderProcedure(c,"R",nil,aux.FilterBoolFunction(Card.IsRace,RACE_ZOMBIE),aux.FilterBoolFunction(Card.IsType,TYPE_MONSTER))
-	aux.EnablePendulumAttribute(c,false)
+	Pendulum.AddProcedure(c,false)
 	--draw
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(m,0))

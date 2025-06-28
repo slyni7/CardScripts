@@ -1,4 +1,4 @@
---���̵� ���� ��ũ�ο�Ŀ
+--보이드 오브 네크로워커
 local m=99000159
 local cm=_G["c"..m]
 function cm.initial_effect(c)

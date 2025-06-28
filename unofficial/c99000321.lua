@@ -1,9 +1,9 @@
---½Ã³×Å©·Î¿öÄ¿ ¸°
+--ì‹œë„¤í¬ë¡œì›Œì»¤ ë¦°
 local m=99000321
 local cm=_G["c"..m]
 function cm.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroMixProcedure(c,cm.matfilter1,nil,nil,aux.NonTuner(Card.IsAttribute,ATTRIBUTE_DARK),1,99)
+	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTunerEx(Card.IsAttribute,ATTRIBUTE_DARK),1,99)
 	c:EnableReviveLimit()
 	--pos
 	local e1=Effect.CreateEffect(c)

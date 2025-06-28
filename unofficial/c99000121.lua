@@ -1,4 +1,4 @@
---���̴ϵ�� �ƸḮ��
+--레이니드롭 아멜리아
 local m=99000121
 local cm=_G["c"..m]
 function cm.initial_effect(c)

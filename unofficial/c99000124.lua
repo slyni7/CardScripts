@@ -1,4 +1,4 @@
---���̴ϵ��� �ٸ���
+--레이니데이 앨리스
 local m=99000124
 local cm=_G["c"..m]
 function cm.initial_effect(c)
