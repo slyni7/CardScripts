@@ -38,13 +38,13 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 		--double tribute
 		local c=e:GetHandler()
-		c:AddDoubleTribute(id,s.otfilter,s.eftg,RESETS_STANDARD_PHASE_END,FLAG_DOUBLE_TRIB_LEVEL8|FLAG_DOUBLE_TRIB_GALAXY)
+		c:AddDoubleTribute(id,s.otfilter,s.eftg,RESETS_STANDARD_PHASE_END,FLAG_DOUBLE_TRIB_LEVEL8+FLAG_DOUBLE_TRIB_GALAXY)
 		--triple tribute
 		c:RegisterFlagEffect(id+100,RESETS_STANDARD_PHASE_END,0,1)
 	end
 end
 function s.otfilter(c,tp)
-	return c:IsDoubleTribute(FLAG_DOUBLE_TRIB_LEVEL8|FLAG_DOUBLE_TRIB_GALAXY) and (c:IsControler(tp) or c:IsFaceup())
+	return c:IsDoubleTribute(FLAG_DOUBLE_TRIB_LEVEL8+FLAG_DOUBLE_TRIB_GALAXY) and (c:IsControler(tp) or c:IsFaceup())
 end
 function s.eftg(e,c)
 	return c:IsRace(RACE_GALAXY) and c:IsLevel(8) and c:IsSummonableCard()
