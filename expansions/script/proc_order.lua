@@ -207,14 +207,14 @@ Card.GetPreviousTypeOnField=function(c)
 end
 --
 local itype=Card.IsType
-Card.IsType=function(c,t)
+Card.IsType=function(c,t,...)
 	if c.CardType_Order then
 		if t==TYPE_FUSION then
 			return false
 		end
-		return itype(c,bit.bor(t,TYPE_FUSION)-TYPE_FUSION)
+		return itype(c,bit.bor(t,TYPE_FUSION)-TYPE_FUSION,...)
 	end
-	return itype(c,t)
+	return itype(c,t,...)
 end
 --
 local iftype=Card.IsFusionType

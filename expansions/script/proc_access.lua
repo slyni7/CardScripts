@@ -368,14 +368,14 @@ end
 	  return ptype(c)
    end
    local itype=Card.IsType
-   Card.IsType=function(c,t)
+   Card.IsType=function(c,t,...)
 	  if c.AccessMonsterAttribute then
 		 if t==TYPE_FUSION or t==nil then
 			return false
 		 end
-		 return itype(c,bit.bor(t,TYPE_FUSION)-TYPE_FUSION)
+		 return itype(c,bit.bor(t,TYPE_FUSION)-TYPE_FUSION,...)
 	  end
-	  return itype(c,t)
+	  return itype(c,t,...)
    end
    local iftype=Card.IsFusionType
    Card.IsFusionType=function(c,t)

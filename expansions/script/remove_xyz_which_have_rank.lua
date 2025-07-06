@@ -32,14 +32,14 @@ end
 end
 --
 	local itype=Card.IsType
-	Card.IsType=function(c,t)
+	Card.IsType=function(c,t,...)
 	if c.CardType_kiniro then
 		if t==TYPE_XYZ then
 			return false
 		end
-		return itype(c,bit.bor(t,TYPE_XYZ)-TYPE_XYZ)
+		return itype(c,bit.bor(t,TYPE_XYZ)-TYPE_XYZ,...)
 	end
-	return itype(c,t)
+	return itype(c,t,...)
 end
 --
 	local iftype=Card.IsFusionType
