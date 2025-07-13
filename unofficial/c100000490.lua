@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function s.filter(c,e)
+function s.matfilter(c,e)
 	return c:IsFaceup() and c:IsCanBeEffectTarget(e) and not c:IsType(TYPE_TOKEN)
 end
 function s.registerxyzmateffect(e,tp)
@@ -23,22 +23,22 @@ function s.registerxyzmateffect(e,tp)
 	Duel.RegisterEffect(matEff,tp)
 	return matEff
 end
-function s.xyzfilter(c,mg,fg,minc,maxg)
-	return c:IsXyzSummonable(mg,fg,minc,maxg)
+function s.xyzfilter(c,mg,minc,maxc)
+	return c:IsXyzSummonable(nil,mg,minc,maxc)
 end
 function s.rescon(exg)
-	return function(sg)
-		return exg:IsExists(Card.IsXyzSummonable,1,nil,nil,sg,#sg,#sg)
+	return function(sg,e,tp,g)
+		return exg:IsExists(Card.IsXyzSummonable,1,nil,nil,sg,#sg,#sg) and sg:IsExists(Card.IsControler,1,nil,1-tp)
 	end
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	local mg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e)
+	local mg=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e)
 	if chk==0 then
 		local matEff=s.registerxyzmateffect(e,tp)
 		local res=Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,mg)
 		matEff:Reset()
-		return res
+		return res and mg:IsExists(Card.IsControler,1,nil,1-tp)
 	end
 	local matEff=s.registerxyzmateffect(e,tp)
 	local exg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,mg)
@@ -51,7 +51,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetTargetCards(e)
 	local matEff=s.registerxyzmateffect(e,tp)
-	local xyzg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,nil,g,#g,#g)
+	local xyzg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,g,#g,#g)
 	if #xyzg>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local xyz=xyzg:Select(tp,1,1,nil):GetFirst()
