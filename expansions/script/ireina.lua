@@ -2794,7 +2794,7 @@ function Duel.PayLPCost(player,lp)
 			return true
 		end
 		if dipabe(player,EFFECT_NIGHT_FEVER_PAYLP_TO_DRAW) then
-			if Duel.IsPlayerCanDraw(tp,math.floor((lp/1400)+0.5)) then
+			if Duel.IsPlayerCanDraw(player,math.floor((lp/1400)+0.5)) then
 				local eset={dipabe(player,EFFECT_NIGHT_FEVER_PAYLP_TO_DRAW)}
 				local te=eset[1]
 				local tc=te:GetHandler()
