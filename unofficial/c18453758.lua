@@ -141,6 +141,10 @@ function s.op3(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	if Debug.GetPlayerOpConfig()~=0 then
+		local lct=Debug.GetPlayerOpLine()
+		Debug.SetPlayerOpLine(lct-1)
+	end
 	local g=Duel.SMCard(tp,s.gofil1,tp,"HO",0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_EFFECT)
 	if g:GetFirst():IsLoc("G") then
