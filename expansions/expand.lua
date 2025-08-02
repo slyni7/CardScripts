@@ -782,3 +782,4 @@ data_setname[18454466]={"sparkle.exe"}
 data_setname[18454467]={"sparkle.exe"}
 data_setname[18454468]={"sparkle.exe"}
 data_setname[18454469]={"sparkle.exe"}
+data_setname[18454475]={"미소노","미카","미소노 미카"}
