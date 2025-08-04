@@ -1,15 +1,16 @@
---네크로워커 로레인
+--르네크로워커 릴리
 local s,id=GetID()
 function s.initial_effect(c)
-	--이 카드는 패에서 특수 소환할 수 있다.
+	--덱에서 언데드족 / 어둠 속성 몬스터 1장을 패에 넣는다.
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	e1:SetCondition(s.spcon)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCountLimit(1,id)
+	e1:SetTarget(s.thtg)
+	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
 	--필드의 몬스터 1장을 묘지로 보낸다.
 	local e2=Effect.CreateEffect(c)
@@ -37,11 +38,20 @@ function s.initial_effect(c)
 end
 s.listed_series={0xc24}
 s.listed_names={id}
-function s.spcon(e,c)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and (Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 or Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0xc24),tp,LOCATION_ONFIELD,0,1,nil))
+function s.thfilter(c)
+	return c:IsRace(RACE_ZOMBIE) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToHand()
+end
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if #g>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
+	end
 end
 function s.necro_con(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -50,36 +60,22 @@ function s.necro_con(e,tp,eg,ep,ev,re,r,rp)
 	return g and g:IsContains(c)
 end
 function s.necro_tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsNegatable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,nil,1,PLAYER_ALL,LOCATION_ONFIELD)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 end
 function s.necro_op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsNegatable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local g=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	if #g==0 then return end
 	local tc=g:GetFirst()
 	Duel.HintSelection(tc,true)
-	Duel.NegateRelatedChain(tc,RESET_TURN_SET)
-	--Negate its effects
+	--그 몬스터는 공격할 수 없다.
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetCode(EFFECT_DISABLE)
+	e1:SetCode(EFFECT_CANNOT_ATTACK)
 	e1:SetReset(RESETS_STANDARD)
 	tc:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_DISABLE_EFFECT)
-	e2:SetValue(RESET_TURN_SET)
-	tc:RegisterEffect(e2)
-	if tc:IsType(TYPE_TRAPMONSTER) then
-		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
-		e3:SetReset(RESETS_STANDARD)
-		tc:RegisterEffect(e3)
-	end
 	if Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 		Duel.BreakEffect()
 		c:ReleaseEffectRelation(re)
