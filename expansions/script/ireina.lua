@@ -4089,6 +4089,8 @@ Duel.LoadScript("proc_skull.lua")
 
 Duel.LoadScript("ireina_full_list.lua")
 
+Duel.LoadScript("invisible.lua")
+
 --
 
 --dofile("expansions/script/ireina_playing_cards.lua")
