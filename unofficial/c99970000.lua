@@ -103,7 +103,7 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.Readjust()
 	Debug.RainbowFishReplay()
-	if Duel.GetLP(0)==1 and Duel.GetLP(1)==1
+	if Duel.GetLP(0)==1 and Duel.GetLP(1)==1 then
 		Duel.SetLP(0,8000)
 		Duel.SetLP(1,8000)
 	end
