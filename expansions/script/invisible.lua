@@ -4,7 +4,8 @@ local e1=Effect.GlobalEffect()
 e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 e1:SetCode(EVENT_STARTUP)
 e1:SetOperation(function()
-	if Duel.GetLP(0)==1 and Duel.GetLP(1)==1 then
+	if Duel.GetLP(0)==1 and Duel.GetLP(1)==1
+		and not Duel.IsPlayerAffectedByEffect(0,99970000) then
 		--Debug.SetPlayerInfo(0,1,5,1)
 		--Debug.SetPlayerInfo(1,1,5,1)
 		Duel.SetLP(0,8000)
