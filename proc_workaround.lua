@@ -1,6 +1,49 @@
 --Utilities to be added to the core
 
 --[[
+	If a monster in the Monster Zone is flipped face-down and back up again it shouldn't be treated as a monster that was Summoned that turn
+--]]
+do
+	local function summon_status_filter(c)
+		return c:IsFacedown() and c:IsPreviousPosition(POS_FACEUP) and c:IsLocation(LOCATION_MZONE) and c:IsStatus(STATUS_SUMMON_TURN|STATUS_FLIP_SUMMON_TURN|STATUS_SPSUMMON_TURN)
+	end
+
+	--Manually set the summon turn statuses to 'false' when a monster is flipped face-down
+	local sum_status_eff=Effect.GlobalEffect()
+	sum_status_eff:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	sum_status_eff:SetCode(EVENT_CHANGE_POS)
+	sum_status_eff:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+				local g=eg:Filter(summon_status_filter,nil)
+				for c in g:Iter() do
+					c:SetStatus(STATUS_SUMMON_TURN,false)
+					c:SetStatus(STATUS_FLIP_SUMMON_TURN,false)
+					c:SetStatus(STATUS_SPSUMMON_TURN,false)
+					--need to set it to 'true' otherwise it can change its position or be Flip Summoned even though it was Summoned that same turn
+					--(probably cuz it's tied to the summon turn statuses)
+					c:SetStatus(STATUS_FORM_CHANGED,true)
+				end
+			end)
+	Duel.RegisterEffect(sum_status_eff,0)
+	
+	--set the summon turn status to 'false' for any monster that is Normal Set
+	--normally that status would cover both Normal Summons and Normal Sets
+	--however there's currently no card (that I can find) that cares for a monster that was Normal Set that specific turn
+	--until an eventual proper split happens this should fix cases such as "Raidraptor - Vanishing Lanius" or Rush cards
+	--that care about being Normal Summoned that turn but not about being Normal Set that turn (e.g. Normal Set --> "Book of Taiyou" --> shouldn't be able to use its effect)
+	local set_turn_status_split=Effect.GlobalEffect()
+	set_turn_status_split:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	set_turn_status_split:SetCode(EVENT_MSET)
+	set_turn_status_split:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+				for c in eg:Iter() do
+					c:SetStatus(STATUS_SUMMON_TURN,false)
+					--same reason as above
+					c:SetStatus(STATUS_FORM_CHANGED,true)
+				end
+			end)
+	Duel.RegisterEffect(set_turn_status_split,0)
+end
+
+--[[
 	Phase and step functions
 	If the optional 'player' parameter is provided it will also check that it's that player's turn
 --]]
