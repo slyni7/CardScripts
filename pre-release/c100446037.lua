@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Synchro Summon procedure: "Killer Tune Reco" + 1+ Tuners
-	Synchro.AddProcedure(c,aux.FilterSummonCode(100446033),1,1,aux.FilterBoolFunctionEx(Card.IsType,TYPE_TUNER),1,99)
+	Synchro.AddProcedure(c,aux.FALSE,1,1,s.tunerfilter,1,99,aux.FilterSummonCode(100446033))
 	--Gains 300 ATK for each Tuner in the GYs
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -38,15 +38,18 @@ function s.initial_effect(c)
 	e3:SetOperation(s.disop)
 	e3:SetHintTiming(0,TIMING_STANDBY_PHASE|TIMING_MAIN_END|TIMINGS_CHECK_MONSTER)
 	c:RegisterEffect(e3)
-	--Multiple Tuners
+	--Multiple tuners
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e4:SetCode(EFFECT_MULTIPLE_TUNERS)
+	e4:SetCode(EFFECT_MATERIAL_CHECK)
+	e4:SetValue(s.valcheck)
 	c:RegisterEffect(e4)
 end
 s.listed_names={100446033} --"Killer Tune Reco"
 s.material={100446033} --"Killer Tune Reco"
+function s.tunerfilter(c,scard,sumtype,tp)
+	return c:IsType(TYPE_TUNER,scard,sumtype,tp) or c:IsHasEffect(EFFECT_CAN_BE_TUNER)
+end
 function s.costfilter(c)
 	return c:IsType(TYPE_TUNER) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
 end
@@ -68,5 +71,16 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		--Negate its effects until the end of this turn
 		tc:NegateEffects(e:GetHandler(),RESET_PHASE|PHASE_END,true)
+	end
+end
+function s.valcheck(e,c)
+	local g=c:GetMaterial()
+	if g:IsExists(function(c) return c:IsType(TYPE_TUNER) or c:IsHasEffect(EFFECT_CAN_BE_TUNER) end,2,nil) then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+		e1:SetCode(EFFECT_MULTIPLE_TUNERS)
+		e1:SetReset(RESET_EVENT|(RESETS_STANDARD&~RESET_TOFIELD)|RESET_PHASE|PHASE_END)
+		c:RegisterEffect(e1)
 	end
 end
