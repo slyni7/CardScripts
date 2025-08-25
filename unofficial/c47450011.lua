@@ -42,7 +42,6 @@ function cm.initial_effect(c)
 	e3:SetCategory(CATEGORY_DESTROY)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_LEAVE_FIELD)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetTarget(cm.destg)
 	e3:SetOperation(cm.desop)
 	c:RegisterEffect(e3)
@@ -132,14 +131,14 @@ function cm.eqop2(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function cm.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local atk=e:GetHandler():GetOriginalAttack()
+	local atk=e:GetHandler():GetBaseAttack()
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAttackBelow,tp,0,LOCATION_MZONE,1,nil,atk) end
 	local g=Duel.GetMatchingGroup(Card.IsAttackBelow,tp,0,LOCATION_MZONE,nil,atk)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0,nil)
 end
 
 function cm.desop(e,tp,eg,ep,ev,re,r,rp)
-	local atk=e:GetHandler():GetOriginalAttack()
+	local atk=e:GetHandler():GetBaseAttack()
 	local g=Duel.GetMatchingGroup(Card.IsAttackBelow,tp,0,LOCATION_MZONE,nil,atk)
 	Duel.Destroy(g,REASON_EFFECT)
 end
