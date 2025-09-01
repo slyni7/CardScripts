@@ -1,10 +1,10 @@
---±ä±ŞÅÚ·¹Æ÷ÅÍ
+--ê¸´ê¸‰í…”ë ˆí¬í„°
 local s,id=GetID()
 function s.initial_effect(c)
 	--order summon
 	aux.AddOrderProcedure(c,"L",nil,s.ordfil1,aux.FilterBoolFunctionEx(Card.IsSummonLocation,LOCATION_DECK))
 	c:EnableReviveLimit()
-	--ÆĞ / µ¦¿¡¼­ ·¹º§ 3 ÀÌÇÏÀÇ »çÀÌÅ±Á· ¸ó½ºÅÍ 1ÀåÀ» Æ¯¼ö ¼ÒÈ¯ÇÑ´Ù.
+	--íŒ¨ / ë±ì—ì„œ ë ˆë²¨ 3 ì´í•˜ì˜ ì‚¬ì´í‚¥ì¡± ëª¬ìŠ¤í„° 1ì¥ì„ íŠ¹ìˆ˜ ì†Œí™˜í•œë‹¤.
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -13,11 +13,11 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_DUEL)
 	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_ORDER) end)
-	e1:SetCost(aux.PayLPCost(1/2))
+	e1:SetCost(Cost.PayLP(1/2))
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--»çÀÌÅ±Á· ¸ó½ºÅÍ ÀÌ¿ÜÀÇ °ø°İ·Â 2000 ÀÌÇÏÀÎ ¸ó½ºÅÍ´Â °ø°İ ¼±¾ğÇÒ ¼ö ¾ø´Ù.
+	--ì‚¬ì´í‚¥ì¡± ëª¬ìŠ¤í„° ì´ì™¸ì˜ ê³µê²©ë ¥ 2000 ì´í•˜ì¸ ëª¬ìŠ¤í„°ëŠ” ê³µê²© ì„ ì–¸í•  ìˆ˜ ì—†ë‹¤.
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_CANNOT_ATTACK)
@@ -46,7 +46,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if tc then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-		--ÀÌ È¿°ú·Î Æ¯¼ö ¼ÒÈ¯ÇÑ ¸ó½ºÅÍ´Â, ÀÌ ÅÏÀÇ ¿£µå ÆäÀÌÁî¿¡ Á¦¿ÜµÈ´Ù.
+		--ì´ íš¨ê³¼ë¡œ íŠ¹ìˆ˜ ì†Œí™˜í•œ ëª¬ìŠ¤í„°ëŠ”, ì´ í„´ì˜ ì—”ë“œ í˜ì´ì¦ˆì— ì œì™¸ëœë‹¤.
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -71,4 +71,5 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.atktarget(e,c)
 	return not c:IsRace(RACE_PSYCHIC) and c:IsAttackBelow(2000)
+
 end
