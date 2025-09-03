@@ -15,3 +15,12 @@ Duel.LoadScript("convert-from-core-proc_synchro.lua")
 Duel.LoadScript("convert-from-core-proc_union.lua")
 Duel.LoadScript("convert-from-core-proc_xyz.lua")
 Duel.LoadScript("convert-from-core-utility.lua")
+
+local dhint=Duel.Hint
+function Duel.Hint(htype,player,hmsg)
+	if htype==HINT_SELECTMSG and hmsg==nil then
+		Debug.Message("Warning: HINTMSG is nil.")
+		return dhint(htype,player,0)
+	end
+	return dhint(htype,player,hmsg)
+end
