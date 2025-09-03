@@ -1,96 +1,96 @@
---�ν����� ������
-local m=99000226
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--인스펙터 프라임
+local s,id=GetID()
+function s.initial_effect(c)
 	--order summon
-	aux.AddOrderProcedure(c,"R",nil,cm.ordfil1,aux.FilterBoolFunction(Card.IsType,TYPE_EFFECT),aux.FilterBoolFunction(Card.IsType,TYPE_EFFECT))
+	aux.AddOrderProcedure(c,"R",nil,aux.NOT(aux.FilterBoolFunctionEx(Card.IsType,TYPE_TOKEN)),aux.FilterBoolFunctionEx(Card.IsType,TYPE_EFFECT),aux.FilterBoolFunctionEx(Card.IsType,TYPE_EFFECT))
 	c:EnableReviveLimit()
-	--atk down
+	--그 상대 몬스터의 공격력 / 수비력을 절반으로 한다.
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(m,0))
-	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e1:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e1:SetCountLimit(1)
-	e1:SetCondition(cm.atkcon)
-	e1:SetOperation(cm.atkop)
+	e1:SetCondition(s.atkcon)
+	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
-	--destroy reg
+	--이 턴에 이 카드가 전투로 파괴한 몬스터의 수만큼 자신은 덱에서 드로우한다.
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_BATTLE_DESTROYING)
-	e2:SetOperation(cm.regop)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_DRAW)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_PHASE|PHASE_BATTLE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
+	e2:SetCondition(s.drcon)
+	e2:SetTarget(s.drtg)
+	e2:SetOperation(s.drop)
 	c:RegisterEffect(e2)
-	--draw
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_DRAW)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_PHASE+PHASE_BATTLE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1)
-	e3:SetTarget(cm.drtg)
-	e3:SetOperation(cm.drop)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_BATTLE_DESTROYING)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e3:SetCondition(aux.bdcon)
+	e3:SetOperation(s.bdop)
 	c:RegisterEffect(e3)
 end
-cm.CardType_Order=true
-function cm.ordfil1(c)
-	return not c:IsType(TYPE_TOKEN) and c:IsType(TYPE_MONSTER)
-end
-function cm.atkcon(e,tp,eg,ep,ev,re,r,rp)
+function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	return c:IsRelateToBattle() and bc and bc:IsFaceup() and bc:IsRelateToBattle()
 end
-function cm.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_PENDULUM)
-end
-function cm.atkop(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	if bc:IsFaceup() and bc:IsRelateToBattle() then
-		local e1=Effect.CreateEffect(e:GetHandler())
+	if bc and bc:IsFaceup() and bc:IsRelateToBattle() then
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 		e1:SetValue(bc:GetAttack()/2)
 		bc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(e:GetHandler())
+		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_SET_DEFENSE_FINAL)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e2:SetReset(RESET_EVENT|RESETS_STANDARD)
 		e2:SetValue(bc:GetDefense()/2)
 		bc:RegisterEffect(e2)
 	end
-	if c:IsRelateToEffect(e) and c:IsChainAttackable() then
+	if c:IsRelateToEffect(e) and c:CanChainAttack() and c==Duel.GetAttacker() then
 		local e3=Effect.CreateEffect(c)
 		e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e3:SetCode(EVENT_DAMAGE_STEP_END)
-		e3:SetOperation(cm.caop2)
+		e3:SetOperation(s.caop)
+		e3:SetCountLimit(1)
+		e3:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_BATTLE)
 		c:RegisterEffect(e3)
 	end
 end
-function cm.caop2(e,tp,eg,ep,ev,re,r,rp)
+function s.caop(e,tp)
 	local c=e:GetHandler()
-	if c:IsRelateToBattle() and c:IsChainAttackable() then
+	if c:CanChainAttack() then
 		Duel.ChainAttack()
 	end
 end
-function cm.regop(e,tp,eg,ep,ev,re,r,rp)
+function s.bdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToBattle() then return end
-	local ct=c:GetFlagEffectLabel(m)
-	if ct then
-		c:SetFlagEffectLabel(m,ct+1)
+	if c:GetFlagEffectLabel(id) then
+		c:SetFlagEffectLabel(id,c:GetFlagEffectLabel(id)+1)
 	else
-		c:RegisterFlagEffect(m,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,1)
+		c:RegisterFlagEffect(id,RESETS_STANDARD_PHASE_END,0,1,1)
 	end
 end
-function cm.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ct=e:GetHandler():GetFlagEffectLabel(m)
-	if chk==0 then return ct and Duel.IsPlayerCanDraw(tp,ct) end
+function s.drcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetFlagEffectLabel(id)
+end
+function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ct=e:GetHandler():GetFlagEffectLabel(id)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,ct) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(ct)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,ct)
 end
-function cm.drop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=e:GetHandler():GetFlagEffectLabel(m)
-	Duel.Draw(tp,ct,REASON_EFFECT)
+function s.drop(e,tp,eg,ep,ev,re,r,rp,chk)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Draw(p,d,REASON_EFFECT)
 end
