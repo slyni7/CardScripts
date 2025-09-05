@@ -1,6 +1,7 @@
 --춘향은 어려서 소중한 이들을 잃구요
 local s,id=GetID()
 function s.initial_effect(c)
+	aux.AddSquareProcedure(c)
 	local e1=MakeEff(c,"STo")
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
@@ -17,6 +18,8 @@ function s.initial_effect(c)
 	WriteEff(e3,3,"O")
 	c:RegisterEffect(e3)
 end
+s.square_mana={ATTRIBUTE_FIRE}
+s.custom_type=CUSTOMTYPE_SQUARE
 s.listed_names={id}
 function s.tfil1(c)
 	return c:ListsCode(id) and c:IsAbleToHand() and c:IsType(TYPE_SPELL)

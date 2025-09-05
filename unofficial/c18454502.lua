@@ -1,6 +1,7 @@
 --춘향신화, 그 찬란한 복수의 완성
 local s,id=GetID()
 function s.initial_effect(c)
+	aux.AddSquareProcedure(c)
 	local e1=MakeEff(c,"I","H")
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	WriteEff(e1,1,"CTO")
@@ -22,6 +23,8 @@ function s.initial_effect(c)
 	WriteEff(e4,4,"O")
 	c:RegisterEffect(e4)
 end
+s.square_mana={ATTRIBUTE_FIRE,ATTRIBUTE_FIRE,ATTRIBUTE_FIRE,ATTRIBUTE_FIRE,ATTRIBUTE_FIRE,ATTRIBUTE_FIRE,ATTRIBUTE_FIRE}
+s.custom_type=CUSTOMTYPE_SQUARE
 s.listed_names={18454503}
 function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
