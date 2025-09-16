@@ -1,10 +1,10 @@
---¶óÀÌÆ®¿¡Æä¸£ ÇÇ³×
+--ë¼ì´íŠ¸ì—í˜ë¥´ í”¼ë„¤
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
 	Xyz.AddProcedure(c,nil,6,2,s.ovfilter,aux.Stringid(id,0),2,s.xyzop)
 	c:EnableReviveLimit()
-	--ÀÌ Ä«µå´Â ¿¢½ÃÁî ¼ÒÈ¯µÈ ÅÏ¿¡´Â ¿¢½ÃÁî ¼ÒÀç·Î ÇÒ ¼ö ¾ø´Ù.
+	--ì´ ì¹´ë“œëŠ” ì—‘ì‹œì¦ˆ ì†Œí™˜ëœ í„´ì—ëŠ” ì—‘ì‹œì¦ˆ ì†Œì¬ë¡œ í•  ìˆ˜ ì—†ë‹¤.
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -12,14 +12,14 @@ function s.initial_effect(c)
 	e0:SetCondition(s.xyzcon)
 	e0:SetValue(1)
 	c:RegisterEffect(e0)
-	--ÆĞÀÇ ¸ó½ºÅÍ 1ÀåÀ» »ó´ë¿¡°Ô º¸¿©ÁÖ°í, º¸¿©ÁØ ¸ó½ºÅÍ¿Í °°Àº Á¾Á· / ¼Ó¼ºÀÇ ¸ó½ºÅÍ 1ÀåÀ» µ¦¿¡¼­ ÆĞ¿¡ ³Ö´Â´Ù. ±× ÈÄ, º¸¿©ÁØ ¸ó½ºÅÍ¸¦ ÁÖÀÎÀÇ µ¦À¸·Î µÇµ¹¸°´Ù.
+	--íŒ¨ì˜ ëª¬ìŠ¤í„° 1ì¥ì„ ìƒëŒ€ì—ê²Œ ë³´ì—¬ì£¼ê³ , ë³´ì—¬ì¤€ ëª¬ìŠ¤í„°ì™€ ê°™ì€ ì†ì„±ì˜ í†µìƒ ì†Œí™˜ ê°€ëŠ¥í•œ ëª¬ìŠ¤í„° 1ì¥ì„ ë±ì—ì„œ íŒ¨ì— ë„£ëŠ”ë‹¤. ê·¸ í›„, ë³´ì—¬ì¤€ ëª¬ìŠ¤í„°ë¥¼ ì£¼ì¸ì˜ ë±ìœ¼ë¡œ ë˜ëŒë¦°ë‹¤.
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_TODECK+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,id)
-	e1:SetCost(aux.dxmcostgen(1,1,nil))
+	e1:SetCost(Cost.DetachFromSelf(1,1,nil))
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1,false,REGISTER_FLAG_DETACH_XMAT)
