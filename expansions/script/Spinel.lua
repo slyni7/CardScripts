@@ -547,6 +547,144 @@ function Duel.RegisterEffect(e,tp,forced,...)
 	dregeff(e,tp,forced,...)
 end
 
+local cgct=Card.GetCardTarget
+local cgfct=Card.GetFirstCardTarget
+local cgctc=Card.GetCardTargetCount
+local cihct=Card.IsHasCardTarget
+
+local dsmc=Duel.SelectMatchingCard
+local dsrg=Duel.SelectReleaseGroup
+local dsrge=Duel.SelectReleaseGroupEx
+local dstr=Duel.SelectTribute
+local dsta=Duel.SelectTarget
+local gfs=Group.FilterSelect
+local gs=Group.Select
+local gsu=Group.SelectUnselect
+local gswse=Group.SelectWithSumEqual
+local gswsg=Group.SelectWithSumGreater
+
+function Spinel.PenumbraBeforeOperation()
+	local ce,cp=Duel.GetChainInfo(0,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER)
+	local cc=ce:GetHandler()
+	if not cc or not cc:IsLocation(0x7e) then
+		cc=Duel.GetFirstMatchingCard(aux.TRUE,cp,LOCATION_EXTRA,0,nil)
+		if not cc then
+			cc=Duel.GetFirstMatchingCard(aux.TRUE,cp,LOCATION_REMOVED,0,nil)
+		end
+		if not cc then
+			cc=Duel.GetFirstMatchingCard(aux.TRUE,cp,LOCATION_GRAVE,0,nil)
+		end
+		if not cc then
+			cc=Duel.GetFirstMatchingCard(aux.TRUE,cp,LOCATION_HAND,0,nil)
+		end
+		if not cc then
+			cc=Duel.GetFirstMatchingCard(aux.TRUE,cp,LOCATION_ONFIELD,0,nil)
+		end
+	end
+	local fg=Duel.GetMatchingGroup(Card.IsFaceup,0,LOCATION_DECK,LOCATION_DECK,nil)
+	if cc then
+		for fc in aux.Next(fg) do
+			fc:RegisterFlagEffect(99000418,0,0,0)
+			cc:SetCardTarget(fc)
+		end
+	end
+	return cc,fg
+end
+function Spinel.PenumbraAfterOperation(cc,fg)
+	if cc then
+		for fc in aux.Next(fg) do
+			fc:ResetFlagEffect(99000418)
+			cc:CancelCardTarget(fc)
+		end
+	end
+end
+
+function Card.GetCardTarget(c)
+	local g=cgct(c)
+	local rg=g:Remove(Card.HasFlagEffect,nil,99000418)
+	return rg
+end
+function Card.GetFirstCardTarget(c)
+	local g=cgct(c)
+	local rg=g:Remove(Card.HasFlagEffect,nil,99000418)
+	if #rg==#g then
+		return cgfct(c)
+	else
+		return rg:GetFirst()
+	end
+end
+function Card.GetCardTargetCount(c)
+	local g=cgct(c)
+	local rg=g:Remove(Card.HasFlagEffect,nil,99000418)
+	return #rg
+end
+function Card.IsHasCardTarget(c,tc)
+	if tc:HasFlagEffect(99000418) then
+		return false
+	end
+	return cihct(c,tc)
+end
+
+function Duel.SelectMatchingCard(...)
+	local cc,fg=Spinel.PenumbraBeforeOperation()
+	local res=dsmc(...)
+	Spinel.PenumbraAfterOperation(cc,fg)
+	return res
+end
+function Duel.SelectReleaseGroup(...)
+	local cc,fg=Spinel.PenumbraBeforeOperation()
+	local res=dsrg(...)
+	Spinel.PenumbraAfterOperation(cc,fg)
+	return res
+end
+function Duel.SelectReleaseGroupEx(...)
+	local cc,fg=Spinel.PenumbraBeforeOperation()
+	local res=dsrge(...)
+	Spinel.PenumbraAfterOperation(cc,fg)
+	return res
+end
+function Duel.SelectTribute(...)
+	local cc,fg=Spinel.PenumbraBeforeOperation()
+	local res=dstr(...)
+	Spinel.PenumbraAfterOperation(cc,fg)
+	return res
+end
+function Duel.SelectTarget(...)
+	local cc,fg=Spinel.PenumbraBeforeOperation()
+	local res=dsta(...)
+	Spinel.PenumbraAfterOperation(cc,fg)
+	return res
+end
+function Group.FilterSelect(...)
+	local cc,fg=Spinel.PenumbraBeforeOperation()
+	local res=gfs(...)
+	Spinel.PenumbraAfterOperation(cc,fg)
+	return res
+end
+function Group.Select(...)
+	local cc,fg=Spinel.PenumbraBeforeOperation()
+	local res=gs(...)
+	Spinel.PenumbraAfterOperation(cc,fg)
+	return res
+end
+function Group.SelectUnselect(...)
+	local cc,fg=Spinel.PenumbraBeforeOperation()
+	local res=gsu(...)
+	Spinel.PenumbraAfterOperation(cc,fg)
+	return res
+end
+function Group.SelectWithSumEqual(...)
+	local cc,fg=Spinel.PenumbraBeforeOperation()
+	local res=gswse(...)
+	Spinel.PenumbraAfterOperation(cc,fg)
+	return res
+end
+function Group.SelectWithSumGreater(...)
+	local cc,fg=Spinel.PenumbraBeforeOperation()
+	local res=gswsg(...)
+	Spinel.PenumbraAfterOperation(cc,fg)
+	return res
+end
 
 --]]
 --¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á
