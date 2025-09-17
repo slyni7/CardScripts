@@ -593,8 +593,8 @@ end
 function Spinel.PenumbraAfterOperation(cc,fg)
 	if cc then
 		for fc in aux.Next(fg) do
-			fc:ResetFlagEffect(99000418)
 			cc:CancelCardTarget(fc)
+			fc:ResetFlagEffect(99000418)
 		end
 	end
 end
