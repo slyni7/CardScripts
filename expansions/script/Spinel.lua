@@ -547,6 +547,8 @@ function Duel.RegisterEffect(e,tp,forced,...)
 	dregeff(e,tp,forced,...)
 end
 
+--]]
+
 local cgct=Card.GetCardTarget
 local cgfct=Card.GetFirstCardTarget
 local cgctc=Card.GetCardTargetCount
@@ -686,5 +688,4 @@ function Group.SelectWithSumGreater(...)
 	return res
 end
 
---]]
 --¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á
