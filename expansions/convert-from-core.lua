@@ -24,8 +24,3 @@ function Duel.Hint(htype,player,hmsg)
 	end
 	return dhint(htype,player,hmsg)
 end
-if aux.MustMaterialCheck==nil then
-	function Auxiliary.MustMaterialCheck()
-		return true
-	end
-end
