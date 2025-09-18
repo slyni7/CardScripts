@@ -108,8 +108,8 @@ function Auxiliary.OrderCheckGoal(sg,tp,oc,gf,...)
 	return Duel.GetLocationCountFromEx(tp,tp,sg,oc)>0 and (not gf or gf(sg))
 		and sg:IsExists(Auxiliary.OrderStartFilter,1,nil,sg,tp,table.unpack(f))
 end
-function Auxiliary.OrderCheckFilter(c,sg,f)
-	return c and sg:IsContains(c) and (not f or f(c))
+function Auxiliary.OrderCheckFilter(c,sg,f,oc,tp)
+	return c and sg:IsContains(c) and (not f or f(c,oc,SUMMON_TYPE_ORDER,tp))
 end
 function Auxiliary.OrderStartFilter(c,sg,tp,...)
 	local f={...}
@@ -120,9 +120,9 @@ function Auxiliary.OrderStartFilter(c,sg,tp,...)
 	for i=0,#f-1 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_MZONE,seq+i)
 		local ec=(seq+i)&1>0 and Duel.GetFieldCard(tp,LOCATION_MZONE,(seq+i+9)/2)
-		if not (aux.OrderCheckFilter(tc,sg,f[i+1])
-			or aux.OrderCheckFilter(ec,sg,f[i+1])) then
-		return false
+		if not (aux.OrderCheckFilter(tc,sg,f[i+1],c,tp)
+			or aux.OrderCheckFilter(ec,sg,f[i+1],c,tp)) then
+			return false
 		end
 	end
 	return true
