@@ -1,10 +1,10 @@
---°ÌÈ­ÀÇ ÆÄ±«ÀÚ
+--ê²í™”ì˜ íŒŒê´´ìž
 local s,id=GetID()
 function s.initial_effect(c)
 	--Synchro Summon procedure
 	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),1,99)
 	c:EnableReviveLimit()
-	--ÇÊµåÀÇ ¸ó½ºÅÍ 1ÀåÀ» ´ë»óÀ¸·Î ÇÏ°í ¹ßµ¿ÇÒ ¼ö ÀÖ´Ù. ±× ¸ó½ºÅÍ¸¦ ÆÄ±«ÇÑ´Ù.
+	--í•„ë“œì˜ ëª¬ìŠ¤í„° 1ìž¥ì„ ëŒ€ìƒìœ¼ë¡œ í•˜ê³  ë°œë™í•  ìˆ˜ ìžˆë‹¤. ê·¸ ëª¬ìŠ¤í„°ë¥¼ íŒŒê´´í•œë‹¤.
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DESTROY)
@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.destg)
 	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
-	--ÀÌ Ä«µå¸¦ Æ÷ÇÔÇÏ´Â ÀÚ½Å ÇÊµåÀÇ ¸ó½ºÅÍ¸¦ ¿À´õ ¼ÒÀç·Î¼­ ¿À´õ ¼ÒÈ¯ÇÑ´Ù.
+	--ì´ ì¹´ë“œë¥¼ í¬í•¨í•˜ëŠ” ìžì‹  í•„ë“œì˜ ëª¬ìŠ¤í„°ë¥¼ ì†Œìž¬ë¡œì„œ ì˜¤ë” ì†Œí™˜ì„ ì‹¤í–‰í•œë‹¤.
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -43,23 +43,38 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
+function s.op2(e,tp,oc,mg)
+	local c=e:GetHandler()
+	if c:IsControler(tp) and c:GetSequence()>5 and c:IsLocation(LOCATION_MZONE) then
+		return Group.FromCards(c)
+	else
+		return nil
+	end
+end
+function s.val2(e,tp,mc,oc)
+	local seq=c:GetSequence()
+	return 2*seq-9
+end
 function s.ordertg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then
-		local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetCode(EFFECT_MUST_BE_OMATERIAL)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetTargetRange(1,0)
-		e:GetHandler():RegisterEffect(e1,true)
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_SINGLE)
+		c:RegisterEffect(e1,true)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_FIELD)
 		e2:SetCode(EFFECT_EXTRA_ORDER_MATERIAL)
-		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e2:SetRange(LOCATION_EMZONE)
-		e2:SetValue(aux.TRUE)
-		e:GetHandler():RegisterEffect(e2,true)
-		local res=Duel.IsExistingMatchingCard(Card.IsOrderSummonable,tp,LOCATION_EXTRA,0,1,nil,e:GetHandler())
+		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
+		e2:SetTargetRange(1,0)
+		e2:SetOperation(s.op2)
+		e2:SetValue(s.val2)
+		c:RegisterEffect(e2,true)
+		local res=Duel.IsExistingMatchingCard(Card.IsOrderSummonable,tp,LOCATION_EXTRA,0,1,nil,c)
 		e1:Reset()
 		e2:Reset()
 		return res
@@ -78,12 +93,14 @@ function s.orderop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e1,true)
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_EXTRA_ORDER_MATERIAL)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_EMZONE)
-	e2:SetValue(aux.TRUE)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e2:SetTargetRange(1,0)
+	e2:SetOperation(s.op2)
+	e2:SetValue(s.val2)
 	c:RegisterEffect(e2,true)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sc=Duel.SelectMatchingCard(tp,Card.IsOrderSummonable,tp,LOCATION_EXTRA,0,1,1,nil,c):GetFirst()
