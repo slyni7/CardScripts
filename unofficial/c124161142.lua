@@ -38,14 +38,12 @@ function s.tg1filter(c,e,tp)
 end
 
 function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(s.tg1filter,tp,LOCATION_DECK,0,nil,e,tp)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #g>0 end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,tp,LOCATION_DECK)
 end
 
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(s.tg1filter,tp,LOCATION_DECK,0,nil,e,tp)
 	if #g>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then  
 		local sg=aux.SelectUnselectGroup(g,e,tp,1,1,aux.TRUE,1,tp,HINTMSG_SPSUMMON)
@@ -74,6 +72,7 @@ function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EFFECT_ADD_TYPE)
 		e1:SetValue(TYPE_TUNER)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
@@ -89,6 +88,7 @@ function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetCode(EFFECT_CHANGE_CODE)
 	e3:SetValue(124161139)
 	e3:SetReset(RESET_EVENT+RESETS_STANDARD)
@@ -100,5 +100,4 @@ function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	e4:SetValue(LOCATION_REMOVED)
 	e4:SetReset(RESET_EVENT+RESETS_REDIRECT)
 	c:RegisterEffect(e4)
-	
 end
