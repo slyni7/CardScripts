@@ -33,7 +33,7 @@ function s.con1filter(c,tp)
 end
 
 function s.con1(e,tp,eg)
-	return eg:IsExists(s.con1filter,1,nil,tp)
+	return eg:FilterCount(s.con1filter,nil,tp)>0
 end
 
 function s.tg1filter(c,e,tp)
@@ -55,7 +55,6 @@ function s.op1filter(c)
 end
 
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local tg=Duel.GetTargetCards(e):GetFirst()
 	if tg and Duel.Remove(tg,POS_FACEUP,REASON_EFFECT)>0 and Duel.Draw(tp,1,REASON_EFFECT)>0 then
 		local g=Duel.GetMatchingGroup(s.op1filter,tp,LOCATION_REMOVED,0,nil)
@@ -73,7 +72,7 @@ function s.con2filter(c,tp)
 end
 
 function s.con2(e,tp,eg,ep,ev,re,r,rp)
-	return eg and not eg:IsContains(e:GetHandler()) and eg:IsExists(s.con2filter,1,nil,tp)
+	return eg and not eg:IsContains(e:GetHandler()) and eg:FilterCount(s.con2filter,nil,tp)>0
 end
 
 function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk)

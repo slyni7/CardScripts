@@ -29,7 +29,7 @@ end
 
 --effect 1
 function s.tg1filter(c,e,tp)
-	return c:IsSetCard(0xf2b) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xf2b) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 
 function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -57,7 +57,7 @@ function s.con2filter(c,tp)
 end
 
 function s.con2(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.con2filter,1,nil,tp)
+	return eg:FilterCount(s.con2filter,nil,tp)>0
 end
 
 function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk)

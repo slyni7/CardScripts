@@ -35,7 +35,7 @@ end
 
 --effect 1
 function s.tg1filter(c,e,tp)
-	return c:IsSetCard(0xf24) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xf24) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 
 function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -74,12 +74,11 @@ function s.con2filter(c)
 end
 
 function s.con2(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.con2filter,1,nil)
+	return eg:FilterCount(s.con2filter,nil)>0
 end
 
 function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsCanBeEffectTarget(e) end
-	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(Card.IsCanBeEffectTarget,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler(),e)
 	if chk==0 then return #g>0 end
 	local sg=aux.SelectUnselectGroup(g,e,tp,1,1,aux.TRUE,1,tp,HINTMSG_DESTROY)
@@ -88,7 +87,6 @@ function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 
 function s.op2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local tg=Duel.GetTargetCards(e):GetFirst()
 	if tg then
 		Duel.Destroy(tg,REASON_EFFECT)

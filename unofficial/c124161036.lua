@@ -23,12 +23,6 @@ function s.initial_effect(c)
 end
 
 --effect 1
-function s.cst1(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToGraveAsCost() end
-	Duel.SendtoGrave(c,REASON_COST)
-end
-
 function s.tg1filter(c,e)
 	return c:IsCanBeEffectTarget(e) and c:IsFacedown()
 end
@@ -44,7 +38,7 @@ function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 
 function s.op1filter(c,e,tp)
-	return c:IsSetCard(0xf22) and c:IsMonster() and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xf22) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 
 function s.op1(e,tp,eg,ep,ev,re,r,rp)

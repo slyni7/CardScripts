@@ -85,7 +85,7 @@ function s.con2filter(c,tp)
 end
 
 function s.con2(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.con2filter,1,nil,tp)
+	return eg:FilterCount(s.con2filter,nil,tp)>0
 end
 
 function s.tg2filter(c,e)
@@ -102,7 +102,6 @@ function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 
 function s.op2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local tg=Duel.GetTargetCards(e):GetFirst()
 	if tg then
 		Duel.Remove(tg,POS_FACEUP,REASON_EFFECT)

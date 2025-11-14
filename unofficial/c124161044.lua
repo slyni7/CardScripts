@@ -23,11 +23,11 @@ end
 
 --effect 1
 function s.tg1ifilter(c) 
-	return c:IsMonster() and c:IsSetCard(0xf22) and c:IsFaceup()
+	return c:IsSetCard(0xf22) and c:IsFaceup()
 end
 
 function s.tg1ofilter(c)
-	return c:IsFaceup() and c:IsMonster() and c:IsCanTurnSet() and c:IsStatus(STATUS_SPSUMMON_TURN)
+	return c:IsFaceup() and c:IsCanTurnSet() and c:IsStatus(STATUS_SPSUMMON_TURN)
 end
 
 function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -82,7 +82,7 @@ function s.con2filter(c,tp)
 end
 
 function s.con2(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.con2filter,1,nil,tp)
+	return eg:FilterCount(s.con2filter,nil,tp)>0
 end
 
 function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
