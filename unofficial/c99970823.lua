@@ -25,7 +25,7 @@ end
 
 --1
 function s.tar1fil(c,e,tp)
-	return c:IsSetCard(0x5d6e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x5d6e) and c:IsLevel(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.tar1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
