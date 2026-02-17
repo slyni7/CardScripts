@@ -248,7 +248,6 @@ Duel.PayLPCost=function(tp,val)
 	if Duel.IsPlayerAffectedByEffect(tp,99000264) then
 		if paylp(tp,val)~=0 then
 			Duel.RaiseEvent(Group.CreateGroup(c),EVENT_CUSTOM+99000264,e,0,tp,tp,0)
-			Debug.Message("RaiseEvent fired4")
 			return 0
 		end
 	else
@@ -260,7 +259,6 @@ Duel.SetLP=function(tp,val)
 	if Duel.IsPlayerAffectedByEffect(tp,99000264) and Duel.GetLP(tp)~=val then
 		if setlp(tp,val)~=0 then
 			Duel.RaiseEvent(Group.CreateGroup(c),EVENT_CUSTOM+99000264,e,0,tp,tp,0)
-			Debug.Message("RaiseEvent fired4")
 			return 0
 		end
 	else
