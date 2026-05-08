@@ -46,7 +46,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if sc and Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)>0 then
 		sc:NegateEffects(e:GetHandler())
 		Duel.BreakEffect()
-		local fusion_params={matfilter=Fusion.OnFieldMat,extrafil=s.fextra(tc,sc)}
+		local fusion_params={matfilter=Fusion.OnFieldMat,extrafil=s.fextra(tc),exactcount=2,gc=Group.FromCards(tc,sc)}
 		local b1=Fusion.SummonEffTG(fusion_params)(e,tp,eg,ep,ev,re,r,rp,0)
 		local b2=sc:IsAbleToGrave()
 		local op=Duel.SelectEffect(tp,
@@ -59,13 +59,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function s.fextra(tc,sc)
+function s.fextra(tc)
 	return  function(e,tp,mg)
-				return Group.FromCards(tc),s.fcheck(tc,sc)
-			end
-end
-function s.fcheck(tc,sc)
-	return  function(tp,sg,fc)
-				return #sg==2 and sg:IsContains(tc) and sg:IsContains(sc)
+				return Group.FromCards(tc)
 			end
 end
