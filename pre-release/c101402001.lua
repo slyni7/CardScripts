@@ -38,6 +38,9 @@ function s.initial_effect(c)
 	end)
 end
 s.listed_names={CARD_DARK_TIME_WIZARD,id}
+function s.spcostfilter(c,e,tp)
+	return Duel.GetMZoneCount(tp,c)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,c,e,tp)
+end
 function s.spfilter(c,e,tp)
 	return c:ListsCode(CARD_DARK_TIME_WIZARD) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
@@ -47,14 +50,13 @@ end
 function s.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	--● Special Summon 1 monster that mentions "Dark Time Wizard" from your hand or Deck, except "Swift Panther Warrior"
-	local b1=Duel.CheckReleaseGroupCost(tp,nil,1,true,aux.ReleaseCheckMMZ,c)
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp)
+	local b1=Duel.CheckReleaseGroupCost(tp,s.spcostfilter,1,true,nil,c,e,tp)
 	--● Send 1 Spell/Trap that mentions "Dark Time Wizard" from your Deck to the GY
 	local b2=Duel.CheckReleaseGroupCost(tp,nil,1,true,nil,c)
 		and Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil)
 	if chk==0 then return b1 or b2 end
-	local func=not b2 and aux.ReleaseCheckMMZ or nil
-	local g=Duel.SelectReleaseGroupCost(tp,nil,1,1,true,func,c)
+	local filter_func=not b2 and s.spcostfilter or nil
+	local g=Duel.SelectReleaseGroupCost(tp,filter_func,1,1,true,nil,c,e,tp)
 	Duel.Release(g,REASON_COST)
 end
 function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -62,7 +62,7 @@ s.listed_names={CARD_REDEYES_B_DRAGON,CARD_DARK_TIME_WIZARD,id}
 s.material={CARD_REDEYES_B_DRAGON}
 s.material_setcode={SET_RED_EYES}
 function s.selfspcostfilter(c,tp,fc)
-	return c:IsReleasable() and c:IsFaceup() and c:IsCanBeFusionMaterial(fc,SUMMON_TYPE_SPECIAL+1,tp)
+	return c:IsReleasable() and c:IsFaceup() and c:IsCanBeFusionMaterial(fc,MATERIAL_FUSION,tp)
 		and Duel.GetLocationCountFromEx(tp,tp,c,fc)>0
 end
 function s.selfspcon(e,c)
@@ -95,7 +95,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetTargetRange(1,0)
-	e1:SetTarget(function(e,c,sump,sumtype) return c:IsOriginalCode(id) and (sumtype&SUMMON_TYPE_FUSION==SUMMON_TYPE_FUSION or sumtype&SUMMON_TYPE_SPECIAL+1==SUMMON_TYPE_SPECIAL+1) end)
+	e1:SetTarget(function(e,c,sump,sumtype) return c:IsOriginalCodeRule(id) and (sumtype&SUMMON_TYPE_FUSION==SUMMON_TYPE_FUSION or sumtype&SUMMON_TYPE_SPECIAL+1==SUMMON_TYPE_SPECIAL+1) end)
 	e1:SetReset(RESET_PHASE|PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
