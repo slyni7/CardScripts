@@ -69,11 +69,7 @@ s.listed_series={0x111}
 s.LVnum=10
 s.LVset=0x111
 function s.regcon(e,tp,eg,ep,ev,re,r,rp)
-	if not re then return false end
-	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0x111)
-end
-function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,2))
+	return re and re:IsCardType(TYPE_MONSTER) and re:IsCardSetcode(SET_ARMED_DRAGON)
 end
 function s.atkcon(atk)
 	return function(e,tp,eg,ep,ev,re,r,rp)

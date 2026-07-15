@@ -1,5 +1,5 @@
 --混絶獄神ヴィードリウム
---Vidrium the Power Patron of Chaos Extermination
+--Vidolium the Unstable Power Patron of Unity
 --scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -53,7 +53,9 @@ function s.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e4:SetCode(EFFECT_IMMUNE_EFFECT)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetValue(function(e,te) return te:IsMonsterEffect() and not te:GetOwner():IsSetCard(SET_POWER_PATRON) end)
+	e4:SetValue(function(e,te)
+		return te:IsMonsterEffect() and not te:IsCardSetcode(SET_POWER_PATRON)
+	end)
 	c:RegisterEffect(e4)
 end
 s.listed_series={SET_POWER_PATRON}

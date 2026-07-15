@@ -120,33 +120,37 @@ if not c946 then
 	c946.initial_effect=function()end
 end
 
+Card.IsCompositeType = Card.IsExactType
 
-
-Card.IsMonster=aux.FilterBoolFunction(Card.IsType,TYPE_MONSTER)
-Card.IsSpell=aux.FilterBoolFunction(Card.IsType,TYPE_SPELL)
-Card.IsTrap=aux.FilterBoolFunction(Card.IsType,TYPE_TRAP)
-Card.IsSpellTrap=aux.FilterBoolFunction(Card.IsType,TYPE_SPELL|TYPE_TRAP)
-
-local function make_exact_type_check(type)
-	return aux.FilterBoolFunction(Card.IsExactType,type)
+function Card.IsExactType(c,typ,...)
+	return c:GetType(...)==typ
 end
 
-Card.IsQuickPlaySpell=make_exact_type_check(TYPE_SPELL|TYPE_QUICKPLAY)
-Card.IsContinuousSpell=make_exact_type_check(TYPE_SPELL|TYPE_CONTINUOUS)
-Card.IsEquipSpell=make_exact_type_check(TYPE_SPELL|TYPE_EQUIP)
-Card.IsFieldSpell=make_exact_type_check(TYPE_SPELL|TYPE_FIELD)
-Card.IsRitualSpell=make_exact_type_check(TYPE_SPELL|TYPE_RITUAL)
-Card.IsLinkSpell=make_exact_type_check(TYPE_SPELL|TYPE_LINK)
+Card.IsMonster   = aux.FilterBoolFunction(Card.IsType,TYPE_MONSTER)
+Card.IsSpell     = aux.FilterBoolFunction(Card.IsType,TYPE_SPELL)
+Card.IsTrap      = aux.FilterBoolFunction(Card.IsType,TYPE_TRAP)
+Card.IsSpellTrap = aux.FilterBoolFunction(Card.IsType,TYPE_SPELL|TYPE_TRAP)
 
-Card.IsContinuousTrap=make_exact_type_check(TYPE_TRAP|TYPE_CONTINUOUS)
-Card.IsCounterTrap=make_exact_type_check(TYPE_TRAP|TYPE_COUNTER)
+local function make_composite_type_check(type)
+	return aux.FilterBoolFunction(Card.IsCompositeType,type)
+end
 
-Card.IsFusionMonster=make_exact_type_check(TYPE_MONSTER|TYPE_FUSION)
-Card.IsRitualMonster=make_exact_type_check(TYPE_MONSTER|TYPE_RITUAL)
-Card.IsSynchroMonster=make_exact_type_check(TYPE_MONSTER|TYPE_SYNCHRO)
-Card.IsXyzMonster=make_exact_type_check(TYPE_MONSTER|TYPE_XYZ)
-Card.IsPendulumMonster=make_exact_type_check(TYPE_MONSTER|TYPE_PENDULUM)
-Card.IsLinkMonster=make_exact_type_check(TYPE_MONSTER|TYPE_LINK)
+Card.IsQuickPlaySpell  = make_composite_type_check(TYPE_SPELL|TYPE_QUICKPLAY)
+Card.IsContinuousSpell = make_composite_type_check(TYPE_SPELL|TYPE_CONTINUOUS)
+Card.IsEquipSpell      = make_composite_type_check(TYPE_SPELL|TYPE_EQUIP)
+Card.IsFieldSpell      = make_composite_type_check(TYPE_SPELL|TYPE_FIELD)
+Card.IsRitualSpell     = make_composite_type_check(TYPE_SPELL|TYPE_RITUAL)
+Card.IsLinkSpell       = make_composite_type_check(TYPE_SPELL|TYPE_LINK)
+
+Card.IsContinuousTrap  = make_composite_type_check(TYPE_TRAP|TYPE_CONTINUOUS)
+Card.IsCounterTrap     = make_composite_type_check(TYPE_TRAP|TYPE_COUNTER)
+
+Card.IsFusionMonster   = make_composite_type_check(TYPE_MONSTER|TYPE_FUSION)
+Card.IsRitualMonster   = make_composite_type_check(TYPE_MONSTER|TYPE_RITUAL)
+Card.IsSynchroMonster  = make_composite_type_check(TYPE_MONSTER|TYPE_SYNCHRO)
+Card.IsXyzMonster      = make_composite_type_check(TYPE_MONSTER|TYPE_XYZ)
+Card.IsPendulumMonster = make_composite_type_check(TYPE_MONSTER|TYPE_PENDULUM)
+Card.IsLinkMonster     = make_composite_type_check(TYPE_MONSTER|TYPE_LINK)
 
 function Card.IsNormalSpell(c)
 	return c:GetType()==TYPE_SPELL
@@ -234,8 +238,11 @@ function Card.IsPreviousRankOnField(c,rank)
 	return c:HasRank() and c:GetPreviousRankOnField()==rank
 end
 
-function Card.IsScale(c,scale)
-	return c:GetScale()==scale
+function Card.IsScale(c,...)
+	for _,scale in ipairs({...}) do
+		if c:GetScale()==scale then return true end
+	end
+	return false
 end
 
 function Card.IsNormalSummoned(c)
@@ -790,6 +797,10 @@ end
 
 function Effect.IsSpellTrapEffect(e)
 	return e:IsActiveType(TYPE_SPELL|TYPE_TRAP)
+end
+
+function Effect.IsGlobalEffect(e)
+	return e:GetOwner():IsCode(0)
 end
 
 
@@ -1583,8 +1594,52 @@ function Cost.DetachFromSelf(min,max,op)
 		local min_count=min_type=="function" and min(e,tp) or min
 		local max_count=max_type=="function" and max(e,tp) or max
 		if chk==0 then return min_count>0 and max_count>=min_count and c:CheckRemoveOverlayCard(tp,min_count,REASON_COST) end
-		if c:RemoveOverlayCard(tp,min_count,max_count,REASON_COST)>0 and op then
-			op(e,Duel.GetOperatedGroup())
+		if c:RemoveOverlayCard(tp,min_count,max_count,REASON_COST)>0 then
+			local cd=e:GetChainData()
+			cd.cost_detached_materials=Duel.GetOperatedGroup()
+			if op then
+				op(e,cd.cost_detached_materials)
+			end
+		end
+	end
+
+	cost_tables.detach[cost_func]=true
+	return cost_func
+end
+
+function Cost.DetachChoiceFromSelf(choices,op)
+	local choices_type=type(choices)
+
+	do --Perform some sanity checks, simplifies debugging
+		if choices_type~="table" and choices_type~="function" then
+			error("Parameter 1 should be table|function",2)
+		end
+		local op_type=type(op)
+		if op_type~="nil" and op_type~="function" then
+			error("Parameter 2 should be nil|function",2)
+		end
+	end
+
+	local function cost_func(e,tp,eg,ep,ev,re,r,rp,chk)
+		local c=e:GetHandler()
+		local final_choices={}
+		for _,ct in ipairs(choices_type=="function" and choices(e,tp) or choices) do
+			if c:CheckRemoveOverlayCard(tp,ct,REASON_COST) then
+				table.insert(final_choices,ct)
+			end
+		end
+		if chk==0 then return #final_choices>0 end
+		local amt=final_choices[1]
+		if #final_choices>1 then
+			--Duel.Hint(HINT_SELECTMSG,tp,) --needs global string
+			amt=Duel.AnnounceNumber(tp,final_choices)
+		end
+		if c:RemoveOverlayCard(tp,amt,amt,REASON_COST)>0 then
+			local cd=e:GetChainData()
+			cd.cost_detached_materials=Duel.GetOperatedGroup()
+			if op then
+				op(e,cd.cost_detached_materials)
+			end
 		end
 	end
 
@@ -1729,9 +1784,9 @@ function Cost.Choice(...)
 
         if chk==0 then return has_choice end
 
-        local op=Duel.SelectEffect(tp,table.unpack(ops))
-        choices[op][1](e,tp,eg,ep,ev,re,r,rp,1)
-        e:SetLabel(op)
+        local cd=e:GetChainData()
+        cd.cost_choice=Duel.SelectEffect(tp,table.unpack(ops))
+        choices[cd.cost_choice][1](e,tp,eg,ep,ev,re,r,rp,1)
     end
 
 	for _,t in pairs(cost_tables) do
@@ -2561,7 +2616,12 @@ function Auxiliary.ToHandOrElse(card,player,check,oper,str,...)
 		end
 		if opt==0 then
 			local res=Duel.SendtoHand(card,nil,REASON_EFFECT)
-			if res~=0 then Duel.ConfirmCards(1-player,card) end
+			if res>0 then
+				local og=Duel.GetOperatedGroup():Filter(Card.IsPreviousLocation,nil,LOCATION_DECK)
+				if #og>0 then
+					Duel.ConfirmCards(1-player,og)
+				end
+			end
 			return res
 		else
 			return oper(card,...)
@@ -2785,12 +2845,17 @@ end
 		int|nil hint: a string to show on the affected cards
 		int|nil effect_desc: a string to be used as the description of the delayed effect (useful when the same effect registers multiple different delayed effects)
 --]]
+local delayed_operation_id=0
 function Auxiliary.DelayedOperation(card_or_group,phase,flag,e,tp,oper,cond,reset,reset_count,hint,effect_desc)
 	local g=(type(card_or_group)=="Group" and card_or_group or Group.FromCards(card_or_group))
 	if #g==0 then return end
+
 	reset=reset or (RESET_PHASE|phase)
 	reset_count=reset_count or 1
-	local fid=e:GetFieldID()
+
+	delayed_operation_id=delayed_operation_id+1
+	local fid=delayed_operation_id
+
 	local function agfilter(c,lbl) return c:GetFlagEffectLabel(flag)==lbl end
 	local function get_affected_group(e) return e:GetLabelObject():Filter(agfilter,nil,e:GetLabel()) end
 
@@ -2820,7 +2885,6 @@ function Auxiliary.DelayedOperation(card_or_group,phase,flag,e,tp,oper,cond,rese
 	for tc in g:Iter() do
 		tc:RegisterFlagEffect(flag,RESET_EVENT+RESETS_STANDARD,flagprop,1,fid,hint):SetCondition(flagcond)
 	end
-	g:KeepAlive()
 
 	return e1
 end
@@ -2883,6 +2947,7 @@ function Auxiliary.DefaultFieldReturnOp(rg)
 end
 
 Duel.LoadScript("debug_utility.lua")
+Duel.LoadScript("chain.lua")
 Duel.LoadScript("cards_specific_functions.lua")
 Duel.LoadScript("proc_fusion.lua")
 Duel.LoadScript("proc_fusion_spell.lua")
