@@ -275,6 +275,204 @@ local PestilenceTable = {
 }
 RegEff.scref(CARD_PESTILENCE,0,PestilenceTable[0])
 RegEff.scref(CARD_PESTILENCE,1,PestilenceTable[1])
+if Blockchain then return end
+Blockchain={SET=0x6d72,ASTRA=99971088,INTERCONNECTION=99971089,INVERSION=99971090,
+	TOSSED_FLAG=99971100,MZONE_FLAG=99971101}
+local B=Blockchain
+B.contexts={}
+B.chains={}
+
+function B.IsSetCard(c)
+	return c:IsSetCard(B.SET)
+end
+
+function B.Init(c)
+	if B.initialized then return end
+	B.initialized=true
+	local ce=Effect.CreateEffect(c)
+	ce:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	ce:SetCode(EVENT_CHAINING)
+	ce:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+		if not re then return end
+		local rc=re:GetHandler()
+		local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
+		B.chains[ev]={effect=re,card=rc,player=rp,
+			field_id=rc:GetFieldID(),chain_id=Duel.GetChainInfo(ev,CHAININFO_CHAIN_ID)}
+		if loc and loc&LOCATION_MZONE~=0 then
+			rc:RegisterFlagEffect(B.MZONE_FLAG,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,0,1)
+		end
+		-- Only the immediately following link is a response to this effect.
+		for _,ctx in pairs(B.contexts) do
+			if ev==ctx.index+1 and rp~=ctx.player then
+				ctx.responded=true
+				ctx.response_effect=re
+				ctx.response_card=rc
+				ctx.response_field_id=rc:GetFieldID()
+			end
+		end
+	end)
+	Duel.RegisterEffect(ce,0)
+	local ee=Effect.CreateEffect(c)
+	ee:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	ee:SetCode(EVENT_CHAIN_END)
+	ee:SetOperation(function() B.contexts={} B.chains={} end)
+	Duel.RegisterEffect(ee,0)
+	local te=Effect.CreateEffect(c)
+	te:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	te:SetCode(EVENT_TOSS_COIN)
+	te:SetOperation(function(e,tp,eg,ep)
+		Duel.RegisterFlagEffect(ep,B.TOSSED_FLAG,RESET_PHASE|PHASE_END,0,1)
+	end)
+	Duel.RegisterEffect(te,0)
+end
+
+-- Call only in the performed target callback (chk~=0), never in feasibility.
+-- The engine has already appended this link before paying costs/choosing targets.
+function B.Track(e,tp)
+	local n=Duel.GetCurrentChain()
+	local ctx={index=n,player=tp,responded=false}
+	if n>1 then
+		local pe,pp=Duel.GetChainInfo(n-1,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER)
+		if pe and pp~=tp then
+			ctx.previous_effect=pe
+			ctx.previous_index=n-1
+			ctx.previous_card=pe:GetHandler()
+			ctx.previous_chain_id=Duel.GetChainInfo(n-1,CHAININFO_CHAIN_ID)
+		end
+	end
+	B.contexts[e]=ctx
+	return ctx
+end
+
+function B.Context(e)
+	return B.contexts[e] or {responded=false}
+end
+
+function B.EffectChainIndex(re)
+	if not re then return nil end
+	for n=Duel.GetCurrentChain(),1,-1 do
+		if Duel.GetChainInfo(n,CHAININFO_TRIGGERING_EFFECT)==re then return n end
+	end
+	return nil
+end
+
+function B.HasTossed(tp)
+	return Duel.GetFlagEffect(tp,B.TOSSED_FLAG)>0
+end
+
+function B.ActivatedInMzone(c)
+	return c:GetFlagEffect(B.MZONE_FLAG)>0
+end
+
+function B.SetInverted(tp)
+	if Duel.GetFlagEffect(tp,B.INVERSION)==0 then
+		Duel.RegisterFlagEffect(tp,B.INVERSION,RESET_PHASE|PHASE_END,0,1)
+	end
+end
+
+function B.Toss(e,tp)
+	-- Astra uses the native coin-negate event, so other official coin modifiers
+	-- participate normally and every toss/re-toss is visible to the engine.
+	local result=Duel.TossCoin(tp,1)
+	if Duel.GetFlagEffect(tp,B.INVERSION)>0 then
+		return result==COIN_HEADS and COIN_TAILS or COIN_HEADS
+	end
+	return result
+end
+
+-- Core Release discards Deck cards and cannot release hand S/T by effect.
+-- The user's explicit broader release rule therefore uses SendTo with the native
+-- REASON_RELEASE bit for those locations. SendTo emits native EVENT_RELEASE.
+-- This preserves send replacement/redirection, but does not execute the core's
+-- separate EFFECT_RELEASE_REPLACE stage for a custom or mixed release batch.
+-- Every selected card in a mixed batch moves together and shares EVENT_RELEASE.
+function B.CustomRelease(c)
+	return c:IsLocation(LOCATION_DECK) or (c:IsLocation(LOCATION_HAND) and c:IsSpellTrap())
+end
+
+function B.CanRelease(c,e,tp,reason)
+	reason=reason or REASON_EFFECT
+	if not c:IsLocation(LOCATION_HAND|LOCATION_ONFIELD|LOCATION_DECK)
+		or not Duel.IsPlayerCanRelease(tp,c,reason)
+		or c:IsHasEffect(EFFECT_UNRELEASABLE_NONSUM) then return false end
+	if reason&REASON_COST~=0 and c:IsHasEffect(EFFECT_CANNOT_USE_AS_COST) then return false end
+	if reason&REASON_EFFECT~=0 then
+		if c:IsImmuneToEffect(e) then return false end
+		for _,ue in ipairs({c:IsHasEffect(EFFECT_UNRELEASABLE_EFFECT)}) do
+			local val=ue:GetValue()
+			if (type(val)=="function" and val(ue,e,tp,c)) or (type(val)~="function" and val~=0) then return false end
+		end
+	end
+	if B.CustomRelease(c) then return c:IsAbleToGrave() end
+	if reason&REASON_EFFECT~=0 then return c:IsReleasableByEffect(e,tp) end
+	return c:IsReleasable(reason,tp)
+end
+
+function B.Release(cards,reason,tp)
+	local g=cards
+	if not cards.Filter then g=Group.FromCards(cards) end
+	if not g:IsExists(B.CustomRelease,1,nil) then return Duel.Release(g,reason,tp) end
+	-- The active engine reason effect is also correct inside a nested continuous
+	-- operation; the top chain's triggering effect would not necessarily be.
+	local re=Duel.GetReasonEffect()
+	local legal=g:Filter(B.CanRelease,nil,re,tp,reason)
+	if #legal==0 then return 0 end
+	return Duel.SendtoGrave(legal,reason|REASON_RELEASE,nil,tp)
+end
+
+function B.HandFieldReleaseFilter(c,e,tp,reason)
+	return (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and B.CanRelease(c,e,tp,reason)
+end
+
+function B.AddCoinQuick(c,id,op,category,descindex,check)
+	B.Init(c)
+	local e=Effect.CreateEffect(c)
+	e:SetDescription(aux.Stringid(id,descindex or 1))
+	e:SetCategory((category or 0)|CATEGORY_COIN)
+	e:SetType(EFFECT_TYPE_QUICK_O)
+	e:SetCode(EVENT_FREE_CHAIN)
+	e:SetRange(LOCATION_MZONE)
+	e:SetCountLimit(1,{id,1})
+	e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk)
+		if chk==0 then return not check or check(e,tp) end
+		B.Track(e,tp)
+	end)
+	e:SetOperation(op)
+	c:RegisterEffect(e)
+	return e
+end
+
+function B.ReleasedRitualFilter(c,e,tp)
+	return c:IsSetCard(B.SET) and c:IsType(TYPE_RITUAL) and c:IsMonster()
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true)
+end
+
+function B.AddReleasedRitual(c,id,descindex)
+	B.Init(c)
+	local e=Effect.CreateEffect(c)
+	e:SetDescription(aux.Stringid(id,descindex or 2))
+	e:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
+	e:SetProperty(EFFECT_FLAG_DELAY)
+	e:SetCode(EVENT_RELEASE)
+	e:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk)
+		if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+			and Duel.IsExistingMatchingCard(B.ReleasedRitualFilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,e:GetHandler(),e,tp) end
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_GRAVE)
+	end)
+	e:SetOperation(function(e,tp)
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local g=Duel.SelectMatchingCard(tp,B.ReleasedRitualFilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,1,e:GetHandler(),e,tp)
+		local sc=g:GetFirst()
+		if sc then
+			sc:SetMaterial(nil)
+			if Duel.SpecialSummon(sc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)>0 then sc:CompleteProcedure() end
+		end
+	end)
+	c:RegisterEffect(e)
+	return e
+end
 
 --세로열 그룹
 function YuL.SelectColumnGroupFilter(c,num,tp)
